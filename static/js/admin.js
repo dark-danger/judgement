@@ -927,6 +927,139 @@ async function saveEventEdits() {
   }
 }
 
+// -------------------------------------------------------------
+// COMBINED 4-EVENT CHAMPIONSHIP HANDLERS
+// -------------------------------------------------------------
+async function openChampionshipModal() {
+  document.getElementById('championshipModal').classList.add('active');
+  const tbody = document.getElementById('championshipTableBody');
+  const podiumContainer = document.getElementById('podiumCardsContainer');
+
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">Loading Combined Championship Scores...</td></tr>';
+  podiumContainer.innerHTML = '';
+
+  try {
+    const res = await fetch('/api/championship');
+    const data = await res.json();
+
+    if (data.success && data.championship) {
+      renderChampionshipUI(data.championship);
+    } else {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #f87171;">Failed to load championship scores</td></tr>';
+    }
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #f87171;">Connection error loading championship</td></tr>';
+  }
+}
+
+function closeChampionshipModal() {
+  document.getElementById('championshipModal').classList.remove('active');
+}
+
+function renderChampionshipUI(list) {
+  const tbody = document.getElementById('championshipTableBody');
+  const podiumContainer = document.getElementById('podiumCardsContainer');
+
+  tbody.innerHTML = '';
+  podiumContainer.innerHTML = '';
+
+  // Render Top 3 Podium Cards
+  const top3 = list.slice(0, 3);
+  const podiumColors = [
+    { title: '🏆 1st Champion', bg: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(0,0,0,0.6))', border: '#fbbf24', text: '#fbbf24' },
+    { title: '🥈 1st Runner Up', bg: 'linear-gradient(135deg, rgba(226, 232, 240, 0.15), rgba(0,0,0,0.6))', border: '#cbd5e1', text: '#f1f5f9' },
+    { title: '🥉 2nd Runner Up', bg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(0,0,0,0.6))', border: '#f97316', text: '#fdba74' }
+  ];
+
+  top3.forEach((item, idx) => {
+    const conf = podiumColors[idx];
+    const card = document.createElement('div');
+    card.style.background = conf.bg;
+    card.style.border = `1px solid ${conf.border}`;
+    card.style.borderRadius = 'var(--radius-md)';
+    card.style.padding = '1rem';
+    card.style.display = 'flex';
+    card.style.flexDirection = 'column';
+    card.style.justifyContent = 'space-between';
+
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span style="font-weight: 800; font-size: 0.85rem; color: ${conf.text}; text-transform: uppercase;">${conf.title}</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.5); padding: 0.15rem 0.45rem; border-radius: 4px; color: ${conf.text};">#${idx + 1}</span>
+      </div>
+      <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 0.4rem; line-height: 1.3;">
+        ${escapeHtml(item.school)}
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid var(--border-glass); padding-top: 0.4rem; margin-top: 0.4rem;">
+        <span>Combined Score:</span>
+        <strong style="color: ${conf.text}; font-size: 0.9rem;">${item.total_score > 0 ? item.total_score + ' pts' : 'Pending'}</strong>
+      </div>
+    `;
+    podiumContainer.appendChild(card);
+  });
+
+  // Render Full Table
+  list.forEach((item, idx) => {
+    const isTop10 = idx < 10;
+    let standing = 'Participant';
+    let rowBg = 'transparent';
+
+    if (idx === 0 && item.total_score > 0) {
+      standing = '🏆 1st Champion';
+      rowBg = 'rgba(251, 191, 36, 0.1)';
+    } else if (idx === 1 && item.total_score > 0) {
+      standing = '🥈 1st Runner Up';
+      rowBg = 'rgba(226, 232, 240, 0.07)';
+    } else if (idx === 2 && item.total_score > 0) {
+      standing = '🥉 2nd Runner Up';
+      rowBg = 'rgba(249, 115, 22, 0.08)';
+    } else if (isTop10 && item.total_score > 0) {
+      standing = `⭐ Top 10 (#${idx + 1})`;
+      rowBg = 'rgba(0, 229, 255, 0.04)';
+    }
+
+    const tr = document.createElement('tr');
+    tr.style.background = rowBg;
+    tr.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
+
+    tr.innerHTML = `
+      <td style="padding: 0.65rem 0.5rem; text-align: center; font-weight: 800; color: ${isTop10 ? '#fbbf24' : 'var(--text-dim)'}; font-family: var(--font-mono);">
+        #${idx + 1}
+      </td>
+      <td style="padding: 0.65rem 0.75rem; font-weight: ${isTop10 ? '700' : '500'}; color: #fff;">
+        ${escapeHtml(item.school)}
+        ${item.room !== '-' ? `<span style="font-size: 0.72rem; color: var(--text-dim); margin-left: 0.4rem;">[${escapeHtml(item.room)}]</span>` : ''}
+      </td>
+      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.dance)}</td>
+      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.song)}</td>
+      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.declamation)}</td>
+      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.science)}</td>
+      <td style="padding: 0.65rem 0.6rem; text-align: center; font-weight: 800; color: ${item.total_score > 0 ? '#fbbf24' : 'var(--text-dim)'}; font-size: 0.9rem;">
+        ${item.total_score > 0 ? item.total_score : '-'}
+      </td>
+      <td style="padding: 0.65rem 0.6rem; text-align: center; font-size: 0.78rem; font-weight: 700; color: ${isTop10 ? '#34d399' : 'var(--text-dim)'};">
+        ${standing}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function syncFinalResultSheetNow() {
+  try {
+    showToast('Syncing all 4 events & Final Result tab to Google Sheet...', 'info');
+    const res = await fetch('/api/sync-all-sheets', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('⚡ Google Sheet all 5 tabs (4 categories + Final Result) updated successfully!', 'success');
+    } else {
+      showToast('Sync completed with warnings', 'info');
+    }
+  } catch (e) {
+    showToast('Failed to trigger sync', 'error');
+  }
+}
+
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -950,4 +1083,5 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
 

@@ -41,12 +41,158 @@ class SheetsService:
         return None
 
     def trigger_background_sync(self, event_id):
-        """Spawns non-blocking background thread to update connected Google Sheet"""
-        thread = threading.Thread(target=self.auto_sync_event, args=(event_id,), daemon=True)
+        """Spawns non-blocking background thread to update connected Google Sheet and Final Result tab"""
+        def _sync_worker():
+            self.auto_sync_event(event_id)
+            self.sync_final_championship()
+
+        thread = threading.Thread(target=_sync_worker, daemon=True)
         thread.start()
 
+    def calculate_championship_data(self):
+        """Calculates 4-event combined score leaderboard across all 58 schools"""
+        try:
+            from create_excel import schools_data
+            from database import db
+
+            all_scores = db.get_scores()
+
+            def get_tag_avg(event_id, tag_no):
+                if not tag_no:
+                    return None, "-"
+                tag_scores = [s for s in all_scores if s.get("event_id") == event_id and s.get("tag_no") == tag_no]
+                if not tag_scores:
+                    return 0, f"{tag_no} (Pending)"
+                totals = [s.get("total", 0) for s in tag_scores]
+                avg = round(sum(totals) / len(totals), 2)
+                return avg, f"{tag_no} ({avg})"
+
+            results = []
+            for row in schools_data:
+                school = row[0]
+                room = row[9] or "-"
+
+                dance_tag = row[2] if row[1] == "YES" else ""
+                song_tag = row[4] if row[3] == "YES" else ""
+                dec_tag = row[6] if row[5] == "YES" else ""
+                sci_tag = row[8] if row[7] == "YES" else ""
+
+                d_avg, d_str = get_tag_avg("evt-group-dance", dance_tag)
+                s_avg, s_str = get_tag_avg("evt-group-song", song_tag)
+                dc_avg, dc_str = get_tag_avg("evt-declamation", dec_tag)
+                se_avg, se_str = get_tag_avg("evt-science-exhibition", sci_tag)
+
+                scored_vals = [v for v in [d_avg, s_avg, dc_avg, se_avg] if v is not None and v > 0]
+                total_score = round(sum(scored_vals), 2)
+                events_done = len(scored_vals)
+                overall_avg = round(total_score / events_done, 2) if events_done > 0 else 0
+
+                results.append({
+                    "school": school,
+                    "room": room,
+                    "dance": d_str,
+                    "dance_score": d_avg or 0,
+                    "song": s_str,
+                    "song_score": s_avg or 0,
+                    "declamation": dc_str,
+                    "declamation_score": dc_avg or 0,
+                    "science": se_str,
+                    "science_score": se_avg or 0,
+                    "total_score": total_score,
+                    "overall_avg": overall_avg,
+                    "events_done": events_done
+                })
+
+            results.sort(key=lambda x: (x["total_score"], x["overall_avg"]), reverse=True)
+            return results
+        except Exception as e:
+            logger.error(f"Error calculating championship data: {e}")
+            return []
+
+    def sync_final_championship(self, webhook_url=None):
+        """Pushes the combined 4-event Top 10 Championship results to Google Sheet 'Final Result' tab"""
+        try:
+            from database import db
+            championship_list = self.calculate_championship_data()
+            if not championship_list:
+                return False, "No data available"
+
+            events = db.get_events()
+            webhook = webhook_url
+            if not webhook and events:
+                webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
+
+            headers = [
+                "Rank",
+                "School Name",
+                "Room / Flat",
+                "Group Dance (/100)",
+                "Group Song (/100)",
+                "Declamation (/100)",
+                "Science Exhibition (/100)",
+                "Combined Total (/400)",
+                "Combined Average (/100)",
+                "Events Scored",
+                "Standing / Award",
+                "Last Updated"
+            ]
+
+            final_rows = [headers]
+            for idx, r in enumerate(championship_list, start=1):
+                if idx == 1 and r["total_score"] > 0:
+                    standing = "🏆 1st Place - Champion (Gold)"
+                elif idx == 2 and r["total_score"] > 0:
+                    standing = "🥈 2nd Place - 1st Runner Up (Silver)"
+                elif idx == 3 and r["total_score"] > 0:
+                    standing = "🥉 3rd Place - 2nd Runner Up (Bronze)"
+                elif idx <= 10 and r["total_score"] > 0:
+                    standing = f"⭐ Top 10 Finalist Trophy (#{idx})"
+                elif r["total_score"] > 0:
+                    standing = f"Position #{idx}"
+                else:
+                    standing = "Pending Evaluation"
+
+                rank_str = f"#{idx}" if r["total_score"] > 0 else "-"
+                row = [
+                    rank_str,
+                    r["school"],
+                    r["room"],
+                    r["dance"],
+                    r["song"],
+                    r["declamation"],
+                    r["science"],
+                    r["total_score"] if r["total_score"] > 0 else "-",
+                    r["overall_avg"] if r["overall_avg"] > 0 else "-",
+                    f"{r['events_done']}/4",
+                    standing,
+                    datetime.now().strftime("%I:%M %p")
+                ]
+                final_rows.append(row)
+
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.post(
+                    webhook,
+                    json={
+                        "event_name": "Agrash Overall Championship",
+                        "tab_name": "Final Result",
+                        "rows": final_rows,
+                        "timestamp": datetime.now().isoformat()
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=25,
+                    allow_redirects=True
+                )
+                logger.info(f"⚡ [Final Result Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, "Final Result tab synced successfully"
+
+            return False, "No webhook configured"
+        except Exception as e:
+            logger.error(f"Error syncing final championship: {e}")
+            return False, str(e)
+
     def sync_all_events(self):
-        """Syncs all registered events to their respective tabs in Google Sheet"""
+        """Syncs all registered events and Final Result to their respective tabs in Google Sheet"""
         try:
             from database import db
             events = db.get_events()
@@ -54,6 +200,10 @@ class SheetsService:
             for ev in events:
                 ok, msg = self.auto_sync_event(ev["id"])
                 results[ev["name"]] = {"success": ok, "message": msg}
+            
+            # Sync Final Combined Result as well
+            ok_fin, msg_fin = self.sync_final_championship()
+            results["Final Result"] = {"success": ok_fin, "message": msg_fin}
             return True, results
         except Exception as e:
             logger.error(f"Error in sync_all_events: {e}")
@@ -147,7 +297,7 @@ class SheetsService:
                             "timestamp": datetime.now().isoformat()
                         },
                         headers={"Content-Type": "application/json"},
-                        timeout=10,
+                        timeout=25,
                         allow_redirects=True
                     )
                     logger.info(f"⚡ [Google Sheet Webhook] Auto-updated successfully! Status: {resp.status_code}")

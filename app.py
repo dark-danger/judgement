@@ -208,6 +208,18 @@ def update_event(event_id):
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/championship", methods=["GET"])
+def get_championship_leaderboard():
+    try:
+        data = sheets_service.calculate_championship_data()
+        return jsonify({
+            "success": True,
+            "championship": data,
+            "top10": data[:10] if data else []
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/api/sync-all-sheets", methods=["POST"])
 def sync_all_sheets_route():
     try:
@@ -215,6 +227,7 @@ def sync_all_sheets_route():
         return jsonify({"success": ok, "details": res})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.route("/api/events/<event_id>", methods=["DELETE"])
 def delete_event(event_id):
