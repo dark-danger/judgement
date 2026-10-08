@@ -312,28 +312,32 @@ class DB:
 
         return True
 
-    def update_sequence(self, event_id, new_sequence, current_index=None):
+    def update_sequence(self, event_id, new_sequence, current_index=0):
         event = self.get_event(event_id)
         if not event:
             return None
         event["sequence"] = new_sequence
-        if current_index is not None:
-            event["current_index"] = max(0, min(current_index, len(new_sequence) - 1)) if new_sequence else 0
+        event["current_index"] = 0
         event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
         return self.update_event(event["id"], event)
 
     def set_current_tag(self, event_id, target_index):
+        """Brings the selected tag to the top of the queue (index 0) so it becomes live on stage"""
         event = self.get_event(event_id)
-        if not event:
+        if not event or not event.get("sequence"):
             return None
-        if 0 <= target_index < len(event["sequence"]):
-            event["current_index"] = target_index
+        seq = list(event["sequence"])
+        if 0 <= target_index < len(seq):
+            item = seq.pop(target_index)
+            seq.insert(0, item)
+            event["sequence"] = seq
+            event["current_index"] = 0
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
             return self.update_event(event["id"], event)
         return None
 
     def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None):
-        """Marks a tag as completed, stores in completed_tags history, and removes from active sequence"""
+        """Marks tag as completed, removes it from sequence, and top of queue (index 0) becomes new stage team"""
         event = self.get_event(event_id)
         if not event:
             return None, "Event not found"
@@ -344,17 +348,14 @@ class DB:
 
         completed_list = list(event.get("completed_tags", []))
 
-        idx_to_remove = None
-        if tag_index is not None and 0 <= tag_index < len(seq):
-            idx_to_remove = tag_index
-        elif tag_no:
+        idx_to_remove = 0
+        if tag_no:
             for i, item in enumerate(seq):
-                if item["tag_no"] == tag_no:
+                if item.get("tag_no") == tag_no:
                     idx_to_remove = i
                     break
-
-        if idx_to_remove is None:
-            idx_to_remove = event.get("current_index", 0)
+        elif tag_index is not None and 0 <= tag_index < len(seq):
+            idx_to_remove = tag_index
 
         if 0 <= idx_to_remove < len(seq):
             removed_item = seq.pop(idx_to_remove)
@@ -363,11 +364,12 @@ class DB:
             
             event["sequence"] = seq
             event["completed_tags"] = completed_list
-            event["current_index"] = max(0, min(idx_to_remove, len(seq) - 1)) if seq else 0
+            event["current_index"] = 0
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
 
             updated = self.update_event(event["id"], event)
-            return updated, f"Tag '{removed_item['tag_no']}' completed and removed from queue"
+            new_stage_tag = seq[0]["tag_no"] if seq else "None (Queue Finished)"
+            return updated, f"Tag '{removed_item['tag_no']}' completed. Next on stage: '{new_stage_tag}'"
         
         return None, "Could not find tag to complete"
 

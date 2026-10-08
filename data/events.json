@@ -61,10 +61,6 @@
     ],
     "sequence": [
       {
-        "tag_no": "DC-21",
-        "notes": "Declamation • Delhi Public School DPS Kathua (Room: F-501)"
-      },
-      {
         "tag_no": "SE-21",
         "notes": "Science Exhibition • Delhi Public School DPS Kathua (Room: F-501)"
       },
@@ -634,7 +630,7 @@
       }
     ],
     "current_index": 0,
-    "next_transition_time": 1791474778.5112221,
+    "next_transition_time": 1791475083.441344,
     "transition_seconds": 120,
     "google_sheet_url": "",
     "completed_tags": [
@@ -642,6 +638,11 @@
         "tag_no": "D-21",
         "notes": "Group Dance • Delhi Public School DPS Kathua (Room: F-501)",
         "completed_at": "09:20 PM"
+      },
+      {
+        "tag_no": "DC-21",
+        "notes": "Declamation • Delhi Public School DPS Kathua (Room: F-501)",
+        "completed_at": "09:26 PM"
       }
     ]
   },

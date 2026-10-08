@@ -346,7 +346,7 @@ function renderMatrixTable() {
   const rowsData = allTags.map((tagNo, seqIdx) => {
     const tagScores = currentScoresData.filter(s => s.tag_no === tagNo);
     const isCompleted = (currentEventData.completed_tags || []).some(c => c.tag_no === tagNo);
-    const isCurrent = currentEventData.sequence[currentEventData.current_index] && currentEventData.sequence[currentEventData.current_index].tag_no === tagNo;
+    const isCurrent = currentEventData.sequence.length > 0 && currentEventData.sequence[0].tag_no === tagNo;
 
     let judgeScores = [];
     let sum = 0;

@@ -27,7 +27,7 @@ async function loadSequenceData() {
       if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Sequence</span>`;
       
       const badge = document.getElementById('totalTagsBadge');
-      if (badge) badge.textContent = `${currentEvent.sequence.length} Active in Queue`;
+      if (badge) badge.textContent = `${currentEvent.sequence.length} Teams in Queue`;
       
       const sideCurrent = document.getElementById('sidebarCurrentTag');
       if (sideCurrent) sideCurrent.textContent = data.current_tag || 'Queue Finished';
@@ -35,7 +35,7 @@ async function loadSequenceData() {
       const sideNext = document.getElementById('sidebarNextTag');
       if (sideNext) sideNext.textContent = data.next_tag || 'None';
 
-      renderSequenceList(currentEvent.sequence, data.current_index);
+      renderSequenceList(currentEvent.sequence);
       renderCompletedList(data.completed_tags || []);
     }
   } catch (err) {
@@ -43,17 +43,17 @@ async function loadSequenceData() {
   }
 }
 
-function renderSequenceList(sequence, currentIndex) {
+function renderSequenceList(sequence) {
   const container = document.getElementById('sequenceList');
   if (!container) return;
 
   if (!sequence || sequence.length === 0) {
     container.innerHTML = `
       <div class="current-team-card" style="text-align: center; padding: 3rem;">
-        <i data-lucide="check-circle-2" style="width: 48px; height: 48px; color: #10b981; margin: 0 auto 0.75rem auto;"></i>
-        <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff;">All Teams Completed!</h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.35rem;">
-          The active queue is empty. You can add more tags on the right or restore from Completed History.
+        <i data-lucide="check-circle-2" style="width: 52px; height: 52px; color: #10b981; margin: 0 auto 0.75rem auto;"></i>
+        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; color: #fff;">All Teams Completed!</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+          The active queue is empty. You can add more tags below or restore completed teams.
         </p>
       </div>
     `;
@@ -62,55 +62,48 @@ function renderSequenceList(sequence, currentIndex) {
   }
 
   container.innerHTML = sequence.map((item, idx) => {
-    const isCurrent = idx === currentIndex;
-    const isNext = idx === currentIndex + 1;
+    const isStage = (idx === 0);
+    const isNext = (idx === 1);
 
     return `
-      <div class="sequence-item ${isCurrent ? 'is-current' : ''} ${isNext ? 'is-next' : ''}" id="seq-item-${idx}">
+      <div class="sequence-item ${isStage ? 'is-current' : ''} ${isNext ? 'is-next' : ''}" id="seq-item-${idx}" style="${isStage ? 'border: 2px solid #ff2a4b; background: linear-gradient(135deg, rgba(255,42,75,0.18), rgba(4,6,10,0.9)); box-shadow: 0 0 25px rgba(255,42,75,0.3);' : ''}">
         <div class="item-left">
-          <span class="seq-order-badge">#${idx + 1}</span>
+          <span class="seq-order-badge" style="${isStage ? 'background: #ff2a4b; color: #fff; font-weight: 900;' : ''}">#${idx + 1}</span>
           <div>
-            <div class="seq-tag-name">${escapeHtml(item.tag_no)}</div>
-            <div style="display: flex; gap: 0.45rem; margin-top: 0.25rem;">
-              ${isCurrent ? '<span class="badge badge-live"><span class="dot-pulse"></span> LIVE ON STAGE</span>' : ''}
-              ${isNext ? '<span class="badge badge-next">NEXT UP</span>' : ''}
+            <div class="seq-tag-name" style="${isStage ? 'font-size: 1.45rem; color: #fff; text-shadow: 0 0 15px rgba(255,42,75,0.5);' : ''}">
+              ${escapeHtml(item.tag_no)}
+            </div>
+            ${item.notes ? `<div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem;">${escapeHtml(item.notes)}</div>` : ''}
+            <div style="display: flex; gap: 0.45rem; margin-top: 0.3rem;">
+              ${isStage ? '<span class="badge badge-live" style="font-size: 0.78rem; padding: 0.2rem 0.6rem;"><span class="dot-pulse"></span> LIVE ON STAGE</span>' : ''}
+              ${isNext ? '<span class="badge badge-next" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">NEXT UP</span>' : ''}
             </div>
           </div>
         </div>
 
         <div class="item-actions">
-          <!-- Complete & Remove Tag Button -->
-          <button class="btn btn-sm btn-emerald" onclick="completeTagAction(${idx}, '${escapeHtml(item.tag_no)}')" title="Mark presentation completed and remove from queue">
-            <i data-lucide="check-check"></i> Complete & Remove
-          </button>
-
-          <!-- Set to Stage Button -->
-          ${!isCurrent ? `
-            <button class="btn btn-sm btn-secondary" onclick="setCurrentStage(${idx})" title="Set as live on stage">
-              <i data-lucide="crosshair"></i> Set On Stage
+          <!-- Complete & Remove Button -->
+          ${isStage ? `
+            <button class="btn btn-emerald btn-md" onclick="completeTagAction(0, '${escapeHtml(item.tag_no)}')" title="Complete presentation & bring next team to stage">
+              <i data-lucide="check-check"></i> Complete & Next
             </button>
           ` : `
-            <span class="badge badge-live" style="font-size: 0.75rem;"><span class="dot-pulse"></span> ON STAGE</span>
+            <button class="btn btn-sm btn-ghost" onclick="completeTagAction(${idx}, '${escapeHtml(item.tag_no)}')" title="Remove this tag from queue" style="color: #f87171;">
+              <i data-lucide="trash-2"></i> Remove
+            </button>
+            <button class="btn btn-sm btn-cyan" onclick="bringToStageAction(${idx})" title="Bring this team to #1 Live on Stage">
+              <i data-lucide="chevrons-up"></i> Bring to Stage
+            </button>
           `}
 
-          <!-- Move to Top (Aga) -->
-          <button class="btn-icon" onclick="moveTagToTop(${idx})" title="Rush to Front (Aga)" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
-            <i data-lucide="chevrons-up"></i>
-          </button>
-
           <!-- Move Up (Uppar) -->
-          <button class="btn-icon" onclick="moveTagUp(${idx})" title="Move Up (Uppar)" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
+          <button class="btn-icon" onclick="moveTagUp(${idx})" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.25;"' : ''}>
             <i data-lucide="chevron-up"></i>
           </button>
 
           <!-- Move Down (Nicha) -->
-          <button class="btn-icon" onclick="moveTagDown(${idx})" title="Move Down (Nicha)" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
+          <button class="btn-icon" onclick="moveTagDown(${idx})" title="Move Down" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>
             <i data-lucide="chevron-down"></i>
-          </button>
-
-          <!-- Move to Bottom (Picha) -->
-          <button class="btn-icon" onclick="moveTagToBottom(${idx})" title="Send to End (Picha)" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
-            <i data-lucide="chevrons-down"></i>
           </button>
         </div>
       </div>
@@ -128,17 +121,17 @@ function renderCompletedList(completedTags) {
   if (countBadge) countBadge.textContent = `${completedTags.length} Completed`;
 
   if (!completedTags || completedTags.length === 0) {
-    container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.82rem; padding: 0.5rem 0;">No completed tags yet.</div>`;
+    container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.82rem; padding: 0.5rem 0;">No completed teams yet.</div>`;
     return;
   }
 
-  container.innerHTML = completedTags.map(item => `
+  container.innerHTML = completedTags.slice(-15).reverse().map(item => `
     <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
       <div>
         <strong style="color: #34d399; font-family: var(--font-heading); font-size: 0.95rem;">${escapeHtml(item.tag_no)}</strong>
-        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 0.5rem;">Done at ${item.completed_at || 'Just now'}</span>
+        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 0.5rem;">Completed at ${item.completed_at || 'Just now'}</span>
       </div>
-      <button class="btn btn-ghost btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="restoreTagAction('${escapeHtml(item.tag_no)}')" title="Restore back to active queue">
+      <button class="btn btn-ghost btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="restoreTagAction('${escapeHtml(item.tag_no)}')" title="Restore back to bottom of active queue">
         <i data-lucide="rotate-ccw"></i> Restore
       </button>
     </div>
@@ -147,7 +140,7 @@ function renderCompletedList(completedTags) {
   if (window.lucide) lucide.createIcons();
 }
 
-// Complete and Remove Tag
+// Complete and Remove Tag (Instant Top Pop)
 async function completeTagAction(idx, tagNo) {
   const targetId = getActiveEventId();
   try {
@@ -158,10 +151,10 @@ async function completeTagAction(idx, tagNo) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`✓ Tag '${tagNo}' completed & removed from queue!`, 'success');
+      showToast(`✓ Completed '${tagNo}'! Next team is now live on stage.`, 'success');
       loadSequenceData();
     } else {
-      showToast(`Error: ${data.error || 'Failed to complete tag'}`, 'error');
+      showToast(`Notice: ${data.error || 'Could not complete tag'}`, 'error');
     }
   } catch (e) {
     showToast('Failed to complete tag', 'error');
@@ -171,12 +164,32 @@ async function completeTagAction(idx, tagNo) {
 // Complete Current Active Stage Tag
 async function completeCurrentActiveTag() {
   if (!currentEvent || !currentEvent.sequence || currentEvent.sequence.length === 0) {
-    showToast('No active tag in queue to complete!', 'info');
+    showToast('No active teams in queue!', 'info');
     return;
   }
-  const currIdx = currentEvent.current_index || 0;
-  const tagNo = currentEvent.sequence[currIdx] ? currentEvent.sequence[currIdx].tag_no : currentEvent.sequence[0].tag_no;
-  await completeTagAction(currIdx, tagNo);
+  const topTag = currentEvent.sequence[0].tag_no;
+  await completeTagAction(0, topTag);
+}
+
+// Bring Tag directly to Stage (#1 in queue)
+async function bringToStageAction(idx) {
+  const targetId = getActiveEventId();
+  try {
+    const res = await fetch(`/api/events/${targetId}/current-tag`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index: idx })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Brought '${currentEvent.sequence[idx].tag_no}' to Stage!`, 'success');
+      loadSequenceData();
+    } else {
+      showToast(`Notice: ${data.error || 'Could not bring to stage'}`, 'error');
+    }
+  } catch (e) {
+    showToast('Failed to update stage', 'error');
+  }
 }
 
 // Restore Tag
@@ -193,14 +206,14 @@ async function restoreTagAction(tagNo) {
       showToast(`Tag '${tagNo}' restored to queue!`, 'success');
       loadSequenceData();
     } else {
-      showToast(`Error: ${data.error || 'Failed to restore tag'}`, 'error');
+      showToast(`Notice: ${data.error || 'Failed to restore tag'}`, 'error');
     }
   } catch (e) {
     showToast('Failed to restore tag', 'error');
   }
 }
 
-// Sequence Order Shift (Uppar, Nicha, Aga, Picha)
+// Sequence Order Shift (Uppar, Nicha)
 async function moveTagUp(idx) {
   if (idx <= 0 || !currentEvent) return;
   const seq = [...currentEvent.sequence];
@@ -219,45 +232,8 @@ async function moveTagDown(idx) {
   await saveSequenceToServer(seq);
 }
 
-async function moveTagToTop(idx) {
-  if (idx <= 0 || !currentEvent) return;
-  const seq = [...currentEvent.sequence];
-  const [item] = seq.splice(idx, 1);
-  seq.unshift(item);
-  await saveSequenceToServer(seq);
-}
-
-async function moveTagToBottom(idx) {
-  if (!currentEvent || idx >= currentEvent.sequence.length - 1) return;
-  const seq = [...currentEvent.sequence];
-  const [item] = seq.splice(idx, 1);
-  seq.push(item);
-  await saveSequenceToServer(seq);
-}
-
-async function setCurrentStage(idx) {
-  const targetId = getActiveEventId();
-  try {
-    const res = await fetch(`/api/events/${targetId}/current-tag`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: idx })
-    });
-    const data = await res.json();
-    if (data.success) {
-      const tagText = (currentEvent && currentEvent.sequence[idx]) ? currentEvent.sequence[idx].tag_no : `Slot #${idx+1}`;
-      showToast(`Set '${tagText}' as live on stage!`, 'success');
-      loadSequenceData();
-    } else {
-      showToast(`Error: ${data.error || 'Failed to set on stage'}`, 'error');
-    }
-  } catch (e) {
-    showToast('Failed to set on stage', 'error');
-  }
-}
-
 async function trigger2MinNotice() {
-  if (!currentEvent) return;
+  if (!currentEvent || !currentEvent.sequence || currentEvent.sequence.length === 0) return;
   await saveSequenceToServer(currentEvent.sequence);
   showToast('2-Minute transition notice triggered on all Judge screens!', 'success');
 }
@@ -268,10 +244,10 @@ async function addNewTag(e) {
   const val = input.value.trim();
   if (!val || !currentEvent) return;
 
-  const seq = [...currentEvent.sequence, { tag_no: val, notes: '' }];
+  const seq = [...currentEvent.sequence, { tag_no: val, notes: 'Added by Stage Coordinator' }];
   input.value = '';
   await saveSequenceToServer(seq);
-  showToast(`Added '${val}' to sequence!`, 'success');
+  showToast(`Added '${val}' to sequence queue!`, 'success');
 }
 
 async function saveSequenceToServer(newSequence) {
@@ -282,17 +258,17 @@ async function saveSequenceToServer(newSequence) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sequence: newSequence,
-        current_index: currentEvent ? currentEvent.current_index : 0
+        current_index: 0
       })
     });
     const data = await res.json();
     if (data.success) {
       currentEvent = data.event;
-      renderSequenceList(currentEvent.sequence, currentEvent.current_index);
+      renderSequenceList(currentEvent.sequence);
       const sideCurrent = document.getElementById('sidebarCurrentTag');
-      if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[currentEvent.current_index] || {}).tag_no || 'Queue Finished';
+      if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[0] || {}).tag_no || 'Queue Finished';
       const sideNext = document.getElementById('sidebarNextTag');
-      if (sideNext) sideNext.textContent = (currentEvent.sequence[currentEvent.current_index + 1] || {}).tag_no || 'None';
+      if (sideNext) sideNext.textContent = (currentEvent.sequence[1] || {}).tag_no || 'None';
     }
   } catch (err) {
     showToast('Failed to save sequence', 'error');

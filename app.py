@@ -103,9 +103,8 @@ def get_single_event(event_id):
         return jsonify({"success": False, "error": "Event not found"}), 404
     
     seq = event.get("sequence", [])
-    curr_idx = event.get("current_index", 0)
-    current_tag = seq[curr_idx]["tag_no"] if 0 <= curr_idx < len(seq) else None
-    next_tag = seq[curr_idx + 1]["tag_no"] if 0 <= curr_idx + 1 < len(seq) else None
+    current_tag = seq[0]["tag_no"] if len(seq) > 0 else None
+    next_tag = seq[1]["tag_no"] if len(seq) > 1 else None
 
     remaining_secs = 0
     if event.get("next_transition_time"):
@@ -116,7 +115,7 @@ def get_single_event(event_id):
         "event": event,
         "current_tag": current_tag,
         "next_tag": next_tag,
-        "current_index": curr_idx,
+        "current_index": 0,
         "completed_tags": event.get("completed_tags", []),
         "remaining_transition_seconds": remaining_secs
     })
