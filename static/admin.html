@@ -181,6 +181,35 @@
           </div>
         </div>
 
+        <!-- Link 4: Registration Desk Portal Link -->
+        <div style="background: rgba(0,0,0,0.55); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+              <strong style="color: #34d399; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                <i data-lucide="clipboard-check"></i> 4. Registration Desk (5 Desks)
+              </strong>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.68rem; padding: 0.15rem 0.5rem;">Front Desk</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">Volunteers mark schools & teams Present/Absent with instant G-Sheet sync.</p>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="regLinkInput" readonly style="flex-grow: 1; font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.45rem 0.65rem; border-radius: 6px; color: #34d399;">
+            <button class="btn btn-emerald btn-sm" onclick="copyLink('regLinkInput')" title="Copy Link">
+              <i data-lucide="copy"></i>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openQrModal('Registration Desk Portal', document.getElementById('regLinkInput').value)" title="Show QR Code">
+              <i data-lucide="qr-code"></i>
+            </button>
+            <a href="#" id="shareRegWhatsApp" target="_blank" class="btn btn-emerald btn-sm" title="Share via WhatsApp">
+              <i data-lucide="share-2"></i>
+            </a>
+            <a href="/registration" id="openRegLinkBtn" target="_blank" class="btn btn-emerald btn-sm" title="Open Registration Desk">
+              <i data-lucide="external-link"></i> Open Desk
+            </a>
+          </div>
+        </div>
+
       </div>
     </section>
 

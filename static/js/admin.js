@@ -274,6 +274,7 @@ function updateShareableLinks() {
   const judgeLink = `${base}/judge/${currentEventData.id}`;
   const seqLink = `${base}/sequence/${currentEventData.id}`;
   const projLink = `${base}/projector/${currentEventData.id}`;
+  const regLink = `${base}/registration`;
 
   // 1. Judge Link
   document.getElementById('judgeLinkInput').value = judgeLink;
@@ -288,6 +289,16 @@ function updateShareableLinks() {
   // 3. Projector Link
   document.getElementById('projLinkInput').value = projLink;
   document.getElementById('openProjLinkBtn').href = projLink;
+
+  // 4. Registration Desk Link
+  const regInput = document.getElementById('regLinkInput');
+  if (regInput) {
+    regInput.value = regLink;
+    const openRegBtn = document.getElementById('openRegLinkBtn');
+    if (openRegBtn) openRegBtn.href = regLink;
+    const shareRegWa = document.getElementById('shareRegWhatsApp');
+    if (shareRegWa) shareRegWa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Agrash 5-Desk Registration Portal Link: ${regLink}`)}`;
+  }
 }
 
 function openQrModal(title, url) {

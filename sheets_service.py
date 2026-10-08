@@ -191,8 +191,103 @@ class SheetsService:
             logger.error(f"Error syncing final championship: {e}")
             return False, str(e)
 
+    def trigger_master_registration_sync(self):
+        """Spawns background thread to update Master Registrations tab in Google Sheet"""
+        thread = threading.Thread(target=self.sync_master_registrations, daemon=True)
+        thread.start()
+
+    def sync_master_registrations(self, webhook_url=None):
+        """Pushes full 58 schools attendance and desk assignment matrix to Google Sheet 'Master Registrations' tab"""
+        try:
+            from registration_service import registration_service
+            from database import db
+
+            schools = registration_service.get_all()
+            if not schools:
+                return False, "No registration records"
+
+            events = db.get_events()
+            webhook = webhook_url
+            if not webhook and events:
+                webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
+
+            headers = [
+                "S.No",
+                "School Name",
+                "Assigned Desk",
+                "Room / Flat",
+                "Group Dance",
+                "Group Song",
+                "Declamation",
+                "Science Exhibition",
+                "Arrival Status",
+                "Check-In Time",
+                "Last Updated"
+            ]
+
+            rows = [headers]
+            for s in schools:
+                ev_map = {ev["category"]: ev for ev in s.get("events", [])}
+
+                def fmt_ev(cat):
+                    ev = ev_map.get(cat)
+                    if not ev:
+                        return "-"
+                    tag = ev.get("tag_no", "")
+                    st = ev.get("status", "PENDING")
+                    if st == "PRESENT":
+                        return f"{tag} (✅ PRESENT)"
+                    elif st == "ABSENT":
+                        return f"{tag} (❌ ABSENT)"
+                    return f"{tag} (⏳ PENDING)"
+
+                d_str = fmt_ev("Group Dance")
+                s_str = fmt_ev("Group Song")
+                dc_str = fmt_ev("Declamation")
+                se_str = fmt_ev("Science Exhibition")
+
+                arr_status = "🟢 ARRIVED" if s.get("is_arrived") else "⏳ PENDING"
+                arr_time = s.get("arrived_at") or "-"
+
+                row = [
+                    f"#{s['seq_no']}",
+                    s["school_name"],
+                    f"Desk {s['desk_no']}",
+                    s.get("room_no", "-"),
+                    d_str,
+                    s_str,
+                    dc_str,
+                    se_str,
+                    arr_status,
+                    arr_time,
+                    datetime.now().strftime("%I:%M %p")
+                ]
+                rows.append(row)
+
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.post(
+                    webhook,
+                    json={
+                        "event_name": "Agrash Master Registrations",
+                        "tab_name": "Master Registrations",
+                        "rows": rows,
+                        "timestamp": datetime.now().isoformat()
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=25,
+                    allow_redirects=True
+                )
+                logger.info(f"⚡ [Master Registrations Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, "Master Registrations tab synced successfully"
+
+            return False, "No webhook configured"
+        except Exception as e:
+            logger.error(f"Error syncing master registrations: {e}")
+            return False, str(e)
+
     def sync_all_events(self):
-        """Syncs all registered events and Final Result to their respective tabs in Google Sheet"""
+        """Syncs all registered events, Final Result, and Master Registrations to their respective tabs in Google Sheet"""
         try:
             from database import db
             events = db.get_events()
@@ -200,14 +295,20 @@ class SheetsService:
             for ev in events:
                 ok, msg = self.auto_sync_event(ev["id"])
                 results[ev["name"]] = {"success": ok, "message": msg}
-            
-            # Sync Final Combined Result as well
+
+            # Sync Final Combined Result
             ok_fin, msg_fin = self.sync_final_championship()
             results["Final Result"] = {"success": ok_fin, "message": msg_fin}
+
+            # Sync Master Registrations
+            ok_reg, msg_reg = self.sync_master_registrations()
+            results["Master Registrations"] = {"success": ok_reg, "message": msg_reg}
+
             return True, results
         except Exception as e:
             logger.error(f"Error in sync_all_events: {e}")
             return False, str(e)
+
 
     def auto_sync_event(self, event_id):
         """Automatically pushes live leaderboard and marksheet to connected Google Sheet"""

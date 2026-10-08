@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrash 2026 - Registration Desk Portal</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .desk-nav-pills {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: none;
+    }
+    .desk-nav-pills::-webkit-scrollbar { display: none; }
+
+    .desk-pill {
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .desk-pill:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .desk-pill.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(37, 99, 235, 0.3));
+      border-color: #00e5ff;
+      color: #00e5ff;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+    }
+
+    .school-reg-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .school-reg-card:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .school-reg-card.is-arrived {
+      border-left: 4px solid #10b981;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(15, 23, 42, 0.8));
+    }
+
+    .category-chip-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .cat-tag-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+    .cat-tag-box.status-present {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .cat-tag-box.status-absent {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .btn-att-toggle {
+      flex: 1;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+    .btn-att-present {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .btn-att-present.active {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+    .btn-att-absent {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .btn-att-absent.active {
+      background: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+
+    .stat-pill-box {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow-orb orb-red"></div>
+  <div class="bg-glow-orb orb-blue"></div>
+
+  <div class="app-container" style="max-width: 1300px;">
+    <!-- Top Navigation -->
+    <header class="app-navbar">
+      <a href="/admin" class="nav-brand">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #10b981, #00e5ff);">
+          <i data-lucide="clipboard-check"></i>
+        </div>
+        <div class="brand-title">
+          <h1>Agrash <span>Registration</span></h1>
+          <span class="brand-subtitle">5-Desk Team Check-In & Arrival Portal</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <button class="btn btn-emerald btn-sm" onclick="syncRegistrationGSheet()" title="Push attendance to Google Sheet Master tab">
+          <i data-lucide="refresh-cw"></i> Sync Google Sheet
+        </button>
+        <a href="/admin" class="btn btn-ghost btn-sm">
+          <i data-lucide="arrow-left"></i> Admin Panel
+        </a>
+      </div>
+    </header>
+
+    <!-- Header Stats Banner -->
+    <section class="current-team-card" style="display: flex; flex-direction: column; gap: 1rem; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span class="team-label-tag">Live Check-In Desk</span>
+          <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 900; margin-top: 0.25rem; color: #fff;">
+            School Arrival & Event Attendance
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.15rem;">
+            When a school arrives at your desk, search their name and mark each registered category Present or Absent.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <div class="stat-pill-box">
+            <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Total Checked In</span>
+            <strong id="statArrivedText" style="font-size: 1.25rem; color: #10b981; font-family: var(--font-mono);">0 / 58</strong>
+          </div>
+          <div class="stat-pill-box">
+            <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Arrival Progress</span>
+            <strong id="statPercentText" style="font-size: 1.25rem; color: #00e5ff; font-family: var(--font-mono);">0%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desk Filter Tabs + Search -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          
+          <!-- Desk Tabs -->
+          <div class="desk-nav-pills">
+            <button class="desk-pill active" onclick="selectDeskFilter(null, this)">
+              <i data-lucide="layers"></i> All Desks (58)
+            </button>
+            <button class="desk-pill" onclick="selectDeskFilter(1, this)">
+              <i data-lucide="user-check"></i> Desk 1 (1-12)
+            </button>
+            <button class="desk-pill" onclick="selectDeskFilter(2, this)">
+              <i data-lucide="user-check"></i> Desk 2 (13-24)
+            </button>
+            <button class="desk-pill" onclick="selectDeskFilter(3, this)">
+              <i data-lucide="user-check"></i> Desk 3 (25-36)
+            </button>
+            <button class="desk-pill" onclick="selectDeskFilter(4, this)">
+              <i data-lucide="user-check"></i> Desk 4 (37-47)
+            </button>
+            <button class="desk-pill" onclick="selectDeskFilter(5, this)">
+              <i data-lucide="user-check"></i> Desk 5 (48-58)
+            </button>
+          </div>
+
+          <!-- Instant Search Box -->
+          <div style="position: relative; min-width: 280px; flex-grow: 1; max-width: 400px;">
+            <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-dim);"></i>
+            <input type="text" id="regSearchInput" oninput="onSearchInput(this.value)" placeholder="Search school, Tag (e.g. D-21), or room..." style="width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.25rem; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); color: #fff; font-size: 0.85rem; outline: none;">
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Schools List Container -->
+    <main style="margin-top: 1.5rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <span id="showingCountText" style="font-size: 0.85rem; color: var(--text-dim); font-weight: 600;">
+          Showing 58 Participating Schools
+        </span>
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--text-dim);">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Present
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; margin-left: 0.5rem;"></span> Absent
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; margin-left: 0.5rem;"></span> Pending
+        </div>
+      </div>
+
+      <div id="schoolsGrid" style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Dynamically rendered school cards -->
+      </div>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="/js/registration.js"></script>
+</body>
+</html>

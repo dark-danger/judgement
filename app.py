@@ -51,12 +51,74 @@ def sequence_page(event_id=None):
 def projector_page(event_id=None):
     return send_from_directory(app.static_folder, "projector.html")
 
+@app.route("/registration")
+@app.route("/registration/<desk_id>")
+@app.route("/desk/<desk_id>")
+def registration_page(desk_id=None):
+    return send_from_directory(app.static_folder, "registration.html")
+
 # Static assets fallback
 @app.route("/<path:filename>")
 def serve_static(filename):
     return send_from_directory(app.static_folder, filename)
 
-# --- API Endpoints ---
+# --- Registration API Endpoints ---
+@app.route("/api/registration", methods=["GET"])
+def get_registrations_api():
+    try:
+        from registration_service import registration_service
+        desk_no = request.args.get("desk")
+        query = request.args.get("q", "")
+        data = registration_service.get_all(desk_no=desk_no, query=query)
+        return jsonify({"success": True, "schools": data, "count": len(data)})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/registration/stats", methods=["GET"])
+def get_registration_stats_api():
+    try:
+        from registration_service import registration_service
+        stats = registration_service.get_stats()
+        return jsonify({"success": True, "stats": stats})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/registration/attendance", methods=["POST"])
+def update_attendance_api():
+    try:
+        from registration_service import registration_service
+        data = request.get_json(silent=True) or {}
+        school_id = data.get("school_id")
+        category = data.get("category")
+        tag_no = data.get("tag_no")
+        status = data.get("status", "PRESENT")
+        mark_all = data.get("mark_all", False)
+
+        if not school_id:
+            return jsonify({"success": False, "error": "School ID is required"}), 400
+
+        updated = registration_service.mark_attendance(
+            school_id=school_id,
+            category=category,
+            tag_no=tag_no,
+            status=status,
+            mark_all=mark_all
+        )
+        if not updated:
+            return jsonify({"success": False, "error": "School not found"}), 404
+
+        return jsonify({"success": True, "school": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/registration/sync-sheets", methods=["POST"])
+def sync_registration_sheets_api():
+    try:
+        ok, msg = sheets_service.sync_master_registrations()
+        return jsonify({"success": ok, "message": msg})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.route("/api/network-info", methods=["GET"])
 def get_network_info():
