@@ -303,6 +303,9 @@ def submit_score(event_id):
         remarks=remarks
     )
 
+    # Permanent Google Sheet Real-time Auto-Sync
+    sheets_service.trigger_background_sync(event_id)
+
     return jsonify({"success": True, "score": score_entry})
 
 @app.route("/api/scores/<score_id>", methods=["PUT"])
@@ -315,7 +318,27 @@ def admin_override_score(score_id):
     if not updated:
         return jsonify({"success": False, "error": "Score entry not found"}), 404
 
+    if updated.get("event_id"):
+        sheets_service.trigger_background_sync(updated["event_id"])
+
     return jsonify({"success": True, "score": updated})
+
+@app.route("/api/events/<event_id>/google-sheet-config", methods=["POST"])
+def save_google_sheet_config(event_id):
+    data = request.get_json(silent=True) or {}
+    webhook_url = data.get("google_sheet_webhook_url", "").strip()
+    sheet_url = data.get("google_sheet_url", "").strip()
+
+    update_dict = {}
+    if webhook_url is not None:
+        update_dict["google_sheet_webhook_url"] = webhook_url
+    if sheet_url is not None:
+        update_dict["google_sheet_url"] = sheet_url
+
+    updated = db.update_event(event_id, update_dict)
+    # Trigger test sync
+    sheets_service.trigger_background_sync(event_id)
+    return jsonify({"success": True, "message": "Google Sheet permanent auto-sync configured!", "event": updated})
 
 # --- Google Sheets Integration & Export ---
 

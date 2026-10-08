@@ -633,6 +633,87 @@ async function deleteActiveEvent() {
   }
 }
 
+function openGoogleSheetModal() {
+  if (currentEventData) {
+    const url = currentEventData.google_sheet_webhook_url || currentEventData.google_sheet_url || '';
+    const input = document.getElementById('gSheetUrlInput');
+    if (input) input.value = url;
+  }
+  document.getElementById('googleSheetModal').classList.add('active');
+}
+
+function closeGoogleSheetModal() {
+  document.getElementById('googleSheetModal').classList.remove('active');
+}
+
+async function saveGoogleSheetConfig() {
+  if (!activeEventId) return;
+  const inputVal = document.getElementById('gSheetUrlInput').value.trim();
+  const btn = document.getElementById('btnSaveGSheet');
+
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+
+  const isWebhook = inputVal.includes('script.google.com') || inputVal.includes('/exec');
+
+  try {
+    const res = await fetch(`/api/events/${activeEventId}/google-sheet-config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        google_sheet_webhook_url: isWebhook ? inputVal : '',
+        google_sheet_url: !isWebhook ? inputVal : ''
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('⚡ Permanent Google Sheet Auto-Sync Connected! All live scores will now update in real-time.', 'success');
+      closeGoogleSheetModal();
+      loadAdminData();
+    } else {
+      showToast(`Error: ${data.message || data.error}`, 'error');
+    }
+  } catch (err) {
+    showToast('Failed to save Google Sheet config', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Connect Permanent Auto-Sync';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function copyAppsScriptCode() {
+  const code = `// ⚡ Paste this in your Google Sheet -> Extensions -> Apps Script
+// Then click "Deploy" -> "New deployment" -> Select "Web App" -> Set "Who has access" to "Anyone" -> Click "Deploy"
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var tabName = data.tab_name || "Live Scores";
+    var sheet = ss.getSheetByName(tabName);
+    if (!sheet) {
+      sheet = ss.insertSheet(tabName);
+    }
+    sheet.clear();
+    
+    var rows = data.rows || [];
+    if (rows.length > 0) {
+      sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+      sheet.getRange(1, 1, 1, rows[0].length).setFontWeight("bold").setBackground("#1e293b").setFontColor("#ffffff");
+    }
+    return ContentService.createTextOutput(JSON.stringify({status: "success", updated_rows: rows.length}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Google Apps Script copied! Paste in Sheet -> Extensions -> Apps Script -> Deploy as Web App.', 'success');
+  });
+}
+
 function copyLink(inputId) {
   const input = document.getElementById(inputId);
   navigator.clipboard.writeText(input.value).then(() => {

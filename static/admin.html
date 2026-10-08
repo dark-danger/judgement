@@ -75,11 +75,15 @@
         </div>
 
         <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button class="btn btn-sm" onclick="openGoogleSheetModal()" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.5); color: #34d399;" title="Connect a Google Sheet for 100% automated real-time background updates">
+            <span id="sheetAutoSyncDot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span>
+            <span>⚡ Permanent G-Sheet Auto-Sync</span>
+          </button>
           <button class="btn btn-emerald btn-sm" onclick="exportExcel()" title="Download multi-tab Excel with Master, Dance, Song, Declamation, Science & Marksheet">
-            <i data-lucide="file-spreadsheet"></i> Download Multi-Sheet Excel
+            <i data-lucide="file-spreadsheet"></i> Multi-Sheet Excel
           </button>
           <button class="btn btn-cyan btn-sm" onclick="exportCsv()" title="Download simple CSV">
-            <i data-lucide="download"></i> Download CSV
+            <i data-lucide="download"></i> CSV
           </button>
           <button class="btn btn-ghost btn-sm" style="color: #f87171;" onclick="deleteActiveEvent()">
             <i data-lucide="trash-2"></i> Delete
@@ -358,6 +362,49 @@
         <button type="button" class="btn btn-ghost" onclick="closeSupabaseModal()">Cancel</button>
         <button type="button" class="btn btn-primary" id="btnSaveSupabase" onclick="saveSupabaseConfig()">
           <i data-lucide="save"></i> Connect & Save
+        </button>
+      </div>
+  <!-- GOOGLE SHEET PERMANENT AUTO-SYNC MODAL -->
+  <div id="googleSheetModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="sheet" style="color: #10b981;"></i>
+          <h3>Permanent Google Sheet Auto-Sync</h3>
+        </div>
+        <button class="modal-close" onclick="closeGoogleSheetModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1.2rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #34d399; font-weight: 800; font-size: 0.9rem;">
+            <i data-lucide="zap"></i> 100% Automatic Live Cloud Sync
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.5;">
+            Jaise hi koi judge score submit karega ya sequence complete hogi, ye background mein aapki Google Sheet ko bina kisi click ke automatically live update karta rahega!
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Google Sheet URL / Webhook URL</label>
+          <input type="text" id="gSheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit">
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.85rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: var(--radius-md);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+            <strong style="color: #fbbf24; font-size: 0.85rem;"><i data-lucide="code"></i> Instant Webhook Script (No API Keys needed)</strong>
+            <button class="btn btn-secondary btn-sm" onclick="copyAppsScriptCode()" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">
+              <i data-lucide="copy"></i> Copy Script
+            </button>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+            Apni Google Sheet me <strong>Extensions -> Apps Script</strong> me paste karke <strong>Deploy as Web App</strong> karo aur URL upar daal do!
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeGoogleSheetModal()">Cancel</button>
+        <button type="button" class="btn btn-emerald" id="btnSaveGSheet" onclick="saveGoogleSheetConfig()">
+          <i data-lucide="save"></i> Connect Permanent Auto-Sync
         </button>
       </div>
     </div>
