@@ -1,4 +1,4 @@
-// Judge Portal Logic with Reality-Show (DID Style) Stage Entrance & Transition Timer
+// Judge Portal Logic with Fullscreen Reality-Show (DID Style) Next Team Arena
 let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
 let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
 
@@ -10,9 +10,8 @@ let currentNotes = '';
 let nextTagNo = null;
 let nextNotes = '';
 let lastRevealedTag = null;
-let transitionSecondsLeft = 0;
-let transitionTimerInterval = null;
-let isTransitionActive = false;
+let isScoreSubmittedForCurrentTag = false;
+let lastSubmittedTag = null;
 
 // Particle Canvas for DID Stage Reveal
 let particleCanvas = null;
@@ -68,14 +67,26 @@ async function loadEventData() {
       const nxtSchool = document.getElementById('nextTagSchool');
       if (nxtSchool) nxtSchool.textContent = nextNotes || (nextTagNo !== 'End of Queue' ? 'Preparing Next' : 'End of Queue');
 
-      // Handle 2-Minute Transition Timer & Stage Reveal
-      handleTransitionAndReveal(data.remaining_transition_seconds, prevTag, currentTagNo, isFirstLoad);
+      // Update Next Team Coming Arena details
+      document.getElementById('arenaNextTagNumber').textContent = nextTagNo;
+      document.getElementById('arenaNextSchoolName').textContent = nextNotes || (nextTagNo !== 'End of Queue' ? 'Next School Team' : 'Queue Finished');
+      document.getElementById('arenaNextCategoryBadge').textContent = currentEvent ? `${currentEvent.name} • Stage Sequence` : 'Live Category';
+
+      // Update Transition Countdown on the arena
+      updateArenaCountdown(data.remaining_transition_seconds);
+
+      // If active tag changed in sequence, reset submitted state and show new team!
+      if (prevTag && prevTag !== currentTagNo && currentTagNo !== 'NO TAG') {
+        isScoreSubmittedForCurrentTag = false;
+        showScoringView();
+        triggerStageReveal(currentTagNo, currentNotes, currentEvent.name);
+      }
 
       // If no judge chosen, show modal
       if (!activeJudge) {
         showJudgeSelectionModal();
       } else {
-        if (isFirstLoad || prevTag !== currentTagNo) {
+        if (isFirstLoad) {
           renderCriteriaSection();
           loadExistingScoresForTag();
         }
@@ -86,91 +97,133 @@ async function loadEventData() {
   }
 }
 
-/**
- * 🌟 TV Reality-Show DID Stage Reveal & 2-Minute Transition Handler
- */
-function handleTransitionAndReveal(remainingSecs, prevTag, newTag, isFirstLoad) {
-  const transitionScreen = document.getElementById('stageTransitionScreen');
-  const heroSection = document.getElementById('judgeHeaderHero');
-  const criteriaSection = document.getElementById('criteriaSection');
-  const submitBar = document.getElementById('submitBar');
-
-  if (remainingSecs && remainingSecs > 0) {
-    // Stage Transition is Active (2-minute window between teams)
-    isTransitionActive = true;
-    transitionSecondsLeft = remainingSecs;
-    
-    if (transitionScreen) transitionScreen.style.display = 'block';
-    if (heroSection) heroSection.style.display = 'none';
-    if (criteriaSection) criteriaSection.style.display = 'none';
-    if (submitBar) submitBar.style.display = 'none';
-
-    updateTransitionDisplay(remainingSecs);
-  } else {
-    // Transition Finished or skipped
-    if (isTransitionActive || (prevTag && prevTag !== newTag && newTag !== 'NO TAG' && newTag !== lastRevealedTag)) {
-      isTransitionActive = false;
-      if (transitionScreen) transitionScreen.style.display = 'none';
-      if (heroSection) heroSection.style.display = 'grid';
-      if (criteriaSection) criteriaSection.style.display = 'grid';
-      if (submitBar) submitBar.style.display = 'flex';
-
-      // Trigger the Grand Reality-Show Stage Reveal!
-      if (newTag && newTag !== 'NO TAG' && newTag !== lastRevealedTag) {
-        triggerStageReveal(newTag, currentNotes, currentEvent ? currentEvent.name : 'Championship');
-      }
-    } else {
-      if (transitionScreen) transitionScreen.style.display = 'none';
-      if (heroSection) heroSection.style.display = 'grid';
-      if (criteriaSection) criteriaSection.style.display = 'grid';
-      if (submitBar) submitBar.style.display = 'flex';
-    }
-  }
-
-  // Update top small pill
+function updateArenaCountdown(seconds) {
+  const digits = document.getElementById('arenaTimerDigits');
+  const progress = document.getElementById('arenaTimerProgress');
   const pill = document.getElementById('transitionTimerPill');
   const txt = document.getElementById('transitionTimerText');
-  if (remainingSecs > 0) {
-    const mins = Math.floor(remainingSecs / 60);
-    const secs = remainingSecs % 60;
-    txt.textContent = `Next team in: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    pill.style.background = 'rgba(245, 158, 11, 0.2)';
-    pill.style.borderColor = '#f59e0b';
+
+  if (seconds > 0) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    const formatted = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    if (digits) digits.textContent = formatted;
+    if (txt) txt.textContent = `Next team in: ${formatted}`;
+    if (pill) {
+      pill.style.background = 'rgba(245, 158, 11, 0.2)';
+      pill.style.borderColor = '#f59e0b';
+    }
+
+    if (progress) {
+      const total = 120;
+      const offset = 283 - (283 * (total - seconds) / total);
+      progress.style.strokeDashoffset = Math.max(0, offset);
+    }
   } else {
-    txt.textContent = 'Queue Active';
-    pill.style.background = 'rgba(255, 255, 255, 0.05)';
-    pill.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    if (digits) digits.textContent = '00:00';
+    if (txt) txt.textContent = 'Queue Active';
+    if (pill) {
+      pill.style.background = 'rgba(255, 255, 255, 0.05)';
+      pill.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    }
   }
 }
 
-function updateTransitionDisplay(seconds) {
-  const digits = document.getElementById('transitionCountdownDigits');
-  const progress = document.getElementById('timerProgressCircle');
-  const nextTagEl = document.getElementById('transitionNextTag');
-  const nextSchoolEl = document.getElementById('transitionNextSchool');
-
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  if (digits) digits.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
-
-  if (progress) {
-    const total = 120; // 2 minutes transition
-    const offset = 283 - (283 * (total - seconds) / total);
-    progress.style.strokeDashoffset = Math.max(0, offset);
+/**
+ * 🌟 Submit Evaluation: Hide Marks System Immediately & Show Fullscreen Decorated Next Team Arena!
+ */
+async function submitEvaluation() {
+  if (!activeJudge) {
+    showToast('Please select your judge profile first', 'error');
+    showJudgeSelectionModal();
+    return;
   }
 
-  if (nextTagEl) nextTagEl.textContent = `Tag: ${currentTagNo || nextTagNo}`;
-  if (nextSchoolEl) nextSchoolEl.textContent = currentNotes || nextNotes || 'Team Preparing for Stage';
+  if (!currentTagNo || currentTagNo === 'NO TAG') {
+    showToast('No active team currently on stage to evaluate', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitScore');
+  btn.disabled = true;
+  btn.textContent = 'Submitting Score...';
+
+  try {
+    const res = await fetch(`/api/events/${eventId}/scores`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tag_no: currentTagNo,
+        judge_id: activeJudge.id,
+        judge_name: activeJudge.name,
+        scores: currentScores
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      // 1. Play Sound & Confetti
+      try {
+        const audio = document.getElementById('submitSound');
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        }
+      } catch (e) {}
+
+      if (window.confetti) {
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.7 },
+          colors: ['#fbbf24', '#ff2a4b', '#00e5ff', '#34d399', '#ffffff']
+        });
+      }
+
+      showToast(`🎯 Score of ${data.score.total}/100 locked for ${currentTagNo}!`, 'success');
+
+      // 2. Hide Marks System & Show Fullscreen "Next Team Coming" Arena
+      isScoreSubmittedForCurrentTag = true;
+      lastSubmittedTag = currentTagNo;
+      
+      document.getElementById('lockedScoreSummaryText').textContent = `${data.score.total}/100 for Tag ${currentTagNo} (${currentNotes || 'Stage Performance'})`;
+      
+      showNextTeamArena();
+    } else {
+      showToast(data.error || 'Failed to submit score', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while submitting score', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i data-lucide="check-circle-2"></i> Submit Score for <span id="btnSubmitTag">${currentTagNo}</span>`;
+    if (window.lucide) lucide.createIcons();
+  }
 }
 
-function skipTransitionCountdown() {
-  isTransitionActive = false;
-  document.getElementById('stageTransitionScreen').style.display = 'none';
-  document.getElementById('judgeHeaderHero').style.display = 'grid';
-  document.getElementById('criteriaSection').style.display = 'grid';
-  document.getElementById('submitBar').style.display = 'flex';
+function showNextTeamArena() {
+  document.getElementById('scoringView').style.display = 'none';
+  document.getElementById('nextTeamComingScreen').style.display = 'block';
+  if (window.lucide) lucide.createIcons();
+}
 
-  triggerStageReveal(currentTagNo, currentNotes, currentEvent ? currentEvent.name : 'Championship');
+function showScoringView() {
+  document.getElementById('nextTeamComingScreen').style.display = 'none';
+  document.getElementById('scoringView').style.display = 'block';
+  if (window.lucide) lucide.createIcons();
+}
+
+function reopenCurrentScoring() {
+  showScoringView();
+  showToast('You can now edit your submitted marks and click update.', 'info');
+}
+
+function startScoringNextTeam() {
+  isScoreSubmittedForCurrentTag = false;
+  showScoringView();
+  
+  // Trigger reality show DID stage entrance banner for the active/next team
+  triggerStageReveal(currentTagNo, currentNotes, currentEvent ? currentEvent.name : 'Competition');
 }
 
 /**
@@ -206,7 +259,7 @@ function triggerStageReveal(tagNo, schoolInfo, eventName) {
 
   if (window.confetti) {
     confetti({
-      particleCount: 70,
+      particleCount: 75,
       spread: 80,
       origin: { y: 0.6 },
       colors: ['#fbbf24', '#ff2a4b', '#00e5ff', '#ffffff']
@@ -218,11 +271,11 @@ function triggerStageReveal(tagNo, schoolInfo, eventName) {
 
   if (window.lucide) lucide.createIcons();
 
-  // Auto dismiss after 4 seconds
+  // Auto dismiss after 3.8 seconds
   clearTimeout(window.revealAutoTimeout);
   window.revealAutoTimeout = setTimeout(() => {
     dismissStageReveal();
-  }, 4200);
+  }, 3800);
 }
 
 function dismissStageReveal() {
@@ -498,74 +551,11 @@ async function loadExistingScoresForTag() {
           updateQuickBtnHighlight(critId, val);
         }
         recalculateTotal();
-        document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/100). Click below to update.</span>`;
-        document.getElementById('btnSubmitScore').innerHTML = `<i data-lucide="refresh-cw"></i> Update Score for ${currentTagNo}`;
-      } else {
-        document.getElementById('scoreStatusMessage').textContent = 'Ready for evaluation';
-        document.getElementById('btnSubmitScore').innerHTML = `<i data-lucide="check-circle-2"></i> Submit Score for ${currentTagNo}`;
+        document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/100)</span>`;
       }
       if (window.lucide) lucide.createIcons();
     }
   } catch (e) {}
-}
-
-async function submitEvaluation() {
-  if (!activeJudge) {
-    showToast('Please select your judge profile first', 'error');
-    showJudgeSelectionModal();
-    return;
-  }
-
-  if (!currentTagNo || currentTagNo === 'NO TAG') {
-    showToast('No active team currently on stage to evaluate', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('btnSubmitScore');
-  btn.disabled = true;
-  btn.textContent = 'Submitting Score...';
-
-  try {
-    const res = await fetch(`/api/events/${eventId}/scores`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tag_no: currentTagNo,
-        judge_id: activeJudge.id,
-        judge_name: activeJudge.name,
-        scores: currentScores
-      })
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      // Play sound
-      try {
-        const audio = document.getElementById('submitSound');
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-      } catch (e) {}
-
-      // Celebrate with confetti
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.8 },
-        colors: ['#ff2a4b', '#00e5ff', '#34d399', '#ffffff']
-      });
-
-      showToast(`🎯 Score of ${data.score.total}/100 submitted successfully for ${currentTagNo}!`, 'success');
-      document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Score Submitted (${data.score.total}/100)</span>`;
-      btn.innerHTML = `<i data-lucide="check"></i> Score Locked (${data.score.total}/100)`;
-      if (window.lucide) lucide.createIcons();
-    } else {
-      showToast(data.error || 'Failed to submit score', 'error');
-    }
-  } catch (err) {
-    showToast('Network error while submitting score', 'error');
-  } finally {
-    btn.disabled = false;
-  }
 }
 
 function showToast(message, type = 'info') {
