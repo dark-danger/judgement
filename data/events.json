@@ -2,7 +2,7 @@
   {
     "id": "evt-agrash",
     "name": "Agrash",
-    "description": "Agrash Grand Finale - Live Judgement & Stage Evaluation",
+    "description": "Agrash Inter-School Event • 4 Categories • 144 Performances",
     "created_at": "2026-10-08T19:49:47.047557",
     "judge_count": 5,
     "judges": [
@@ -61,53 +61,587 @@
     ],
     "sequence": [
       {
-        "tag_no": "TAG-102",
-        "notes": "Slot 2"
+        "tag_no": "D-21",
+        "notes": "Group Dance • Delhi Public School DPS Kathua (Room: F-501)"
       },
       {
-        "tag_no": "TAG-103",
-        "notes": "Slot 3"
+        "tag_no": "DC-21",
+        "notes": "Declamation • Delhi Public School DPS Kathua (Room: F-501)"
       },
       {
-        "tag_no": "TAG-104",
-        "notes": "Slot 4"
+        "tag_no": "SE-21",
+        "notes": "Science Exhibition • Delhi Public School DPS Kathua (Room: F-501)"
       },
       {
-        "tag_no": "TAG-105",
-        "notes": "Slot 5"
+        "tag_no": "D-22",
+        "notes": "Group Dance • SMR International School Safidon (Room: F-502)"
       },
       {
-        "tag_no": "TAG-106",
-        "notes": "Slot 6"
+        "tag_no": "DC-22",
+        "notes": "Declamation • SMR International School Safidon (Room: F-502)"
       },
       {
-        "tag_no": "TAG-107",
-        "notes": "Slot 7"
+        "tag_no": "S-23",
+        "notes": "Group Song • ST Andrews World School Kundli (Room: F-503)"
       },
       {
-        "tag_no": "TAG-108",
-        "notes": "Slot 8"
+        "tag_no": "D-24",
+        "notes": "Group Dance • Sant Nikka Singh Public School Model Town Karnal (Room: F-504)"
       },
       {
-        "tag_no": "TAG-109",
-        "notes": "Slot 9"
+        "tag_no": "S-24",
+        "notes": "Group Song • Sant Nikka Singh Public School Model Town Karnal (Room: F-504)"
       },
       {
-        "tag_no": "TAG-110",
-        "notes": "Slot 10"
+        "tag_no": "DC-24",
+        "notes": "Declamation • Sant Nikka Singh Public School Model Town Karnal (Room: F-504)"
+      },
+      {
+        "tag_no": "D-25",
+        "notes": "Group Dance • JP Jain Sr Sec School Sonipat (Room: F-505)"
+      },
+      {
+        "tag_no": "DC-25",
+        "notes": "Declamation • JP Jain Sr Sec School Sonipat (Room: F-505)"
+      },
+      {
+        "tag_no": "D-26",
+        "notes": "Group Dance • Himgiri Public School Samalkha (Room: F-506)"
+      },
+      {
+        "tag_no": "DC-27",
+        "notes": "Declamation • Delhi Public School DPS Panipat City (Room: F-507)"
+      },
+      {
+        "tag_no": "SE-27",
+        "notes": "Science Exhibition • Delhi Public School DPS Panipat City (Room: F-507)"
+      },
+      {
+        "tag_no": "D-28",
+        "notes": "Group Dance • Doon Public School Gohana (Room: F-508)"
+      },
+      {
+        "tag_no": "DC-28",
+        "notes": "Declamation • Doon Public School Gohana (Room: F-508)"
+      },
+      {
+        "tag_no": "SE-28",
+        "notes": "Science Exhibition • Doon Public School Gohana (Room: F-508)"
+      },
+      {
+        "tag_no": "SE-29",
+        "notes": "Science Exhibition • Navyug Public High School (Room: F-509)"
+      },
+      {
+        "tag_no": "D-30",
+        "notes": "Group Dance • Arya Kanya Gurukul Sr Sec School Karnal (Room: F-510)"
+      },
+      {
+        "tag_no": "S-30",
+        "notes": "Group Song • Arya Kanya Gurukul Sr Sec School Karnal (Room: F-510)"
+      },
+      {
+        "tag_no": "DC-30",
+        "notes": "Declamation • Arya Kanya Gurukul Sr Sec School Karnal (Room: F-510)"
+      },
+      {
+        "tag_no": "DC-31",
+        "notes": "Declamation • Pratap Public School Sector 6 Karnal (Room: F-511)"
+      },
+      {
+        "tag_no": "SE-31",
+        "notes": "Science Exhibition • Pratap Public School Sector 6 Karnal (Room: F-511)"
+      },
+      {
+        "tag_no": "D-32",
+        "notes": "Group Dance • DAV Public School Thermal Colony Panipat (Room: F-513)"
+      },
+      {
+        "tag_no": "SE-32",
+        "notes": "Science Exhibition • DAV Public School Thermal Colony Panipat (Room: F-513)"
+      },
+      {
+        "tag_no": "D-33",
+        "notes": "Group Dance • DAV Police Public Sr Sec School Police Line Sonipat (Room: F-514)"
+      },
+      {
+        "tag_no": "SE-33",
+        "notes": "Science Exhibition • DAV Police Public Sr Sec School Police Line Sonipat (Room: F-514)"
+      },
+      {
+        "tag_no": "D-34",
+        "notes": "Group Dance • Guru Teg Bhadur Public School Karnal (Room: F-401)"
+      },
+      {
+        "tag_no": "S-34",
+        "notes": "Group Song • Guru Teg Bhadur Public School Karnal (Room: F-401)"
+      },
+      {
+        "tag_no": "DC-34",
+        "notes": "Declamation • Guru Teg Bhadur Public School Karnal (Room: F-401)"
+      },
+      {
+        "tag_no": "SE-34",
+        "notes": "Science Exhibition • Guru Teg Bhadur Public School Karnal (Room: F-401)"
+      },
+      {
+        "tag_no": "D-35",
+        "notes": "Group Dance • Ujala Modern Sr Sec School Kaith Shahpur Israna (Room: F-405)"
+      },
+      {
+        "tag_no": "D-36",
+        "notes": "Group Dance • Motilal Nehru Public School Urban Estate Jind (Room: F-406)"
+      },
+      {
+        "tag_no": "DC-36",
+        "notes": "Declamation • Motilal Nehru Public School Urban Estate Jind (Room: F-406)"
+      },
+      {
+        "tag_no": "SE-36",
+        "notes": "Science Exhibition • Motilal Nehru Public School Urban Estate Jind (Room: F-406)"
+      },
+      {
+        "tag_no": "D-37",
+        "notes": "Group Dance • DAV Police Public School Police Line Karnal (Room: F-407)"
+      },
+      {
+        "tag_no": "S-37",
+        "notes": "Group Song • DAV Police Public School Police Line Karnal (Room: F-407)"
+      },
+      {
+        "tag_no": "DC-37",
+        "notes": "Declamation • DAV Police Public School Police Line Karnal (Room: F-407)"
+      },
+      {
+        "tag_no": "SE-37",
+        "notes": "Science Exhibition • DAV Police Public School Police Line Karnal (Room: F-407)"
+      },
+      {
+        "tag_no": "D-38",
+        "notes": "Group Dance • Sarv Vidya Public School Indri (Room: F-408)"
+      },
+      {
+        "tag_no": "DC-38",
+        "notes": "Declamation • Sarv Vidya Public School Indri (Room: F-408)"
+      },
+      {
+        "tag_no": "D-39",
+        "notes": "Group Dance • Halwasiya Vidya Vihar Sr Sec School Bhiwani (Room: F-409)"
+      },
+      {
+        "tag_no": "S-39",
+        "notes": "Group Song • Halwasiya Vidya Vihar Sr Sec School Bhiwani (Room: F-409)"
+      },
+      {
+        "tag_no": "DC-39",
+        "notes": "Declamation • Halwasiya Vidya Vihar Sr Sec School Bhiwani (Room: F-409)"
+      },
+      {
+        "tag_no": "SE-39",
+        "notes": "Science Exhibition • Halwasiya Vidya Vihar Sr Sec School Bhiwani (Room: F-409)"
+      },
+      {
+        "tag_no": "DC-40",
+        "notes": "Declamation • Shiv Shakti Sr Sec School Sonipat (Room: F-410)"
+      },
+      {
+        "tag_no": "DC-41",
+        "notes": "Declamation • Pratap Singh Memorial Sr Sec School Sonipat (Room: F-302)"
+      },
+      {
+        "tag_no": "SE-41",
+        "notes": "Science Exhibition • Pratap Singh Memorial Sr Sec School Sonipat (Room: F-302)"
+      },
+      {
+        "tag_no": "S-42",
+        "notes": "Group Song • Babu Ram ( BR ) Global School Gannaur (Room: F-303)"
+      },
+      {
+        "tag_no": "DC-42",
+        "notes": "Declamation • Babu Ram ( BR ) Global School Gannaur (Room: F-303)"
+      },
+      {
+        "tag_no": "SE-42",
+        "notes": "Science Exhibition • Babu Ram ( BR ) Global School Gannaur (Room: F-303)"
+      },
+      {
+        "tag_no": "D-43",
+        "notes": "Group Dance • MM Public School Assandh (Room: F-310)"
+      },
+      {
+        "tag_no": "S-43",
+        "notes": "Group Song • MM Public School Assandh (Room: F-310)"
+      },
+      {
+        "tag_no": "DC-43",
+        "notes": "Declamation • MM Public School Assandh (Room: F-310)"
+      },
+      {
+        "tag_no": "SE-43",
+        "notes": "Science Exhibition • MM Public School Assandh (Room: F-310)"
+      },
+      {
+        "tag_no": "D-44",
+        "notes": "Group Dance • Mothers Pride School Pataudi Gurugram (Room: F-311)"
+      },
+      {
+        "tag_no": "S-44",
+        "notes": "Group Song • Mothers Pride School Pataudi Gurugram (Room: F-311)"
+      },
+      {
+        "tag_no": "DC-44",
+        "notes": "Declamation • Mothers Pride School Pataudi Gurugram (Room: F-311)"
+      },
+      {
+        "tag_no": "SE-44",
+        "notes": "Science Exhibition • Mothers Pride School Pataudi Gurugram (Room: F-311)"
+      },
+      {
+        "tag_no": "D-45",
+        "notes": "Group Dance • BR International Public School Kurukshetra (Room: F-202)"
+      },
+      {
+        "tag_no": "S-45",
+        "notes": "Group Song • BR International Public School Kurukshetra (Room: F-202)"
+      },
+      {
+        "tag_no": "DC-45",
+        "notes": "Declamation • BR International Public School Kurukshetra (Room: F-202)"
+      },
+      {
+        "tag_no": "SE-45",
+        "notes": "Science Exhibition • BR International Public School Kurukshetra (Room: F-202)"
+      },
+      {
+        "tag_no": "SE-46",
+        "notes": "Science Exhibition • RPS International School Sector 50 Gurgaon (Room: F-203)"
+      },
+      {
+        "tag_no": "DC-47",
+        "notes": "Declamation • Holy Family Convent School Gohana (Room: F-204)"
+      },
+      {
+        "tag_no": "DC-48",
+        "notes": "Declamation • Mahavati Sports Sr Sec School Pawti Samalkha (Room: F-205)"
+      },
+      {
+        "tag_no": "SE-48",
+        "notes": "Science Exhibition • Mahavati Sports Sr Sec School Pawti Samalkha (Room: F-205)"
+      },
+      {
+        "tag_no": "D-49",
+        "notes": "Group Dance • Lakshay International School Naultha Panipat (Room: F-206)"
+      },
+      {
+        "tag_no": "DC-49",
+        "notes": "Declamation • Lakshay International School Naultha Panipat (Room: F-206)"
+      },
+      {
+        "tag_no": "SE-49",
+        "notes": "Science Exhibition • Lakshay International School Naultha Panipat (Room: F-206)"
+      },
+      {
+        "tag_no": "D-50",
+        "notes": "Group Dance • Rishikul Vidyapeeth Sonipat (Room: F-207)"
+      },
+      {
+        "tag_no": "S-50",
+        "notes": "Group Song • Rishikul Vidyapeeth Sonipat (Room: F-207)"
+      },
+      {
+        "tag_no": "DC-50",
+        "notes": "Declamation • Rishikul Vidyapeeth Sonipat (Room: F-207)"
+      },
+      {
+        "tag_no": "D-51",
+        "notes": "Group Dance • Sant Nischal Singh Public School Yamunanagar (Room: F-209)"
+      },
+      {
+        "tag_no": "S-51",
+        "notes": "Group Song • Sant Nischal Singh Public School Yamunanagar (Room: F-209)"
+      },
+      {
+        "tag_no": "DC-51",
+        "notes": "Declamation • Sant Nischal Singh Public School Yamunanagar (Room: F-209)"
+      },
+      {
+        "tag_no": "SE-51",
+        "notes": "Science Exhibition • Sant Nischal Singh Public School Yamunanagar (Room: F-209)"
+      },
+      {
+        "tag_no": "D-52",
+        "notes": "Group Dance • SD Sr Sec School Panipat (Room: F-210)"
+      },
+      {
+        "tag_no": "S-52",
+        "notes": "Group Song • SD Sr Sec School Panipat (Room: F-210)"
+      },
+      {
+        "tag_no": "DC-52",
+        "notes": "Declamation • SD Sr Sec School Panipat (Room: F-210)"
+      },
+      {
+        "tag_no": "SE-52",
+        "notes": "Science Exhibition • SD Sr Sec School Panipat (Room: F-210)"
+      },
+      {
+        "tag_no": "S-53",
+        "notes": "Group Song • Geeta Vidya Mandir Public School Nimbari (Room: D-201)"
+      },
+      {
+        "tag_no": "SE-53",
+        "notes": "Science Exhibition • Geeta Vidya Mandir Public School Nimbari (Room: D-201)"
+      },
+      {
+        "tag_no": "DC-54",
+        "notes": "Declamation • Dayanand Public School Gohana (Room: D-202)"
+      },
+      {
+        "tag_no": "SE-54",
+        "notes": "Science Exhibition • Dayanand Public School Gohana (Room: D-202)"
+      },
+      {
+        "tag_no": "D-55",
+        "notes": "Group Dance • Saraswati Public School Jagadhri Yamunanagar (Room: D-204)"
+      },
+      {
+        "tag_no": "S-55",
+        "notes": "Group Song • Saraswati Public School Jagadhri Yamunanagar (Room: D-204)"
+      },
+      {
+        "tag_no": "DC-55",
+        "notes": "Declamation • Saraswati Public School Jagadhri Yamunanagar (Room: D-204)"
+      },
+      {
+        "tag_no": "SE-55",
+        "notes": "Science Exhibition • Saraswati Public School Jagadhri Yamunanagar (Room: D-204)"
+      },
+      {
+        "tag_no": "D-56",
+        "notes": "Group Dance • DAV Centenary Public School Police Line Samalkha Panipat (Room: D-205)"
+      },
+      {
+        "tag_no": "S-56",
+        "notes": "Group Song • DAV Centenary Public School Police Line Samalkha Panipat (Room: D-205)"
+      },
+      {
+        "tag_no": "D-57",
+        "notes": "Group Dance • JPS Academy Assandh (Room: D-207)"
+      },
+      {
+        "tag_no": "S-57",
+        "notes": "Group Song • JPS Academy Assandh (Room: D-207)"
+      },
+      {
+        "tag_no": "DC-57",
+        "notes": "Declamation • JPS Academy Assandh (Room: D-207)"
+      },
+      {
+        "tag_no": "SE-57",
+        "notes": "Science Exhibition • JPS Academy Assandh (Room: D-207)"
+      },
+      {
+        "tag_no": "D-58",
+        "notes": "Group Dance • Delhi Public School Jind (Room: D-404)"
+      },
+      {
+        "tag_no": "S-58",
+        "notes": "Group Song • Delhi Public School Jind (Room: D-404)"
+      },
+      {
+        "tag_no": "DC-58",
+        "notes": "Declamation • Delhi Public School Jind (Room: D-404)"
+      },
+      {
+        "tag_no": "D-59",
+        "notes": "Group Dance • Maharishi Dayanand Sr Sec School Ballah Karnal (Room: D-405)"
+      },
+      {
+        "tag_no": "D-60",
+        "notes": "Group Dance • Yaduvanshi Niketan School Sector 33 Gurugram (Room: E-303)"
+      },
+      {
+        "tag_no": "DC-60",
+        "notes": "Declamation • Yaduvanshi Niketan School Sector 33 Gurugram (Room: E-303)"
+      },
+      {
+        "tag_no": "SE-60",
+        "notes": "Science Exhibition • Yaduvanshi Niketan School Sector 33 Gurugram (Room: E-303)"
+      },
+      {
+        "tag_no": "D-61",
+        "notes": "Group Dance • Sant Nikka Singh Public School Zarifa Farm Karnal (Room: E-304)"
+      },
+      {
+        "tag_no": "S-61",
+        "notes": "Group Song • Sant Nikka Singh Public School Zarifa Farm Karnal (Room: E-304)"
+      },
+      {
+        "tag_no": "DC-61",
+        "notes": "Declamation • Sant Nikka Singh Public School Zarifa Farm Karnal (Room: E-304)"
+      },
+      {
+        "tag_no": "D-62",
+        "notes": "Group Dance • Geeta Vidya Mandir Public School NHBC Panipat (Room: E-305)"
+      },
+      {
+        "tag_no": "S-62",
+        "notes": "Group Song • Geeta Vidya Mandir Public School NHBC Panipat (Room: E-305)"
+      },
+      {
+        "tag_no": "DC-62",
+        "notes": "Declamation • Geeta Vidya Mandir Public School NHBC Panipat (Room: E-305)"
+      },
+      {
+        "tag_no": "D-63",
+        "notes": "Group Dance • Shaheed Bhagat Singh Sr Sec School Karnal (Room: E-307)"
+      },
+      {
+        "tag_no": "DC-63",
+        "notes": "Declamation • Shaheed Bhagat Singh Sr Sec School Karnal (Room: E-307)"
+      },
+      {
+        "tag_no": "D-64",
+        "notes": "Group Dance • Swastik Bal Vikas Sr Sec School Panipat (Room: E-308)"
+      },
+      {
+        "tag_no": "S-64",
+        "notes": "Group Song • Swastik Bal Vikas Sr Sec School Panipat (Room: E-308)"
+      },
+      {
+        "tag_no": "DC-64",
+        "notes": "Declamation • Swastik Bal Vikas Sr Sec School Panipat (Room: E-308)"
+      },
+      {
+        "tag_no": "SE-64",
+        "notes": "Science Exhibition • Swastik Bal Vikas Sr Sec School Panipat (Room: E-308)"
+      },
+      {
+        "tag_no": "S-65",
+        "notes": "Group Song • Silver Bells Public School Shamli (Room: E-310)"
+      },
+      {
+        "tag_no": "DC-65",
+        "notes": "Declamation • Silver Bells Public School Shamli (Room: E-310)"
+      },
+      {
+        "tag_no": "D-66",
+        "notes": "Group Dance • The Golden Era Public School"
+      },
+      {
+        "tag_no": "DC-67",
+        "notes": "Declamation • MASD Public School Panipat"
+      },
+      {
+        "tag_no": "D-68",
+        "notes": "Group Dance • SD Modern Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "DC-68",
+        "notes": "Declamation • SD Modern Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "D-69",
+        "notes": "Group Dance • DR MKK Arya Model Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "S-69",
+        "notes": "Group Song • DR MKK Arya Model Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "DC-69",
+        "notes": "Declamation • DR MKK Arya Model Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "SE-69",
+        "notes": "Science Exhibition • DR MKK Arya Model Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "DC-70",
+        "notes": "Declamation • Global Public School Gohana"
+      },
+      {
+        "tag_no": "D-71",
+        "notes": "Group Dance • Sunrise Public School Panipat"
+      },
+      {
+        "tag_no": "DC-71",
+        "notes": "Declamation • Sunrise Public School Panipat"
+      },
+      {
+        "tag_no": "D-72",
+        "notes": "Group Dance • Gyandeep Sr Sec School Gannaur"
+      },
+      {
+        "tag_no": "DC-72",
+        "notes": "Declamation • Gyandeep Sr Sec School Gannaur"
+      },
+      {
+        "tag_no": "SE-72",
+        "notes": "Science Exhibition • Gyandeep Sr Sec School Gannaur"
+      },
+      {
+        "tag_no": "D-73",
+        "notes": "Group Dance • OM Public School Gohana"
+      },
+      {
+        "tag_no": "S-73",
+        "notes": "Group Song • OM Public School Gohana"
+      },
+      {
+        "tag_no": "DC-73",
+        "notes": "Declamation • OM Public School Gohana"
+      },
+      {
+        "tag_no": "SE-73",
+        "notes": "Science Exhibition • OM Public School Gohana"
+      },
+      {
+        "tag_no": "D-74",
+        "notes": "Group Dance • Montessori City School Kathua"
+      },
+      {
+        "tag_no": "D-75",
+        "notes": "Group Dance • Adarsh Vidya Mandir Sr Sec School Panipat"
+      },
+      {
+        "tag_no": "D-76",
+        "notes": "Group Dance • North Valley Public School"
+      },
+      {
+        "tag_no": "S-76",
+        "notes": "Group Song • North Valley Public School"
+      },
+      {
+        "tag_no": "DC-76",
+        "notes": "Declamation • North Valley Public School"
+      },
+      {
+        "tag_no": "D-77",
+        "notes": "Group Dance • RKSD Public School Kaithal"
+      },
+      {
+        "tag_no": "S-77",
+        "notes": "Group Song • RKSD Public School Kaithal"
+      },
+      {
+        "tag_no": "D-78",
+        "notes": "Group Dance • DAV Police Public School Kurukshetra"
+      },
+      {
+        "tag_no": "S-78",
+        "notes": "Group Song • DAV Police Public School Kurukshetra"
+      },
+      {
+        "tag_no": "DC-78",
+        "notes": "Declamation • DAV Police Public School Kurukshetra"
       }
     ],
-    "current_index": 3,
-    "next_transition_time": 1791469443.9521658,
+    "current_index": 0,
+    "next_transition_time": 1791474026.742379,
     "transition_seconds": 120,
     "google_sheet_url": "",
-    "completed_tags": [
-      {
-        "tag_no": "TAG-101",
-        "notes": "Slot 1",
-        "completed_at": "07:51 PM"
-      }
-    ]
+    "completed_tags": []
   },
   {
     "id": "evt-grand-finale-2026",

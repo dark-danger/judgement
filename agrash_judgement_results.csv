@@ -1,0 +1,11 @@
+Rank,Tag No,Judge 1 (/100),Judge 2 (/100),Judge 3 (/100),Judge 4 (/100),Judge 5 (/100),Overall Average (/100),Judges Scored,Status,Timestamp
+#1,TAG-106,91.0,90.0,86.0,81.0,97.0,89.0,5/5,IN QUEUE,08:14 PM
+#2,TAG-103,83.0,88.0,89.0,89.0,88.0,87.4,5/5,IN QUEUE,08:14 PM
+#3,TAG-104,88.0,92.0,87.0,84.0,86.0,87.4,5/5,IN QUEUE,08:14 PM
+#4,TAG-102,83.0,87.0,90.0,82.0,90.0,86.4,5/5,IN QUEUE,08:14 PM
+#5,TAG-105,81.0,86.0,88.0,87.0,82.0,84.8,5/5,LIVE ON STAGE,08:14 PM
+-,TAG-107,Pending,Pending,Pending,Pending,Pending,-,0/5,IN QUEUE,08:14 PM
+-,TAG-108,Pending,Pending,Pending,Pending,Pending,-,0/5,IN QUEUE,08:14 PM
+-,TAG-109,Pending,Pending,Pending,Pending,Pending,-,0/5,IN QUEUE,08:14 PM
+-,TAG-110,Pending,Pending,Pending,Pending,Pending,-,0/5,IN QUEUE,08:14 PM
+-,TAG-101,Pending,Pending,Pending,Pending,Pending,-,0/5,COMPLETED,08:14 PM
