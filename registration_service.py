@@ -3,24 +3,18 @@ import json
 import logging
 from datetime import datetime
 from create_excel import schools_data
+from database import DATA_DIR, load_json, save_json
 
 logger = logging.getLogger("registration_service")
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)
 REG_FILE = os.path.join(DATA_DIR, "registration.json")
 
 def init_registration_data():
     """Builds initial 58 schools registration records divided into 5 desks"""
-    if os.path.exists(REG_FILE):
-        try:
-            with open(REG_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if data and len(data) >= 58:
-                    return data
-        except Exception:
-            pass
+    existing = load_json(REG_FILE, [])
+    if existing and len(existing) >= 58:
+        return existing
+
 
     records = []
     total_schools = len(schools_data)
@@ -81,9 +75,7 @@ def init_registration_data():
             "events": events_list
         })
 
-    with open(REG_FILE, "w", encoding="utf-8") as f:
-        json.dump(records, f, indent=2)
-
+    save_json(REG_FILE, records)
     logger.info(f"✅ Initialized {len(records)} school registration records across 5 desks.")
     return records
 
@@ -208,16 +200,13 @@ class RegistrationService:
         }
 
     def _load(self):
-        if not os.path.exists(REG_FILE):
+        data = load_json(REG_FILE, [])
+        if not data or len(data) < 58:
             return init_registration_data()
-        try:
-            with open(REG_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return init_registration_data()
+        return data
 
     def _save(self, data):
-        with open(REG_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        save_json(REG_FILE, data)
 
 registration_service = RegistrationService()
+

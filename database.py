@@ -25,7 +25,7 @@ def get_writable_data_dir():
     except Exception:
         tmp_dir = "/tmp/agrash_data"
         os.makedirs(tmp_dir, exist_ok=True)
-        for fname in ["events.json", "scores.json", "config.json", "supabase_config.json"]:
+        for fname in ["events.json", "scores.json", "config.json", "supabase_config.json", "registration.json"]:
             src = os.path.join(INITIAL_DATA_DIR, fname)
             dst = os.path.join(tmp_dir, fname)
             if os.path.exists(src) and not os.path.exists(dst):
