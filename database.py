@@ -125,7 +125,8 @@ class DB:
             "current_index": 0,
             "next_transition_time": None,
             "transition_seconds": 120,
-            "google_sheet_url": ""
+            "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
+            "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbwTlyRir62OFv-xjZup9mascZ-awMXvYO7cgPMjTEJb_6gD0T_nR5WW2gRYVRfAE57g7g/exec"
         }
         if not any(e.get("id") == "evt-agrash" for e in events):
             events.insert(0, agrash_event)
