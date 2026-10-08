@@ -251,10 +251,99 @@ async function loadAdminData() {
       currentEventData = evtData.event;
       currentScoresData = scData.scores || [];
       updateShareableLinks();
+      renderJudgesPanel();
       renderMatrixTable();
     }
   } catch (e) {
     console.error('Error fetching admin data:', e);
+  }
+}
+
+function renderJudgesPanel() {
+  if (!currentEventData) return;
+  const countSpan = document.getElementById('assignedJudgesCount');
+  const chipsContainer = document.getElementById('assignedJudgesChips');
+  if (!chipsContainer) return;
+
+  const judges = currentEventData.judges || [];
+  if (countSpan) countSpan.textContent = judges.length;
+
+  if (judges.length === 0) {
+    chipsContainer.innerHTML = `<span style="font-size: 0.8rem; color: var(--text-dim);">No judges configured. Click '+ Add / Edit Judges' to add!</span>`;
+    return;
+  }
+
+  chipsContainer.innerHTML = judges.map((j, idx) => `
+    <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.35); padding: 0.3rem 0.65rem; border-radius: 20px; font-size: 0.82rem; color: #fff;">
+      <span style="color: #00e5ff; font-weight: 700; font-family: var(--font-mono);">#${idx + 1}</span>
+      <strong>${escapeHtml(j.name)}</strong>
+      <button type="button" onclick="quickRenameJudge('${j.id}', '${escapeHtml(j.name)}')" title="Rename ${escapeHtml(j.name)}" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0 0.15rem; display: inline-flex; align-items: center;">
+        <i data-lucide="edit-2" style="width: 12px; height: 12px;"></i>
+      </button>
+      <button type="button" onclick="quickDeleteJudge('${j.id}', '${escapeHtml(j.name)}')" title="Remove ${escapeHtml(j.name)}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0 0.15rem; display: inline-flex; align-items: center;">
+        <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+      </button>
+    </div>
+  `).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
+async function quickRenameJudge(judgeId, currentName) {
+  const newName = prompt(`Enter new name for judge (${currentName}):`, currentName);
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) {
+    showToast('Judge name cannot be empty', 'error');
+    return;
+  }
+  if (!currentEventData || !currentEventData.judges) return;
+
+  const judgesList = currentEventData.judges.map(j => {
+    if (j.id === judgeId) {
+      return { ...j, name: trimmed };
+    }
+    return j;
+  });
+
+  try {
+    const res = await fetch(`/api/events/${activeEventId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ judges: judgesList })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`✅ Judge renamed to "${trimmed}" successfully!`, 'success');
+      await loadAdminData();
+    } else {
+      showToast(data.error || 'Failed to rename judge', 'error');
+    }
+  } catch (e) {
+    showToast('Error updating judge name', 'error');
+  }
+}
+
+async function quickDeleteJudge(judgeId, judgeName) {
+  if (!currentEventData || (currentEventData.judges && currentEventData.judges.length <= 1)) {
+    showToast('At least 1 judge is required for evaluation', 'error');
+    return;
+  }
+  if (!confirm(`Are you sure you want to remove judge "${judgeName}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/events/${activeEventId}/judges/${judgeId}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`✅ Judge "${judgeName}" removed!`, 'success');
+      await loadAdminData();
+    } else {
+      showToast(data.error || 'Failed to remove judge', 'error');
+    }
+  } catch (e) {
+    showToast('Error removing judge', 'error');
   }
 }
 
@@ -870,11 +959,7 @@ async function saveEventEdits() {
     const input = row.querySelector('.judge-name-val');
     const jName = input ? input.value.trim() : `Judge ${idx + 1}`;
     if (jName) {
-      judgesList.append ? judgesList.push({
-        id: row.dataset.judgeId || `j${idx + 1}`,
-        name: jName,
-        is_active: true
-      }) : judgesList.push({
+      judgesList.push({
         id: row.dataset.judgeId || `j${idx + 1}`,
         name: jName,
         is_active: true

@@ -270,6 +270,30 @@ def update_event(event_id):
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/events/<event_id>/add-judge", methods=["POST"])
+def add_judge_route(event_id):
+    try:
+        data = request.get_json(silent=True) or {}
+        judge_name = data.get("name", "").strip() or "Judge"
+        updated = db.add_judge(event_id, judge_name)
+        if not updated:
+            return jsonify({"success": False, "error": "Event not found"}), 404
+        sheets_service.trigger_background_sync(event_id)
+        return jsonify({"success": True, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/events/<event_id>/judges/<judge_id>", methods=["DELETE"])
+def remove_judge_route(event_id, judge_id):
+    try:
+        updated = db.remove_judge(event_id, judge_id)
+        if not updated:
+            return jsonify({"success": False, "error": "Event not found"}), 404
+        sheets_service.trigger_background_sync(event_id)
+        return jsonify({"success": True, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/api/championship", methods=["GET"])
 def get_championship_leaderboard():
     try:

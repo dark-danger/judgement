@@ -4,36 +4,21 @@
     "name": "Group Dance",
     "description": "Agrash 2026 - Inter-School Group Dance Championship",
     "created_at": "2026-10-08T22:58:40.457924",
-    "judge_count": 6,
+    "judge_count": 3,
     "judges": [
       {
         "id": "j1",
-        "name": "Judge 1 (Choreography)",
+        "name": "Dr. Sharma",
         "is_active": true
       },
       {
         "id": "j2",
-        "name": "Judge 2 (Rhythm)",
+        "name": "Prof. Verma",
         "is_active": true
       },
       {
         "id": "j3",
-        "name": "Judge 3 (Costumes)",
-        "is_active": true
-      },
-      {
-        "id": "j4",
-        "name": "Judge 4 (Energy)",
-        "is_active": true
-      },
-      {
-        "id": "j5",
-        "name": "Judge 5 (Overall)",
-        "is_active": true
-      },
-      {
-        "id": "j6",
-        "name": "Chief Guest Judge",
+        "name": "Judge 3",
         "is_active": true
       }
     ],

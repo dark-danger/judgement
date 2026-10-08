@@ -107,6 +107,34 @@ function selectJudge(id, name) {
   showToast(`Welcome, ${name}! Your judging session is active.`, 'success');
 }
 
+async function addNewJudgeFromPortal() {
+  const name = prompt('Enter your judge name or title (e.g. Dr. Sharma / Prof. Verma):');
+  if (name === null) return;
+  const trimmed = name.trim();
+  if (!trimmed) {
+    showToast('Judge name cannot be empty', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/events/${eventId}/add-judge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed })
+    });
+    const data = await res.json();
+    if (data.success && data.event && data.event.judges) {
+      currentEvent = data.event;
+      const newJudge = data.event.judges.find(j => j.name.toLowerCase() === trimmed.toLowerCase()) || data.event.judges[data.event.judges.length - 1];
+      selectJudge(newJudge.id, newJudge.name);
+    } else {
+      showToast(data.error || 'Failed to add judge profile', 'error');
+    }
+  } catch (e) {
+    showToast('Network error adding judge', 'error');
+  }
+}
+
 function updateJudgeUI() {
   if (activeJudge) {
     document.getElementById('activeJudgeBadge').style.display = 'inline-flex';

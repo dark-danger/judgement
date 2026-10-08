@@ -210,7 +210,24 @@
           </div>
         </div>
 
+      <!-- ACTIVE EVENT JUDGES PANEL WIDGET -->
+      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-top: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="gavel" style="color: #00e5ff; width: 20px; height: 20px;"></i>
+            <strong style="color: #00e5ff; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">Assigned Judges (<span id="assignedJudgesCount">0</span>):</strong>
+          </div>
+          <div id="assignedJudgesChips" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Dynamically populated chips -->
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="btn btn-cyan btn-sm" onclick="openEditEventModal()" title="Add, remove or rename judges for this event">
+            <i data-lucide="user-plus"></i> + Add / Edit Judges
+          </button>
+        </div>
       </div>
+
     </section>
 
     <!-- Master Leaderboard & Marks Matrix -->
