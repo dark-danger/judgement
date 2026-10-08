@@ -35,16 +35,20 @@ def index_page():
 def admin_page():
     return send_from_directory(app.static_folder, "admin.html")
 
+@app.route("/judge")
+@app.route("/judges")
 @app.route("/judge/<event_id>")
-def judge_page(event_id):
+def judge_page(event_id=None):
     return send_from_directory(app.static_folder, "judge.html")
 
+@app.route("/sequence")
 @app.route("/sequence/<event_id>")
-def sequence_page(event_id):
+def sequence_page(event_id=None):
     return send_from_directory(app.static_folder, "sequence.html")
 
+@app.route("/projector")
 @app.route("/projector/<event_id>")
-def projector_page(event_id):
+def projector_page(event_id=None):
     return send_from_directory(app.static_folder, "projector.html")
 
 # Static assets fallback
@@ -65,6 +69,27 @@ def get_network_info():
         "network_base_url": f"http://{local_ip}:{port}",
         "localhost_base_url": f"http://127.0.0.1:{port}"
     })
+
+@app.route("/api/supabase/status", methods=["GET"])
+def get_supabase_status():
+    status = db.get_supabase_status()
+    return jsonify({"success": True, **status})
+
+@app.route("/api/supabase/config", methods=["POST"])
+def configure_supabase():
+    data = request.get_json() or {}
+    url = data.get("url", "")
+    key = data.get("key", "")
+    if not url or not key:
+        return jsonify({"success": False, "error": "Both Supabase Project URL and API Key are required"}), 400
+    
+    success, msg = db.configure_supabase(url, key)
+    return jsonify({"success": success, "message": msg, **db.get_supabase_status()})
+
+@app.route("/api/supabase/sync", methods=["POST"])
+def sync_supabase():
+    success, msg = db.sync_local_to_supabase()
+    return jsonify({"success": success, "message": msg})
 
 @app.route("/api/events", methods=["GET"])
 def get_all_events():

@@ -34,6 +34,10 @@
         </div>
       </a>
       <div class="nav-actions">
+        <button id="btnSupabaseModal" class="btn btn-sm" onclick="openSupabaseModal()" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.4); color: #00e5ff;">
+          <span id="supabaseStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; box-shadow: 0 0 8px #eab308; display: inline-block;"></span>
+          <span id="supabaseStatusText">Supabase Sync</span>
+        </button>
         <button class="btn btn-secondary btn-sm" onclick="populateSampleData()" title="Populate demo marks for presentation">
           <i data-lucide="sparkles"></i> Demo Fill Scores
         </button>
@@ -57,9 +61,12 @@
         </div>
 
         <!-- Network Domain / IP Mode Switcher -->
-        <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(0,0,0,0.5); padding: 0.35rem 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
-          <span style="font-size: 0.78rem; color: var(--text-dim); font-weight: 700;">SHARE VIA:</span>
-          <button class="btn-quick active" id="btnModeNetwork" onclick="setLinkHostMode('network')">
+        <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(0,0,0,0.5); padding: 0.35rem 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-glass); flex-wrap: wrap;">
+          <span style="font-size: 0.78rem; color: var(--text-dim); font-weight: 700;">SHARE LINKS VIA:</span>
+          <button class="btn-quick active" id="btnModeCloud" onclick="setLinkHostMode('cloud')">
+            🌐 Live Cloud URL
+          </button>
+          <button class="btn-quick" id="btnModeNetwork" onclick="setLinkHostMode('network')">
             📲 Wi-Fi LAN IP (<span id="lanIpText">192.168.1.x</span>)
           </button>
           <button class="btn-quick" id="btnModeLocalhost" onclick="setLinkHostMode('localhost')">
@@ -297,6 +304,62 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- SUPABASE CLOUD SYNC MODAL -->
+  <div id="supabaseModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="database" style="color: #00e5ff;"></i>
+          <h3>Supabase Cloud Database Settings</h3>
+        </div>
+        <button class="modal-close" onclick="closeSupabaseModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="supabaseStatusCard" style="background: rgba(0,0,0,0.6); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-glass); margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span id="supabaseModalStatusDot" style="width: 10px; height: 10px; border-radius: 50%; background: #eab308;"></span>
+              <strong id="supabaseModalStatusTitle" style="color: #fff; font-size: 0.95rem;">Checking status...</strong>
+            </div>
+            <button class="btn btn-cyan btn-sm" onclick="syncSupabaseDataNow()">
+              <i data-lucide="refresh-cw"></i> Sync Local Data to Cloud
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Supabase Project URL</label>
+          <input type="text" id="supabaseUrlInput" placeholder="https://your-project-ref.supabase.co">
+          <span style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">From Supabase Dashboard -> Project Settings -> API</span>
+        </div>
+
+        <div class="form-group">
+          <label>Supabase Anon / Service Role Key</label>
+          <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          <span style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">From Supabase Dashboard -> Project Settings -> API -> anon public / service_role</span>
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.85rem; background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: var(--radius-md);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+            <strong style="color: #00e5ff; font-size: 0.85rem;"><i data-lucide="terminal"></i> Supabase SQL Schema</strong>
+            <button class="btn btn-secondary btn-sm" onclick="copySupabaseSchemaSql()" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">
+              <i data-lucide="copy"></i> Copy SQL Schema
+            </button>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">
+            Run this in your Supabase Project -> SQL Editor to create <code>events</code> & <code>scores</code> tables with real-time replication.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeSupabaseModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnSaveSupabase" onclick="saveSupabaseConfig()">
+          <i data-lucide="save"></i> Connect & Save
+        </button>
+      </div>
     </div>
   </div>
 

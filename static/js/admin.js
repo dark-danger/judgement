@@ -4,11 +4,23 @@ let activeEventId = null;
 let currentEventData = null;
 let currentScoresData = [];
 let networkInfo = { local_ip: '127.0.0.1', port: 5005, network_base_url: 'http://127.0.0.1:5005' };
-let linkHostMode = 'network'; // 'network' or 'localhost'
+let linkHostMode = 'cloud'; // 'cloud', 'network', 'localhost'
+let supabaseStatus = { connected: false, url: '', has_key: false };
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
+  
+  // Auto-detect mode
+  const host = window.location.hostname;
+  if (host === '127.0.0.1' || host === 'localhost') {
+    linkHostMode = 'network';
+  } else {
+    linkHostMode = 'cloud';
+  }
+  setLinkHostMode(linkHostMode);
+
   fetchNetworkInfo();
+  checkSupabaseStatus();
   renderJudgeNameInputs(5);
   loadAllEvents();
 
@@ -32,9 +44,166 @@ async function fetchNetworkInfo() {
 
 function setLinkHostMode(mode) {
   linkHostMode = mode;
-  document.getElementById('btnModeNetwork').classList.toggle('active', mode === 'network');
-  document.getElementById('btnModeLocalhost').classList.toggle('active', mode === 'localhost');
+  const btnCloud = document.getElementById('btnModeCloud');
+  const btnNet = document.getElementById('btnModeNetwork');
+  const btnLocal = document.getElementById('btnModeLocalhost');
+  
+  if (btnCloud) btnCloud.classList.toggle('active', mode === 'cloud');
+  if (btnNet) btnNet.classList.toggle('active', mode === 'network');
+  if (btnLocal) btnLocal.classList.toggle('active', mode === 'localhost');
   updateShareableLinks();
+}
+
+async function checkSupabaseStatus() {
+  try {
+    const res = await fetch('/api/supabase/status');
+    const data = await res.json();
+    if (data.success) {
+      supabaseStatus = data;
+      updateSupabaseUI();
+    }
+  } catch (e) {}
+}
+
+function updateSupabaseUI() {
+  const dot = document.getElementById('supabaseStatusDot');
+  const text = document.getElementById('supabaseStatusText');
+  const modalDot = document.getElementById('supabaseModalStatusDot');
+  const modalTitle = document.getElementById('supabaseModalStatusTitle');
+  const urlInput = document.getElementById('supabaseUrlInput');
+
+  if (supabaseStatus.connected) {
+    if (dot) {
+      dot.style.background = '#22c55e';
+      dot.style.boxShadow = '0 0 8px #22c55e';
+    }
+    if (text) text.textContent = 'Supabase Cloud (Live)';
+    if (modalDot) modalDot.style.background = '#22c55e';
+    if (modalTitle) modalTitle.innerHTML = `<span style="color: #22c55e;">🟢 Connected to Supabase Cloud</span>`;
+  } else {
+    if (dot) {
+      dot.style.background = '#eab308';
+      dot.style.boxShadow = '0 0 8px #eab308';
+    }
+    if (text) text.textContent = 'Supabase Sync';
+    if (modalDot) modalDot.style.background = '#eab308';
+    if (modalTitle) modalTitle.innerHTML = `<span style="color: #eab308;">🟡 Local JSON Mode (Not Connected)</span>`;
+  }
+
+  if (urlInput && supabaseStatus.url && !urlInput.value) {
+    urlInput.value = supabaseStatus.url;
+  }
+}
+
+function openSupabaseModal() {
+  checkSupabaseStatus();
+  document.getElementById('supabaseModal').classList.add('active');
+}
+
+function closeSupabaseModal() {
+  document.getElementById('supabaseModal').classList.remove('active');
+}
+
+async function saveSupabaseConfig() {
+  const url = document.getElementById('supabaseUrlInput').value.trim();
+  const key = document.getElementById('supabaseKeyInput').value.trim();
+  const btn = document.getElementById('btnSaveSupabase');
+
+  if (!url || !key) {
+    showToast('Please enter both Supabase URL and API Key', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+
+  try {
+    const res = await fetch('/api/supabase/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, key })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('⚡ Connected to Supabase Cloud Database!', 'success');
+      supabaseStatus = data;
+      updateSupabaseUI();
+      closeSupabaseModal();
+      loadAdminData();
+    } else {
+      showToast(`Error: ${data.message || data.error}`, 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to Supabase', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Connect & Save';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+async function syncSupabaseDataNow() {
+  showToast('Synchronizing local data with Supabase...', 'info');
+  try {
+    const res = await fetch('/api/supabase/sync', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+    } else {
+      showToast(`Sync notice: ${data.message}`, 'info');
+    }
+  } catch (err) {
+    showToast('Failed to sync with Supabase', 'error');
+  }
+}
+
+function copySupabaseSchemaSql() {
+  const sql = `-- 🔥 AGRASH Judgement Portal - Supabase SQL Schema
+CREATE TABLE IF NOT EXISTS events (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    judge_count INT DEFAULT 5,
+    judges JSONB DEFAULT '[]'::jsonb,
+    criteria JSONB DEFAULT '[]'::jsonb,
+    sequence JSONB DEFAULT '[]'::jsonb,
+    completed_tags JSONB DEFAULT '[]'::jsonb,
+    current_index INT DEFAULT 0,
+    next_transition_time DOUBLE PRECISION,
+    transition_seconds INT DEFAULT 120,
+    google_sheet_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS scores (
+    id TEXT PRIMARY KEY,
+    event_id TEXT REFERENCES events(id) ON DELETE CASCADE,
+    tag_no TEXT NOT NULL,
+    judge_id TEXT NOT NULL,
+    judge_name TEXT,
+    scores JSONB DEFAULT '{}'::jsonb,
+    total NUMERIC(5, 2) DEFAULT 0,
+    remarks TEXT,
+    admin_overridden BOOLEAN DEFAULT FALSE,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read on events" ON events FOR SELECT USING (true);
+CREATE POLICY "Allow public write on events" ON events FOR ALL USING (true);
+
+CREATE POLICY "Allow public read on scores" ON scores FOR SELECT USING (true);
+CREATE POLICY "Allow public write on scores" ON scores FOR ALL USING (true);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE events;
+ALTER PUBLICATION supabase_realtime ADD TABLE scores;`;
+
+  navigator.clipboard.writeText(sql).then(() => {
+    showToast('SQL Schema copied to clipboard! Paste into Supabase SQL Editor.', 'success');
+  });
 }
 
 async function loadAllEvents() {
@@ -92,7 +261,15 @@ async function loadAdminData() {
 function updateShareableLinks() {
   if (!currentEventData) return;
 
-  const base = linkHostMode === 'network' ? networkInfo.network_base_url : window.location.origin;
+  let base = window.location.origin;
+  if (linkHostMode === 'network') {
+    base = networkInfo.network_base_url;
+  } else if (linkHostMode === 'localhost') {
+    base = networkInfo.localhost_base_url || 'http://127.0.0.1:5005';
+  } else {
+    // cloud mode
+    base = window.location.origin;
+  }
   
   const judgeLink = `${base}/judge/${currentEventData.id}`;
   const seqLink = `${base}/sequence/${currentEventData.id}`;

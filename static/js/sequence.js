@@ -1,5 +1,6 @@
 // Sequence Controller Logic
-const eventId = window.location.pathname.split('/').pop() || 'evt-agrash';
+let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
+let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
 
 let currentEvent = null;
 
