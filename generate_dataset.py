@@ -1,0 +1,81 @@
+import csv
+import os
+
+data = [
+    ["School Name", "Group Dance", "Tags", "Group Song", "Tags", "Declamation", "Tags", "Science Exhibition", "Tags", "Green Room Allocation"],
+    ["58", "43", "", "27", "", "44", "", "30", "", ""],
+    ["Delhi Public School DPS Kathua", "YES", "D-21", "", "", "YES", "DC-21", "YES", "SE-21", "F-501"],
+    ["SMR International School Safidon", "YES", "D-22", "", "", "YES", "DC-22", "", "", "F-502"],
+    ["ST Andrews World School Kundli", "", "", "YES", "S-23", "", "", "", "", "F-503"],
+    ["Sant Nikka Singh Public School Model Town Karnal", "YES", "D-24", "YES", "S-24", "YES", "DC-24", "", "", "F-504"],
+    ["JP Jain Sr Sec School Sonipat", "YES", "D-25", "", "", "YES", "DC-25", "", "", "F-505"],
+    ["Himgiri Public School Samalkha", "YES", "D-26", "", "", "", "", "", "", "F-506"],
+    ["Delhi Public School DPS Panipat City", "", "", "", "", "YES", "DC-27", "YES", "SE-27", "F-507"],
+    ["Doon Public School Gohana", "YES", "D-28", "", "", "YES", "DC-28", "YES", "SE-28", "F-508"],
+    ["Navyug Public High School", "", "", "", "", "", "", "YES", "SE-29", "F-509"],
+    ["Arya Kanya Gurukul Sr Sec School Karnal", "YES", "D-30", "YES", "S-30", "YES", "DC-30", "", "", "F-510"],
+    ["Pratap Public School Sector 6 Karnal", "", "", "", "", "YES", "DC-31", "YES", "SE-31", "F-511"],
+    ["DAV Public School Thermal Colony Panipat", "YES", "D-32", "", "", "", "", "YES", "SE-32", "F-513"],
+    ["DAV Police Public Sr Sec School Police Line Sonipat", "YES", "D-33", "", "", "", "", "YES", "SE-33", "F-514"],
+    ["Guru Teg Bhadur Public School Karnal", "YES", "D-34", "YES", "S-34", "YES", "DC-34", "YES", "SE-34", "F-401"],
+    ["Ujala Modern Sr Sec School Kaith Shahpur Israna", "YES", "D-35", "", "", "", "", "", "", "F-405"],
+    ["Motilal Nehru Public School Urban Estate Jind", "YES", "D-36", "", "", "YES", "DC-36", "YES", "SE-36", "F-406"],
+    ["DAV Police Public School Police Line Karnal", "YES", "D-37", "YES", "S-37", "YES", "DC-37", "YES", "SE-37", "F-407"],
+    ["Sarv Vidya Public School Indri", "YES", "D-38", "", "", "YES", "DC-38", "", "", "F-408"],
+    ["Halwasiya Vidya Vihar Sr Sec School Bhiwani", "YES", "D-39", "YES", "S-39", "YES", "DC-39", "YES", "SE-39", "F-409"],
+    ["Shiv Shakti Sr Sec School Sonipat", "", "", "", "", "YES", "DC-40", "", "", "F-410"],
+    ["Pratap Singh Memorial Sr Sec School Sonipat", "", "", "", "", "YES", "DC-41", "YES", "SE-41", "F-302"],
+    ["Babu Ram ( BR ) Global School Gannaur", "", "", "YES", "S-42", "YES", "DC-42", "YES", "SE-42", "F-303"],
+    ["MM Public School Assandh", "YES", "D-43", "YES", "S-43", "YES", "DC-43", "YES", "SE-43", "F-310"],
+    ["Mothers Pride School Pataudi Gurugram", "YES", "D-44", "YES", "S-44", "YES", "DC-44", "YES", "SE-44", "F-311"],
+    ["BR International Public School Kurukshetra", "YES", "D-45", "YES", "S-45", "YES", "DC-45", "YES", "SE-45", "F-202"],
+    ["RPS International School Sector 50 Gurgaon", "", "", "", "", "", "", "YES", "SE-46", "F-203"],
+    ["Holy Family Convent School Gohana", "", "", "", "", "YES", "DC-47", "", "", "F-204"],
+    ["Mahavati Sports Sr Sec School Pawti Samalkha", "", "", "", "", "YES", "DC-48", "YES", "SE-48", "F-205"],
+    ["Lakshay International School Naultha Panipat", "YES", "D-49", "", "", "YES", "DC-49", "YES", "SE-49", "F-206"],
+    ["Rishikul Vidyapeeth Sonipat", "YES", "D-50", "YES", "S-50", "YES", "DC-50", "", "", "F-207"],
+    ["Sant Nischal Singh Public School Yamunanagar", "YES", "D-51", "YES", "S-51", "YES", "DC-51", "YES", "SE-51", "F-209"],
+    ["SD Sr Sec School Panipat", "YES", "D-52", "YES", "S-52", "YES", "DC-52", "YES", "SE-52", "F-210"],
+    ["Geeta Vidya Mandir Public School Nimbari", "", "", "YES", "S-53", "", "", "YES", "SE-53", "D-201"],
+    ["Dayanand Public School Gohana", "", "", "", "", "YES", "DC-54", "YES", "SE-54", "D-202"],
+    ["Saraswati Public School Jagadhri Yamunanagar", "YES", "D-55", "YES", "S-55", "YES", "DC-55", "YES", "SE-55", "D-204"],
+    ["DAV Centenary Public School Police Line Samalkha Panipat", "YES", "D-56", "YES", "S-56", "", "", "", "", "D-205"],
+    ["JPS Academy Assandh", "YES", "D-57", "YES", "S-57", "YES", "DC-57", "YES", "SE-57", "D-207"],
+    ["Delhi Public School Jind", "YES", "D-58", "YES", "S-58", "YES", "DC-58", "", "", "D-404"],
+    ["Maharishi Dayanand Sr Sec School Ballah Karnal", "YES", "D-59", "", "", "", "", "", "", "D-405"],
+    ["Yaduvanshi Niketan School Sector 33 Gurugram", "YES", "D-60", "", "", "YES", "DC-60", "YES", "SE-60", "E-303"],
+    ["Sant Nikka Singh Public School Zarifa Farm Karnal", "YES", "D-61", "YES", "S-61", "YES", "DC-61", "", "", "E-304"],
+    ["Geeta Vidya Mandir Public School NHBC Panipat", "YES", "D-62", "YES", "S-62", "YES", "DC-62", "", "", "E-305"],
+    ["Shaheed Bhagat Singh Sr Sec School Karnal", "YES", "D-63", "", "", "YES", "DC-63", "", "", "E-307"],
+    ["Swastik Bal Vikas Sr Sec School Panipat", "YES", "D-64", "YES", "S-64", "YES", "DC-64", "YES", "SE-64", "E-308"],
+    ["Silver Bells Public School Shamli", "", "", "YES", "S-65", "YES", "DC-65", "", "", "E-310"],
+    ["The Golden Era Public School", "YES", "D-66", "", "", "", "", "", "", ""],
+    ["MASD Public School Panipat", "", "", "", "", "YES", "DC-67", "", "", ""],
+    ["SD Modern Sr Sec School Panipat", "YES", "D-68", "", "", "YES", "DC-68", "", "", ""],
+    ["DR MKK Arya Model Sr Sec School Panipat", "YES", "D-69", "YES", "S-69", "YES", "DC-69", "YES", "SE-69", ""],
+    ["Global Public School Gohana", "", "", "", "", "YES", "DC-70", "", "", ""],
+    ["Sunrise Public School Panipat", "YES", "D-71", "", "", "YES", "DC-71", "", "", ""],
+    ["Gyandeep Sr Sec School Gannaur", "YES", "D-72", "", "", "YES", "DC-72", "YES", "SE-72", ""],
+    ["OM Public School Gohana", "YES", "D-73", "YES", "S-73", "YES", "DC-73", "YES", "SE-73", ""],
+    ["Montessori City School Kathua", "YES", "D-74", "", "", "", "", "", "", ""],
+    ["Adarsh Vidya Mandir Sr Sec School Panipat", "YES", "D-75", "", "", "", "", "", "", ""],
+    ["North Valley Public School", "YES", "D-76", "YES", "S-76", "YES", "DC-76", "", "", ""],
+    ["RKSD Public School Kaithal", "YES", "D-77", "YES", "S-77", "", "", "", "", ""],
+    ["DAV Police Public School Kurukshetra", "YES", "D-78", "YES", "S-78", "YES", "DC-78", "", "", ""]
+]
+
+out_dir = "/Users/yash/Documents/WORKS/Registration/data"
+os.makedirs(out_dir, exist_ok=True)
+csv_path = os.path.join(out_dir, "agrash_schools_sheet.csv")
+
+with open(csv_path, "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerows(data)
+
+# Also create static downloadable version
+static_dir = "/Users/yash/Documents/WORKS/Registration/static"
+with open(os.path.join(static_dir, "agrash_schools_sheet.csv"), "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerows(data)
+
+print(f"✅ Generated exact Agrash Schools Sheet CSV with {len(data)-2} schools and all category tags!")
