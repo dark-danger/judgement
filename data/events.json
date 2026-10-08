@@ -644,7 +644,8 @@
         "notes": "Declamation • Delhi Public School DPS Kathua (Room: F-501)",
         "completed_at": "09:26 PM"
       }
-    ]
+    ],
+    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbwTlyRir62OFv-xjZup9mascZ-awMXvYO7cgPMjTEJb_6gD0T_nR5WW2gRYVRfAE57g7g/exec"
   },
   {
     "id": "evt-grand-finale-2026",
