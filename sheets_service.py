@@ -191,86 +191,81 @@ class SheetsService:
             logger.error(f"Error syncing final championship: {e}")
             return False, str(e)
 
-    def trigger_master_registration_sync(self):
-        """Spawns background thread to update Master Registrations tab in Google Sheet"""
-        thread = threading.Thread(target=self.sync_master_registrations, daemon=True)
+    CATEGORY_TAB_MAP = {
+        "group dance": "registration_dance",
+        "group song": "registration_song",
+        "declamation": "registration_declamation",
+        "science exhibition": "registration_science"
+    }
+
+    def trigger_registration_sync(self, category=None):
+        """Spawns background thread to update specific or all 4 registration sheets in Google Sheet"""
+        def _worker():
+            if category:
+                self.sync_category_registration(category)
+            else:
+                self.sync_all_registration_sheets()
+        thread = threading.Thread(target=_worker, daemon=True)
         thread.start()
 
-    def sync_master_registrations(self, webhook_url=None):
-        """Pushes full 58 schools attendance and desk assignment matrix to Google Sheet 'Master Registrations' tab"""
+    def sync_category_registration(self, category_name, webhook_url=None):
+        """Pushes single category registration & attendance sheet (e.g. registration_dance) to Google Sheet"""
         try:
             from registration_service import registration_service
             from database import db
 
+            tab_name = self.CATEGORY_TAB_MAP.get(category_name.lower().strip(), f"registration_{category_name.lower()[:5]}")
             schools = registration_service.get_all()
-            if not schools:
-                return False, "No registration records"
+            
+            headers = [
+                "S.No",
+                "Tag No",
+                "School Name",
+                "Assigned Desk",
+                "Room / Flat",
+                "Attendance Status",
+                "Check-In Time",
+                "Last Updated"
+            ]
+
+            rows = [headers]
+            count = 1
+            for s in schools:
+                ev = next((e for e in s.get("events", []) if e.get("category").lower() == category_name.lower()), None)
+                if ev:
+                    st = ev.get("status", "PENDING")
+                    if st == "PRESENT":
+                        st_display = "PRESENT (✅)"
+                    elif st == "ABSENT":
+                        st_display = "ABSENT (❌)"
+                    else:
+                        st_display = "PENDING (⏳)"
+
+                    row = [
+                        f"#{count}",
+                        ev.get("tag_no", ""),
+                        s["school_name"],
+                        f"Desk {s['desk_no']}",
+                        s.get("room_no", "-"),
+                        st_display,
+                        ev.get("marked_at") or "-",
+                        datetime.now().strftime("%I:%M %p")
+                    ]
+                    rows.append(row)
+                    count += 1
 
             events = db.get_events()
             webhook = webhook_url
             if not webhook and events:
                 webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
 
-            headers = [
-                "S.No",
-                "School Name",
-                "Assigned Desk",
-                "Room / Flat",
-                "Group Dance",
-                "Group Song",
-                "Declamation",
-                "Science Exhibition",
-                "Arrival Status",
-                "Check-In Time",
-                "Last Updated"
-            ]
-
-            rows = [headers]
-            for s in schools:
-                ev_map = {ev["category"]: ev for ev in s.get("events", [])}
-
-                def fmt_ev(cat):
-                    ev = ev_map.get(cat)
-                    if not ev:
-                        return "-"
-                    tag = ev.get("tag_no", "")
-                    st = ev.get("status", "PENDING")
-                    if st == "PRESENT":
-                        return f"{tag} (✅ PRESENT)"
-                    elif st == "ABSENT":
-                        return f"{tag} (❌ ABSENT)"
-                    return f"{tag} (⏳ PENDING)"
-
-                d_str = fmt_ev("Group Dance")
-                s_str = fmt_ev("Group Song")
-                dc_str = fmt_ev("Declamation")
-                se_str = fmt_ev("Science Exhibition")
-
-                arr_status = "🟢 ARRIVED" if s.get("is_arrived") else "⏳ PENDING"
-                arr_time = s.get("arrived_at") or "-"
-
-                row = [
-                    f"#{s['seq_no']}",
-                    s["school_name"],
-                    f"Desk {s['desk_no']}",
-                    s.get("room_no", "-"),
-                    d_str,
-                    s_str,
-                    dc_str,
-                    se_str,
-                    arr_status,
-                    arr_time,
-                    datetime.now().strftime("%I:%M %p")
-                ]
-                rows.append(row)
-
             if webhook and webhook.startswith("http"):
                 import requests
                 resp = requests.post(
                     webhook,
                     json={
-                        "event_name": "Agrash Master Registrations",
-                        "tab_name": "Master Registrations",
+                        "event_name": f"Registration {category_name}",
+                        "tab_name": tab_name,
                         "rows": rows,
                         "timestamp": datetime.now().isoformat()
                     },
@@ -278,16 +273,25 @@ class SheetsService:
                     timeout=25,
                     allow_redirects=True
                 )
-                logger.info(f"⚡ [Master Registrations Webhook] Synced successfully! Status: {resp.status_code}")
-                return True, "Master Registrations tab synced successfully"
+                logger.info(f"⚡ [{tab_name} Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, f"{tab_name} synced successfully"
 
             return False, "No webhook configured"
         except Exception as e:
-            logger.error(f"Error syncing master registrations: {e}")
+            logger.error(f"Error syncing category registration: {e}")
             return False, str(e)
 
+    def sync_all_registration_sheets(self, webhook_url=None):
+        """Pushes all 4 separate registration tabs (dance, song, declamation, science) to Google Sheet"""
+        cats = ["Group Dance", "Group Song", "Declamation", "Science Exhibition"]
+        res = {}
+        for c in cats:
+            ok, msg = self.sync_category_registration(c, webhook_url=webhook_url)
+            res[c] = {"success": ok, "message": msg}
+        return True, res
+
     def sync_all_events(self):
-        """Syncs all registered events, Final Result, and Master Registrations to their respective tabs in Google Sheet"""
+        """Syncs all registered evaluation events, Final Result, and 4 Registration tabs to Google Sheet"""
         try:
             from database import db
             events = db.get_events()
@@ -300,14 +304,15 @@ class SheetsService:
             ok_fin, msg_fin = self.sync_final_championship()
             results["Final Result"] = {"success": ok_fin, "message": msg_fin}
 
-            # Sync Master Registrations
-            ok_reg, msg_reg = self.sync_master_registrations()
-            results["Master Registrations"] = {"success": ok_reg, "message": msg_reg}
+            # Sync 4 Registration sheets
+            ok_regs, res_regs = self.sync_all_registration_sheets()
+            results["Registrations"] = res_regs
 
             return True, results
         except Exception as e:
             logger.error(f"Error in sync_all_events: {e}")
             return False, str(e)
+
 
 
     def auto_sync_event(self, event_id):

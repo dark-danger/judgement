@@ -151,10 +151,10 @@ class RegistrationService:
 
         if updated_school:
             self._save(data)
-            # Trigger background sheet sync
+            # Trigger background sheet sync for affected category or all
             try:
                 from sheets_service import sheets_service
-                sheets_service.trigger_master_registration_sync()
+                sheets_service.trigger_registration_sync(category if not mark_all else None)
             except Exception as e:
                 logger.error(f"Error triggering sheet sync on attendance: {e}")
 
