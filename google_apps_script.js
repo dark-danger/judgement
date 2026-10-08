@@ -31,6 +31,33 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // Support deleting unwanted tabs
+    if (payload.action === "delete_tabs" || payload.delete_tabs) {
+      var toDelete = payload.delete_tabs || [
+        "registration_dance",
+        "registration_song",
+        "registration_declamation",
+        "registration_science",
+        "Master Registrations",
+        "Live Scores",
+        "Sheet1",
+        "Sheet2"
+      ];
+      var deleted = [];
+      for (var i = 0; i < toDelete.length; i++) {
+        var sh = ss.getSheetByName(toDelete[i]);
+        if (sh && ss.getSheets().length > 1) {
+          ss.deleteSheet(sh);
+          deleted.push(toDelete[i]);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        deleted_tabs: deleted,
+        remaining_tabs: ss.getSheets().map(function(s) { return s.getName(); })
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var tabName = payload.tab_name || "Live Scores";
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) {
