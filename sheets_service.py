@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import threading
-import urllib.request
 from datetime import datetime
 
 logger = logging.getLogger("sheets_service")
@@ -22,7 +21,6 @@ class SheetsService:
             import gspread
             from google.oauth2.service_account import Credentials
 
-            # Check environment variable for JSON string (ideal for Vercel)
             sa_json_env = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
             if sa_json_env:
                 try:
@@ -32,7 +30,6 @@ class SheetsService:
                 except Exception as e:
                     logger.error(f"Error loading GOOGLE_SERVICE_ACCOUNT_JSON env: {e}")
 
-            # Check local file
             if os.path.exists(self.credentials_path):
                 creds = Credentials.from_service_account_file(self.credentials_path, scopes=SCOPES)
                 return gspread.authorize(creds)
@@ -40,10 +37,13 @@ class SheetsService:
             logger.error(f"Error authorizing gspread: {e}")
         return None
 
-    def trigger_background_sync(self, event_id):
+    def trigger_background_sync(self, event_id=None):
         """Spawns non-blocking background thread to update connected Google Sheet and Final Result tab"""
         def _sync_worker():
-            self.auto_sync_event(event_id)
+            if event_id:
+                self.auto_sync_event(event_id)
+            else:
+                self.sync_all_events()
             self.sync_final_championship()
 
         thread = threading.Thread(target=_sync_worker, daemon=True)
@@ -191,134 +191,12 @@ class SheetsService:
             logger.error(f"Error syncing final championship: {e}")
             return False, str(e)
 
-    CATEGORY_TAB_MAP = {
-        "group dance": "registration_dance",
-        "group song": "registration_song",
-        "declamation": "registration_declamation",
-        "science exhibition": "registration_science"
-    }
-
-    def trigger_registration_sync(self, category=None):
-        """Spawns background thread to update specific or all 4 registration sheets in Google Sheet"""
-        def _worker():
-            if category:
-                self.sync_category_registration(category)
-            else:
-                self.sync_all_registration_sheets()
-        thread = threading.Thread(target=_worker, daemon=True)
-        thread.start()
-
-    def sync_category_registration(self, category_name, webhook_url=None):
-        """Pushes single category registration & attendance sheet (e.g. registration_dance) to Google Sheet"""
-        try:
-            from registration_service import registration_service
-            from database import db
-
-            tab_name = self.CATEGORY_TAB_MAP.get(category_name.lower().strip(), f"registration_{category_name.lower()[:5]}")
-            schools = registration_service.get_all()
-            
-            headers = [
-                "S.No",
-                "Tag No",
-                "School Name",
-                "Assigned Desk",
-                "Room / Flat",
-                "Attendance Status",
-                "Check-In Time",
-                "Last Updated"
-            ]
-
-            rows = [headers]
-            count = 1
-            for s in schools:
-                ev = next((e for e in s.get("events", []) if e.get("category").lower() == category_name.lower()), None)
-                if ev:
-                    st = ev.get("status", "PENDING")
-                    if st == "PRESENT":
-                        st_display = "PRESENT (✅)"
-                    elif st == "ABSENT":
-                        st_display = "ABSENT (❌)"
-                    else:
-                        st_display = "PENDING (⏳)"
-
-                    row = [
-                        f"#{count}",
-                        ev.get("tag_no", ""),
-                        s["school_name"],
-                        f"Desk {s['desk_no']}",
-                        s.get("room_no", "-"),
-                        st_display,
-                        ev.get("marked_at") or "-",
-                        datetime.now().strftime("%I:%M %p")
-                    ]
-                    rows.append(row)
-                    count += 1
-
-            events = db.get_events()
-            webhook = webhook_url
-            if not webhook and events:
-                webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
-
-            if webhook and webhook.startswith("http"):
-                import requests
-                resp = requests.post(
-                    webhook,
-                    json={
-                        "event_name": f"Registration {category_name}",
-                        "tab_name": tab_name,
-                        "rows": rows,
-                        "timestamp": datetime.now().isoformat()
-                    },
-                    headers={"Content-Type": "application/json"},
-                    timeout=25,
-                    allow_redirects=True
-                )
-                logger.info(f"⚡ [{tab_name} Webhook] Synced successfully! Status: {resp.status_code}")
-                return True, f"{tab_name} synced successfully"
-
-            return False, "No webhook configured"
-        except Exception as e:
-            logger.error(f"Error syncing category registration: {e}")
-            return False, str(e)
-
-    def sync_all_registration_sheets(self, webhook_url=None):
-        """Pushes all 4 separate registration tabs (dance, song, declamation, science) to Google Sheet"""
-        cats = ["Group Dance", "Group Song", "Declamation", "Science Exhibition"]
-        res = {}
-        for c in cats:
-            ok, msg = self.sync_category_registration(c, webhook_url=webhook_url)
-            res[c] = {"success": ok, "message": msg}
-        return True, res
-
-    def sync_all_events(self):
-        """Syncs all registered evaluation events, Final Result, and 4 Registration tabs to Google Sheet"""
-        try:
-            from database import db
-            events = db.get_events()
-            results = {}
-            for ev in events:
-                ok, msg = self.auto_sync_event(ev["id"])
-                results[ev["name"]] = {"success": ok, "message": msg}
-
-            # Sync Final Combined Result
-            ok_fin, msg_fin = self.sync_final_championship()
-            results["Final Result"] = {"success": ok_fin, "message": msg_fin}
-
-            # Sync 4 Registration sheets
-            ok_regs, res_regs = self.sync_all_registration_sheets()
-            results["Registrations"] = res_regs
-
-            return True, results
-        except Exception as e:
-            logger.error(f"Error in sync_all_events: {e}")
-            return False, str(e)
-
-
-
     def auto_sync_event(self, event_id):
-        """Automatically pushes live leaderboard and marksheet to connected Google Sheet"""
+        """Automatically pushes live leaderboard and marksheet with Attendance column to connected Google Sheet"""
         try:
             from database import db
+            from registration_service import registration_service
+
             event = db.get_event(event_id)
             if not event:
                 return False, "Event not found"
@@ -326,6 +204,20 @@ class SheetsService:
             scores = db.get_scores(event_id=event["id"])
             judges = event.get("judges", [])
             
+            # Map attendance status for all tags
+            all_reg = registration_service.get_all()
+            tag_att_map = {}
+            for s in all_reg:
+                for ev in s.get("events", []):
+                    st = ev.get("status", "PENDING")
+                    if st == "PRESENT":
+                        st_display = "PRESENT (✅)"
+                    elif st == "ABSENT":
+                        st_display = "ABSENT (❌)"
+                    else:
+                        st_display = "PENDING (⏳)"
+                    tag_att_map[ev["tag_no"]] = st_display
+
             all_tags = []
             tag_meta = {}
 
@@ -338,10 +230,11 @@ class SheetsService:
                     all_tags.append(c["tag_no"])
                     tag_meta[c["tag_no"]] = c.get("notes", "")
 
-            headers = ["Rank", "Tag No", "School & Category"]
+            # Distinct Attendance (Present/Absent) column
+            headers = ["Rank", "Tag No", "School & Details", "Attendance (Present/Absent)"]
             for j in judges:
                 headers.append(f"{j['name']} (/100)")
-            headers.extend(["Overall Average (/100)", "Judges Scored", "Status", "Last Updated"])
+            headers.extend(["Overall Average (/100)", "Judges Scored", "Stage Status", "Last Updated"])
 
             rows_data = []
             for tag_no in all_tags:
@@ -349,7 +242,8 @@ class SheetsService:
                 is_completed = any(c.get("tag_no") == tag_no for c in event.get("completed_tags", []))
                 is_live = (event.get("sequence") and event["sequence"][0]["tag_no"] == tag_no)
                 
-                status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else "IN QUEUE")
+                stage_status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else "IN QUEUE")
+                att_status = tag_att_map.get(tag_no, "PENDING (⏳)")
 
                 j_totals = []
                 row_judge_cols = []
@@ -365,10 +259,11 @@ class SheetsService:
                 rows_data.append({
                     "tag_no": tag_no,
                     "details": tag_meta.get(tag_no, ""),
+                    "attendance": att_status,
                     "judge_scores": row_judge_cols,
                     "avg": avg,
                     "count": len(j_totals),
-                    "status": status
+                    "status": stage_status
                 })
 
             # Sort by highest average
@@ -378,40 +273,39 @@ class SheetsService:
             
             final_table_rows = [headers]
             for idx, r in enumerate(scored_rows, start=1):
-                row = [f"#{idx}", r["tag_no"], r["details"]]
+                row = [f"#{idx}", r["tag_no"], r["details"], r["attendance"]]
                 row.extend(r["judge_scores"])
                 row.extend([r["avg"], f"{r['count']}/{len(judges)}", r["status"], datetime.now().strftime("%I:%M %p")])
                 final_table_rows.append(row)
 
             for r in unscored_rows:
-                row = ["-", r["tag_no"], r["details"]]
+                row = ["-", r["tag_no"], r["details"], r["attendance"]]
                 row.extend(r["judge_scores"])
                 row.extend(["-", f"0/{len(judges)}", r["status"], datetime.now().strftime("%I:%M %p")])
                 final_table_rows.append(row)
 
-            # Check 1: Google Apps Script Webhook URL (Instant 0-auth sync)
+            # Push to Google Sheet Webhook
             webhook_url = event.get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
-            if webhook_url and webhook_url.startswith("http"):
-                try:
-                    import requests
-                    resp = requests.post(
-                        webhook_url,
-                        json={
-                            "event_name": event["name"],
-                            "tab_name": event.get("name", "Live Scores"),
-                            "rows": final_table_rows,
-                            "timestamp": datetime.now().isoformat()
-                        },
-                        headers={"Content-Type": "application/json"},
-                        timeout=25,
-                        allow_redirects=True
-                    )
-                    logger.info(f"⚡ [Google Sheet Webhook] Auto-updated successfully! Status: {resp.status_code}")
-                    return True, "Auto-updated via Webhook"
-                except Exception as ex:
-                    logger.error(f"Webhook request failed: {ex}")
+            tab_name = event.get("name", "Live Scores")
 
-            # Check 2: Service account connection
+            if webhook_url and webhook_url.startswith("http"):
+                import requests
+                resp = requests.post(
+                    webhook_url,
+                    json={
+                        "event_name": event["name"],
+                        "tab_name": tab_name,
+                        "rows": final_table_rows,
+                        "timestamp": datetime.now().isoformat()
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=25,
+                    allow_redirects=True
+                )
+                logger.info(f"⚡ [Google Sheet Webhook] Auto-updated '{tab_name}'! Status: {resp.status_code}")
+                return True, f"Auto-updated '{tab_name}' via Webhook"
+
+            # Fallback to Service Account if configured
             client = self._get_client()
             target_sheet = event.get("google_sheet_url") or os.environ.get("GOOGLE_SHEET_URL")
             if client and target_sheet:
@@ -420,7 +314,6 @@ class SheetsService:
                 else:
                     sheet = client.open_by_key(target_sheet)
 
-                tab_name = "Live Scores"
                 try:
                     worksheet = sheet.worksheet(tab_name)
                     worksheet.clear()
@@ -428,28 +321,34 @@ class SheetsService:
                     worksheet = sheet.add_worksheet(title=tab_name, rows=len(final_table_rows) + 20, cols=20)
 
                 worksheet.update("A1", final_table_rows)
-                logger.info(f"⚡ [Google Sheet Service Account] Auto-updated '{sheet.title}'!")
-                return True, "Auto-updated via Service Account"
+                logger.info(f"⚡ [Google Sheet Service Account] Auto-updated '{sheet.title}' ({tab_name})!")
+                return True, f"Auto-updated '{tab_name}' via Service Account"
 
             return False, "No Google Sheet Webhook or Service Account configured"
         except Exception as e:
             logger.error(f"Auto-sync error: {e}")
             return False, str(e)
 
+    def sync_all_events(self):
+        """Syncs all 4 category evaluation events and Final Result to Google Sheet"""
+        try:
+            from database import db
+            events = db.get_events()
+            results = {}
+            for ev in events:
+                ok, msg = self.auto_sync_event(ev["id"])
+                results[ev["name"]] = {"success": ok, "message": msg}
+
+            # Sync Final Combined Result
+            ok_fin, msg_fin = self.sync_final_championship()
+            results["Final Result"] = {"success": ok_fin, "message": msg_fin}
+
+            return True, results
+        except Exception as e:
+            logger.error(f"Error in sync_all_events: {e}")
+            return False, str(e)
+
     def export_event_scores(self, event, scores, sheet_url_or_name=None):
         return self.auto_sync_event(event["id"])
-
-    def import_tags_from_sheet(self, sheet_url_or_name, column_index=1):
-        client = self._get_client()
-        if not client:
-            return False, "Google service account not configured", []
-        try:
-            sheet = client.open_by_url(sheet_url_or_name) if "http" in sheet_url_or_name else client.open(sheet_url_or_name)
-            ws = sheet.get_worksheet(0)
-            col_vals = ws.col_values(column_index)
-            tags = [v.strip() for v in col_vals if v.strip() and v.strip().lower() != "tags"]
-            return True, f"Found {len(tags)} tags", tags
-        except Exception as e:
-            return False, str(e), []
 
 sheets_service = SheetsService()
