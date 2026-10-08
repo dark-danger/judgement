@@ -1,23 +1,16 @@
 /**
- * 🔥 AGRASH 2026 - Automatic Google Sheet Live Sync WebApp Script
- * =============================================================
- * 
- * STEPS TO DEPLOY (Only 30 Seconds):
- * 1. Open your Google Sheet: https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit
- * 2. In top menu, click: Extensions -> Apps Script
- * 3. Delete any existing code, paste this ENTIRE code, and click Save (💾).
- * 4. In top-right, click: "Deploy" -> "New deployment"
- * 5. Select Type (⚙️ gear icon): "Web app"
- * 6. Set Description: "Agrash Sync"
- * 7. Set "Execute as": "Me"
- * 8. Set "Who has access": "Anyone"  <-- IMPORTANT!
- * 9. Click "Deploy", copy the generated Web App URL, and paste it in Agrash Admin Panel!
+ * 🔥 AGRASH 2026 - Automatic Google Sheet Live Sync WebApp Script (HARD-LINKED)
+ * =============================================================================
+ * SPREADSHEET ID: 1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk
  */
+
+var TARGET_SPREADSHEET_ID = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk";
 
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
-    message: "⚡ Agrash Live Sync WebApp is active and ready to receive scores!"
+    sheet_id: TARGET_SPREADSHEET_ID,
+    message: "⚡ Agrash Live Sync WebApp is active and ready to write into Google Sheet!"
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -29,9 +22,16 @@ function doPost(e) {
     }
 
     var payload = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var tabName = payload.tab_name || "Live Scores";
+    var sheetId = payload.sheet_id || TARGET_SPREADSHEET_ID;
     
+    // Explicitly open the user's Google Sheet by ID
+    var ss = SpreadsheetApp.openById(sheetId);
+    if (!ss) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Could not open spreadsheet with ID: " + sheetId }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var tabName = payload.tab_name || "Live Scores";
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) {
       sheet = ss.insertSheet(tabName);
@@ -58,10 +58,10 @@ function doPost(e) {
       headerRange.setHorizontalAlignment("center");
       sheet.setRowHeight(1, 32);
 
-      // Center-align columns
+      // Column Alignment
       for (var col = 1; col <= numCols; col++) {
         if (col === 3) {
-          // School name left-align
+          // School details column left-aligned
           sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("left");
         } else {
           sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("center");
@@ -69,17 +69,11 @@ function doPost(e) {
       }
 
       // Highlight Top 3 Ranks
-      if (numRows > 1) {
-        sheet.getRange(2, 1, 1, numCols).setBackground("#fef3c7"); // #1 Gold tint
-      }
-      if (numRows > 2) {
-        sheet.getRange(3, 1, 1, numCols).setBackground("#f1f5f9"); // #2 Silver tint
-      }
-      if (numRows > 3) {
-        sheet.getRange(4, 1, 1, numCols).setBackground("#ffedd5"); // #3 Bronze tint
-      }
+      if (numRows > 1) sheet.getRange(2, 1, 1, numCols).setBackground("#fef3c7"); // #1 Gold tint
+      if (numRows > 2) sheet.getRange(3, 1, 1, numCols).setBackground("#f1f5f9"); // #2 Silver tint
+      if (numRows > 3) sheet.getRange(4, 1, 1, numCols).setBackground("#ffedd5"); // #3 Bronze tint
 
-      // Auto-resize columns
+      // Auto-fit columns
       for (var c = 1; c <= numCols; c++) {
         sheet.autoResizeColumn(c);
       }
@@ -87,8 +81,9 @@ function doPost(e) {
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      updated_rows: rows.length,
+      sheet_title: ss.getName(),
       tab: tabName,
+      updated_rows: rows.length,
       timestamp: new Date().toISOString()
     })).setMimeType(ContentService.MimeType.JSON);
 
