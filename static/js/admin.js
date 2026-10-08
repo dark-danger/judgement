@@ -604,6 +604,12 @@ async function syncWithGoogleSheets() {
   }
 }
 
+function exportExcel() {
+  if (!activeEventId) return;
+  window.location.href = `/api/events/${activeEventId}/export-excel`;
+  showToast('📊 Generating & downloading multi-sheet Excel workbook...', 'success');
+}
+
 function exportCsv() {
   if (!activeEventId) return;
   window.location.href = `/api/events/${activeEventId}/export-csv`;

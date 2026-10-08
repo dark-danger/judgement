@@ -75,10 +75,10 @@
         </div>
 
         <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-          <button class="btn btn-emerald btn-sm" onclick="syncWithGoogleSheets()">
-            <i data-lucide="sheet"></i> Sync Google Sheet
+          <button class="btn btn-emerald btn-sm" onclick="exportExcel()" title="Download multi-tab Excel with Master, Dance, Song, Declamation, Science & Marksheet">
+            <i data-lucide="file-spreadsheet"></i> Download Multi-Sheet Excel
           </button>
-          <button class="btn btn-cyan btn-sm" onclick="exportCsv()">
+          <button class="btn btn-cyan btn-sm" onclick="exportCsv()" title="Download simple CSV">
             <i data-lucide="download"></i> Download CSV
           </button>
           <button class="btn btn-ghost btn-sm" style="color: #f87171;" onclick="deleteActiveEvent()">

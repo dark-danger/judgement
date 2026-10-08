@@ -2,15 +2,13 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 import os
+import json
 
-wb = openpyxl.Workbook()
-ws = wb.active
-ws.title = "Agrash Registrations"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_FILE = os.path.join(BASE_DIR, "agrash_schools_sheet.xlsx")
 
-# Data list matching the user's Google Sheet screenshots exactly
-data = [
-    ["School Name", "Group Dance", "Tags", "Group Song", "Tags", "Declamation", "Tags", "Science Exhibition", "Tags", "Green Room Allocation"],
-    ["58", "43", "", "27", "", "44", "", "30", "", ""],
+# Exact data list of all 58 schools
+schools_data = [
     ["Delhi Public School DPS Kathua", "YES", "D-21", "", "", "YES", "DC-21", "YES", "SE-21", "F-501"],
     ["SMR International School Safidon", "YES", "D-22", "", "", "YES", "DC-22", "", "", "F-502"],
     ["ST Andrews World School Kundli", "", "", "YES", "S-23", "", "", "", "", "F-503"],
@@ -71,96 +69,261 @@ data = [
     ["DAV Police Public School Kurukshetra", "YES", "D-78", "YES", "S-78", "YES", "DC-78", "", "", ""]
 ]
 
-# Write all data rows
-for r_idx, row in enumerate(data, start=1):
-    ws.append(row)
-
-# Styling Definitions
-font_header = Font(name="Arial", size=11, bold=True, color="000000")
-font_count = Font(name="Arial", size=11, bold=True, color="FFFFFF")
-font_school = Font(name="Arial", size=10, bold=True, color="000000")
-font_cell = Font(name="Arial", size=10, color="000000")
-font_tag = Font(name="Arial", size=10, bold=True, color="000000")
-
-fill_gold = PatternFill(start_color="F5B041", end_color="F5B041", fill_type="solid") # Gold header
-fill_maroon = PatternFill(start_color="4A1525", end_color="4A1525", fill_type="solid") # Maroon count row
-fill_dance = PatternFill(start_color="D6EAF8", end_color="D6EAF8", fill_type="solid") # Light blue (Dance)
-fill_song = PatternFill(start_color="D4EFDF", end_color="D4EFDF", fill_type="solid") # Light green (Song)
-fill_declamation = PatternFill(start_color="E8F8F5", end_color="E8F8F5", fill_type="solid") # Mint (Declamation)
-fill_science = PatternFill(start_color="E8F6F3", end_color="E8F6F3", fill_type="solid") # Science
-fill_green_room = PatternFill(start_color="EAFAF1", end_color="EAFAF1", fill_type="solid")
-
+# Styling Palette
 thin_border = Border(
-    left=Side(style='thin', color='BFBFBF'),
-    right=Side(style='thin', color='BFBFBF'),
-    top=Side(style='thin', color='BFBFBF'),
-    bottom=Side(style='thin', color='BFBFBF')
+    left=Side(style='thin', color='CBD5E1'),
+    right=Side(style='thin', color='CBD5E1'),
+    top=Side(style='thin', color='CBD5E1'),
+    bottom=Side(style='thin', color='CBD5E1')
 )
 
-align_center = Alignment(horizontal="center", vertical="center")
-align_left = Alignment(horizontal="left", vertical="center")
+def auto_fit_columns(ws):
+    for col in ws.columns:
+        max_len = 0
+        col_letter = get_column_letter(col[0].column)
+        for cell in col:
+            val_str = str(cell.value or '')
+            if len(val_str) > max_len:
+                max_len = len(val_str)
+        ws.column_dimensions[col_letter].width = max(max_len + 4, 12)
 
-# Apply Header Styles (Row 1)
-for col_idx in range(1, 11):
-    cell = ws.cell(row=1, column=col_idx)
-    cell.font = font_header
-    cell.fill = fill_gold if col_idx < 10 else fill_green_room
-    cell.alignment = align_left if col_idx == 1 else align_center
-    cell.border = thin_border
+def build_workbook(scores_data=None):
+    wb = openpyxl.Workbook()
+    
+    # -------------------------------------------------------------
+    # SHEET 1: Master Registration (All 58 Schools)
+    # -------------------------------------------------------------
+    ws_master = wb.active
+    ws_master.title = "Master Registrations"
+    ws_master.sheet_properties.tabColor = "00E5FF" # Cyan
 
-# Apply Count Row Styles (Row 2)
-for col_idx in range(1, 11):
-    cell = ws.cell(row=2, column=col_idx)
-    cell.font = font_count
-    cell.fill = fill_maroon
-    cell.alignment = align_center
-    cell.border = thin_border
+    # Title
+    ws_master.merge_cells("A1:J1")
+    title_cell = ws_master["A1"]
+    title_cell.value = "🔥 AGRASH GRAND FINALE - MASTER REGISTRATION & SLOTS"
+    title_cell.font = Font(name="Arial", size=14, bold=True, color="FFFFFF")
+    title_cell.fill = PatternFill("solid", fgColor="0B101C")
+    title_cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws_master.row_dimensions[1].height = 32
 
-# Apply Data Rows Styles (Row 3 to 60)
-for row_idx in range(3, len(data) + 1):
-    ws.row_dimensions[row_idx].height = 20
+    # Headers
+    headers = ["School Name", "Group Dance", "Tags", "Group Song", "Tags", "Declamation", "Tags", "Science Exhibition", "Tags", "Green Room Allocation"]
+    ws_master.append(headers)
+    ws_master.row_dimensions[2].height = 24
+
     for col_idx in range(1, 11):
-        cell = ws.cell(row=row_idx, column=col_idx)
+        cell = ws_master.cell(row=2, column=col_idx)
+        cell.font = Font(name="Arial", size=10, bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor="1E293B")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.border = thin_border
-        val = str(cell.value or "").strip()
 
-        if col_idx == 1:
-            cell.font = font_school
-            cell.alignment = align_left
-        else:
-            cell.alignment = align_center
-            if "D-" in val or "S-" in val or "DC-" in val or "SE-" in val:
-                cell.font = font_tag
+    # Summary Row
+    summary = ["Total: 58 Schools", "43 Teams", "", "27 Teams", "", "44 Teams", "", "30 Teams", "", "Total: 144 Slots"]
+    ws_master.append(summary)
+    for col_idx in range(1, 11):
+        cell = ws_master.cell(row=3, column=col_idx)
+        cell.font = Font(name="Arial", size=9, bold=True, color="00E5FF")
+        cell.fill = PatternFill("solid", fgColor="0F172A")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = thin_border
+
+    # Data Rows
+    for row_idx, r in enumerate(schools_data, start=4):
+        ws_master.append(r)
+        ws_master.row_dimensions[row_idx].height = 20
+        is_even = (row_idx % 2 == 0)
+        row_bg = "F8FAFC" if is_even else "FFFFFF"
+
+        for col_idx in range(1, 11):
+            cell = ws_master.cell(row=row_idx, column=col_idx)
+            cell.font = Font(name="Arial", size=9.5)
+            cell.border = thin_border
+            cell.fill = PatternFill("solid", fgColor=row_bg)
+            
+            if col_idx == 1:
+                cell.alignment = Alignment(horizontal="left", vertical="center")
             else:
-                cell.font = font_cell
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            
+            # Highlight Tags
+            if col_idx in [3, 5, 7, 9] and cell.value:
+                cell.font = Font(name="Arial", size=9.5, bold=True, color="FF2A4B")
+            elif col_idx in [2, 4, 6, 8] and cell.value == "YES":
+                cell.font = Font(name="Arial", size=9, bold=True, color="10B981")
+            elif col_idx == 10 and cell.value:
+                cell.font = Font(name="Arial", size=9.5, bold=True, color="2563EB")
 
-        # Column background colors matching screenshot
-        if col_idx in [2, 3]:
-            cell.fill = fill_dance
-        elif col_idx in [4, 5]:
-            cell.fill = fill_song
-        elif col_idx in [6, 7]:
-            cell.fill = fill_declamation
-        elif col_idx in [8, 9]:
-            cell.fill = fill_science
-        elif col_idx == 10:
-            cell.fill = fill_green_room
+    auto_fit_columns(ws_master)
 
-# Auto-adjust column widths
-for col in ws.columns:
-    max_len = 0
-    col_letter = get_column_letter(col[0].column)
-    for cell in col:
-        if cell.value:
-            max_len = max(max_len, len(str(cell.value)))
-    ws.column_dimensions[col_letter].width = max(max_len + 4, 12)
+    # -------------------------------------------------------------
+    # HELPER TO BUILD CATEGORY SHEET
+    # -------------------------------------------------------------
+    def add_category_sheet(sheet_title, tab_color, tag_prefix, yes_col_idx, tag_col_idx, cat_name):
+        ws_cat = wb.create_sheet(title=sheet_title)
+        ws_cat.sheet_properties.tabColor = tab_color
 
-ws.column_dimensions['A'].width = 52 # School name column width
+        ws_cat.merge_cells("A1:E1")
+        c1 = ws_cat["A1"]
+        c1.value = f"🏆 AGRASH 2026 - {cat_name.upper()} ROSTER & TAGS"
+        c1.font = Font(name="Arial", size=13, bold=True, color="FFFFFF")
+        c1.fill = PatternFill("solid", fgColor="0B101C")
+        c1.alignment = Alignment(horizontal="center", vertical="center")
+        ws_cat.row_dimensions[1].height = 30
 
-# Save Excel files
-root_file = "/Users/yash/Documents/WORKS/Registration/agrash_schools_sheet.xlsx"
-static_file = "/Users/yash/Documents/WORKS/Registration/static/agrash_schools_sheet.xlsx"
+        cat_headers = ["Slot #", "Team Tag", "School Name", "Green Room", "Status"]
+        ws_cat.append(cat_headers)
+        ws_cat.row_dimensions[2].height = 22
 
-wb.save(root_file)
-wb.save(static_file)
-print(f"🎉 Successfully created Excel file matching screenshots: {root_file}")
+        for col_i in range(1, 6):
+            cell = ws_cat.cell(row=2, column=col_i)
+            cell.font = Font(name="Arial", size=10, bold=True, color="FFFFFF")
+            cell.fill = PatternFill("solid", fgColor="1E293B")
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = thin_border
+
+        slot_num = 1
+        for s in schools_data:
+            has_part = s[yes_col_idx] == "YES" or s[tag_col_idx]
+            tag = s[tag_col_idx]
+            school_name = s[0]
+            room = s[9]
+
+            if has_part and tag:
+                r_idx = slot_num + 2
+                ws_cat.append([slot_num, tag, school_name, room or "-", "Registered"])
+                ws_cat.row_dimensions[r_idx].height = 20
+                is_even = (slot_num % 2 == 0)
+                row_bg = "F8FAFC" if is_even else "FFFFFF"
+
+                for col_i in range(1, 6):
+                    cell = ws_cat.cell(row=r_idx, column=col_i)
+                    cell.font = Font(name="Arial", size=9.5)
+                    cell.border = thin_border
+                    cell.fill = PatternFill("solid", fgColor=row_bg)
+                    
+                    if col_i == 2:
+                        cell.font = Font(name="Arial", size=10, bold=True, color="FF2A4B")
+                        cell.alignment = Alignment(horizontal="center", vertical="center")
+                    elif col_i == 3:
+                        cell.alignment = Alignment(horizontal="left", vertical="center")
+                    else:
+                        cell.alignment = Alignment(horizontal="center", vertical="center")
+                
+                slot_num += 1
+
+        auto_fit_columns(ws_cat)
+
+    # -------------------------------------------------------------
+    # SHEET 2: Group Dance
+    # -------------------------------------------------------------
+    add_category_sheet("Group Dance", "FF2A4B", "D-", 1, 2, "Group Dance")
+
+    # -------------------------------------------------------------
+    # SHEET 3: Group Song
+    # -------------------------------------------------------------
+    add_category_sheet("Group Song", "10B981", "S-", 3, 4, "Group Song")
+
+    # -------------------------------------------------------------
+    # SHEET 4: Declamation
+    # -------------------------------------------------------------
+    add_category_sheet("Declamation", "F59E0B", "DC-", 5, 6, "Declamation")
+
+    # -------------------------------------------------------------
+    # SHEET 5: Science Exhibition
+    # -------------------------------------------------------------
+    add_category_sheet("Science Exhibition", "8B5CF6", "SE-", 7, 8, "Science Exhibition")
+
+    # -------------------------------------------------------------
+    # SHEET 6: Live Judgement Marksheet
+    # -------------------------------------------------------------
+    ws_scores = wb.create_sheet(title="Live Marksheet")
+    ws_scores.sheet_properties.tabColor = "F59E0B"
+
+    ws_scores.merge_cells("A1:H1")
+    s1 = ws_scores["A1"]
+    s1.value = "📊 AGRASH LIVE JUDGEMENT MARKSHEET & SCORES"
+    s1.font = Font(name="Arial", size=13, bold=True, color="FFFFFF")
+    s1.fill = PatternFill("solid", fgColor="0B101C")
+    s1.alignment = Alignment(horizontal="center", vertical="center")
+    ws_scores.row_dimensions[1].height = 30
+
+    score_headers = ["Rank", "Team Tag", "Judge 1", "Judge 2", "Judge 3", "Judge 4", "Judge 5", "Overall Avg (/100)"]
+    ws_scores.append(score_headers)
+    ws_scores.row_dimensions[2].height = 22
+
+    for col_i in range(1, 9):
+        cell = ws_scores.cell(row=2, column=col_i)
+        cell.font = Font(name="Arial", size=10, bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor="1E293B")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = thin_border
+
+    # Load from scores.json if available
+    scores_file = os.path.join(BASE_DIR, "data", "scores.json")
+    all_scores = []
+    if os.path.exists(scores_file):
+        try:
+            with open(scores_file, "r", encoding="utf-8") as f:
+                all_scores = json.load(f)
+        except Exception:
+            pass
+
+    # Unique tags
+    unique_tags = []
+    for s in schools_data:
+        for t_idx in [2, 4, 6, 8]:
+            tag = s[t_idx]
+            if tag and tag not in unique_tags:
+                unique_tags.append(tag)
+
+    # Rank calculations
+    tag_rows = []
+    for tag in unique_tags:
+        t_scores = [sc for sc in all_scores if sc.get("tag_no") == tag]
+        totals = [sc["total"] for sc in t_scores if "total" in sc]
+        avg = round(sum(totals) / len(totals), 2) if totals else 0
+        tag_rows.append({"tag": tag, "totals": totals, "avg": avg, "count": len(totals)})
+
+    tag_rows.sort(key=lambda x: x["avg"], reverse=True)
+
+    for idx, r in enumerate(tag_rows, start=1):
+        row_num = idx + 2
+        rank_str = f"#{idx}" if r["count"] > 0 else "-"
+        avg_str = r["avg"] if r["count"] > 0 else "Pending"
+        
+        j_scores = []
+        for j_i in range(1, 6):
+            if j_i - 1 < len(r["totals"]):
+                j_scores.append(r["totals"][j_i - 1])
+            else:
+                j_scores.append("-")
+
+        ws_scores.append([rank_str, r["tag"], j_scores[0], j_scores[1], j_scores[2], j_scores[3], j_scores[4], avg_str])
+        ws_scores.row_dimensions[row_num].height = 20
+        is_even = (idx % 2 == 0)
+        row_bg = "F8FAFC" if is_even else "FFFFFF"
+
+        for col_i in range(1, 9):
+            cell = ws_scores.cell(row=row_num, column=col_i)
+            cell.font = Font(name="Arial", size=9.5)
+            cell.border = thin_border
+            cell.fill = PatternFill("solid", fgColor=row_bg)
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            if col_i == 2:
+                cell.font = Font(name="Arial", size=10, bold=True, color="FF2A4B")
+            elif col_i == 8 and r["count"] > 0:
+                cell.font = Font(name="Arial", size=10, bold=True, color="00E5FF")
+                cell.fill = PatternFill("solid", fgColor="0F172A")
+
+    auto_fit_columns(ws_scores)
+
+    wb.save(OUTPUT_FILE)
+    print(f"✅ Successfully built multi-sheet Excel workbook at: {OUTPUT_FILE}")
+    print(f"   Sheets included:")
+    for s in wb.sheetnames:
+        print(f"     • {s}")
+    return OUTPUT_FILE
+
+if __name__ == "__main__":
+    build_workbook()

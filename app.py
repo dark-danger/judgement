@@ -395,6 +395,22 @@ def export_csv(event_id):
         headers={"Content-Disposition": f"attachment;filename=judgement_{event['name'].replace(' ', '_')}.csv"}
     )
 
+@app.route("/api/events/<event_id>/export-excel", methods=["GET"])
+@app.route("/api/download-excel", methods=["GET"])
+def export_excel(event_id=None):
+    from create_excel import build_workbook
+    scores = db.get_scores(event_id=event_id)
+    excel_path = build_workbook(scores_data=scores)
+    
+    with open(excel_path, "rb") as f:
+        file_bytes = f.read()
+
+    return Response(
+        file_bytes,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=Agrash_MultiSheet_Judgement_Roster.xlsx"}
+    )
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5005))
     local_ip = get_local_ip()
