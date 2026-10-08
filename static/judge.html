@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrash - Judge Portal</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-glow-orb orb-red"></div>
+  <div class="bg-glow-orb orb-blue"></div>
+
+  <!-- Audio Chime -->
+  <audio id="submitSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVoGAACBhYqFbF1fdJivrJBhNjVgodDbqWE4MDCW2/LDciUWGDCe5/XRkFktFjOM1erTpHFAJiuKz+fTs4NUNSKGv+PQro5cPSB/t93MqpBnRB14sNPFrJdrUBlzqc29pYpmVxhwo8eqlm9jXh9tmsCglG5fWhpqlLmgkGphVRdmlK+ekmZgUxFfjrCWlXFdThNZj6mVknFUSBBTiamUkW9ORg9Ph6eSj2pIQgxMhaWLh2NDPghKg5+Fe1g8E019mIh8WD0SSEeHiXtXPBBLdpKBblI1DD9viHxmUTEJP2eEfGZRMQk/Z4R8ZlExCT9nhHxmUTEJ" type="audio/wav">
+  </audio>
+
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="app-navbar">
+      <a href="/" class="nav-brand">
+        <div class="brand-icon"><i data-lucide="flame"></i></div>
+        <div class="brand-title">
+          <h1 id="eventTitleNav">Agrash <span>Judge Panel</span></h1>
+          <span class="brand-subtitle">Live Stage Evaluation</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <div id="activeJudgeBadge" class="badge badge-done" style="display: none; border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.12);">
+          <i data-lucide="user-check"></i> <span id="activeJudgeNameText">Judge Name</span>
+        </div>
+        <button id="switchJudgeBtn" class="btn btn-ghost btn-sm" onclick="showJudgeSelectionModal()" style="display: none;">
+          <i data-lucide="repeat"></i> Switch Judge
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Banner for Current Team & Next Coming Team -->
+    <section class="judge-header-hero">
+      <!-- Current Performing Team Tag Card -->
+      <div class="current-team-card">
+        <div class="team-label-tag">Current Team on Stage</div>
+        <div class="current-tag-number">
+          <span id="currentTagDisplay">--</span>
+          <span class="badge badge-live live-indicator">
+            <span class="dot-pulse"></span> LIVE NOW
+          </span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.5rem;" id="currentTagNotes">
+          Evaluate across 5 criteria (20 marks each). Total: 100 Marks.
+        </p>
+      </div>
+
+      <!-- Next Coming Team in Sequence -->
+      <div class="next-team-card">
+        <div>
+          <div class="team-label-tag" style="color: #00e5ff;">Next Coming Team</div>
+          <div class="next-tag-number" id="nextTagDisplay">--</div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <div class="timer-pill" id="transitionTimerPill">
+            <i data-lucide="clock"></i>
+            <span id="transitionTimerText">Queue Active</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 Criteria Scoring Section -->
+    <main class="criteria-section" id="criteriaSection">
+      <!-- Generated dynamically in JS -->
+    </main>
+
+    <!-- Sticky Score Calculation and Submit Bar -->
+    <footer class="score-submit-bar" id="submitBar">
+      <div class="total-score-block">
+        <span class="label" style="color: var(--text-muted); font-weight: 700;">TOTAL SCORE:</span>
+        <span class="val" id="totalScoreVal">0</span>
+        <span class="out-of" style="font-size: 1.2rem; color: var(--text-dim); font-weight: 800;">/ 100</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span id="scoreStatusMessage" style="font-size: 0.85rem; color: var(--text-muted);">
+          All criteria filled
+        </span>
+        <button class="btn btn-red btn-lg" id="btnSubmitScore" onclick="submitEvaluation()">
+          <i data-lucide="check-circle-2"></i> Submit Score for <span id="btnSubmitTag">--</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- JUDGE SELECTION MODAL -->
+  <div id="judgeModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="users" style="color: #ff2a4b;"></i>
+          <h3>Agrash • Select Your Judge Profile</h3>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          Please select your name below to start scoring for Agrash. Your scores will be locked under your profile.
+        </p>
+        <div id="judgesListGrid" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Populated in JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="/js/judge.js"></script>
+</body>
+</html>

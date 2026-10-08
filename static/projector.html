@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrash - Auditorium Live Scoreboard & Leaderboard</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <style>
+    body {
+      padding: 1.5rem 2.5rem;
+    }
+    .projector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid rgba(255, 42, 75, 0.4);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .podium-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      align-items: end;
+    }
+    .podium-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .podium-rank-1 {
+      border: 2px solid #fbbf24;
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.35);
+      transform: translateY(-15px);
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.15), rgba(11, 16, 28, 0.95));
+    }
+    .podium-rank-2 {
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 0 25px rgba(226, 232, 240, 0.2);
+    }
+    .podium-rank-3 {
+      border: 2px solid #f97316;
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.2);
+    }
+    .podium-tag {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .podium-score {
+      font-family: var(--font-heading);
+      font-size: 2.6rem;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow-orb orb-red"></div>
+  <div class="bg-glow-orb orb-blue"></div>
+
+  <!-- Projector Header -->
+  <header class="projector-header">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <div class="brand-icon" style="width: 54px; height: 54px;">
+        <i data-lucide="trophy" style="width: 30px; height: 30px;"></i>
+      </div>
+      <div>
+        <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;">
+          AGRASH <span style="background: linear-gradient(135deg, #ff2a4b, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LIVE LEADERBOARD</span>
+        </h1>
+        <span style="font-size: 0.85rem; color: #00e5ff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">
+          Auditorium Stage Display • Real-time Sync
+        </span>
+      </div>
+    </div>
+
+    <!-- Live Active on Stage Box -->
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="background: rgba(0,0,0,0.6); border: 2px solid #ff2a4b; padding: 0.6rem 1.5rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 0 20px rgba(255, 42, 75, 0.35);">
+        <span style="font-size: 0.72rem; font-weight: 800; color: #ff2a4b; text-transform: uppercase; letter-spacing: 0.06em;">
+          <span class="dot-pulse"></span> NOW ON STAGE
+        </span>
+        <div id="projectorCurrentTag" style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900; color: #fff;">
+          --
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+        <i data-lucide="maximize"></i> Fullscreen
+      </button>
+    </div>
+  </header>
+
+  <!-- Top 3 Podium Cards -->
+  <section class="podium-grid" id="podiumSection">
+    <!-- Rank 2 -->
+    <div class="podium-card podium-rank-2" id="podium2">
+      <span class="badge" style="background: rgba(226, 232, 240, 0.2); color: #fff;">🥈 RANK #2</span>
+      <div class="podium-tag" id="podium2Tag">--</div>
+      <div class="podium-score" style="color: #e2e8f0;" id="podium2Score">--</div>
+      <span style="font-size: 0.8rem; color: var(--text-dim);">Average Score / 100</span>
+    </div>
+
+    <!-- Rank 1 (Gold) -->
+    <div class="podium-card podium-rank-1" id="podium1">
+      <div style="position: absolute; top: -10px; background: #fbbf24; color: #000; font-weight: 900; font-size: 0.75rem; padding: 0.2rem 0.8rem; border-radius: var(--radius-full);">
+        👑 TOURNAMENT LEADER
+      </div>
+      <span class="badge" style="background: rgba(251, 191, 36, 0.3); color: #fbbf24; margin-top: 0.5rem;">🥇 RANK #1 GOLD</span>
+      <div class="podium-tag" style="font-size: 2.8rem; text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);" id="podium1Tag">--</div>
+      <div class="podium-score" style="color: #fbbf24; font-size: 3.2rem;" id="podium1Score">--</div>
+      <span style="font-size: 0.85rem; color: #fde68a; font-weight: 700;">Average Score / 100</span>
+    </div>
+
+    <!-- Rank 3 -->
+    <div class="podium-card podium-rank-3" id="podium3">
+      <span class="badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">🥉 RANK #3</span>
+      <div class="podium-tag" id="podium3Tag">--</div>
+      <div class="podium-score" style="color: #f97316;" id="podium3Score">--</div>
+      <span style="font-size: 0.8rem; color: var(--text-dim);">Average Score / 100</span>
+    </div>
+  </section>
+
+  <!-- Full Leaderboard Table -->
+  <main class="matrix-table-container">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="font-size: 0.95rem;">Rank</th>
+          <th style="font-size: 0.95rem;">Team Tag</th>
+          <th style="font-size: 0.95rem;">Overall Average</th>
+          <th style="font-size: 0.95rem;">Judges Evaluated</th>
+          <th style="font-size: 0.95rem;">Status</th>
+        </tr>
+      </thead>
+      <tbody id="projectorTableBody">
+        <!-- Populated in JS -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    const eventId = window.location.pathname.split('/').pop() || 'evt-agrash';
+
+    async function loadProjectorData() {
+      try {
+        const [evtRes, scRes] = await Promise.all([
+          fetch(`/api/events/${eventId}`),
+          fetch(`/api/events/${eventId}/scores`)
+        ]);
+
+        const evtData = await evtRes.json();
+        const scData = await scRes.json();
+
+        if (evtData.success) {
+          const event = evtData.event;
+          const scores = scData.scores || [];
+          const judges = event.judges || [];
+
+          document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
+
+          // Combine active + completed tags
+          let allTags = event.sequence.map(s => s.tag_no);
+          (event.completed_tags || []).forEach(c => {
+            if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
+          });
+
+          // Calculate averages
+          const rankedList = allTags.map(tag => {
+            const tagScores = scores.filter(s => s.tag_no === tag);
+            const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
+            const count = tagScores.length;
+            const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
+            const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
+            const isLive = evtData.current_tag === tag;
+
+            return { tag, avg, count, totalJudges: judges.length, isCompleted, isLive };
+          });
+
+          // Sort by highest average
+          rankedList.sort((a, b) => b.avg - a.avg);
+
+          // Update Top 3 Podium
+          if (rankedList.length > 0 && rankedList[0].avg > 0) {
+            document.getElementById('podium1Tag').textContent = rankedList[0].tag;
+            document.getElementById('podium1Score').textContent = rankedList[0].avg;
+          }
+          if (rankedList.length > 1 && rankedList[1].avg > 0) {
+            document.getElementById('podium2Tag').textContent = rankedList[1].tag;
+            document.getElementById('podium2Score').textContent = rankedList[1].avg;
+          }
+          if (rankedList.length > 2 && rankedList[2].avg > 0) {
+            document.getElementById('podium3Tag').textContent = rankedList[2].tag;
+            document.getElementById('podium3Score').textContent = rankedList[2].avg;
+          }
+
+          // Render Table
+          const tbody = document.getElementById('projectorTableBody');
+          tbody.innerHTML = rankedList.map((item, idx) => `
+            <tr style="${item.isLive ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
+              <td>
+                <span class="badge ${idx === 0 ? 'podium-rank-1' : (idx === 1 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
+                  #${idx + 1}
+                </span>
+              </td>
+              <td>
+                <strong style="font-family: var(--font-heading); font-size: 1.35rem; color: #fff;">${item.tag}</strong>
+                ${item.isLive ? ' <span class="badge badge-live" style="font-size:0.7rem; padding:0.15rem 0.5rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
+              </td>
+              <td>
+                <strong style="font-family: var(--font-heading); font-size: 1.5rem; color: ${item.avg > 0 ? '#00e5ff' : 'var(--text-dim)'};">
+                  ${item.avg > 0 ? item.avg : '--'}
+                </strong>
+              </td>
+              <td>
+                <span style="font-size: 1rem; color: var(--text-muted);">${item.count} / ${item.totalJudges}</span>
+              </td>
+              <td>
+                ${item.isLive ? '<span class="badge badge-live">LIVE ON STAGE</span>' : (item.isCompleted ? '<span class="badge badge-done">COMPLETED</span>' : '<span class="badge badge-next">IN QUEUE</span>')}
+              </td>
+            </tr>
+          `).join('');
+
+          if (window.lucide) lucide.createIcons();
+        }
+      } catch (e) {
+        console.error('Projector load error:', e);
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      loadProjectorData();
+      setInterval(loadProjectorData, 3000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+import os
+import io
+import csv
+import json
+import time
+import socket
+from datetime import datetime
+from flask import Flask, request, jsonify, send_from_directory, Response
+from flask_cors import CORS
+from database import db
+from sheets_service import sheets_service
+
+app = Flask(__name__, static_folder="static", static_url_path="")
+CORS(app)
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'
+
+# --- Web Page Routes ---
+
+@app.route("/")
+def index_page():
+    return send_from_directory(app.static_folder, "index.html")
+
+@app.route("/admin")
+def admin_page():
+    return send_from_directory(app.static_folder, "admin.html")
+
+@app.route("/judge/<event_id>")
+def judge_page(event_id):
+    return send_from_directory(app.static_folder, "judge.html")
+
+@app.route("/sequence/<event_id>")
+def sequence_page(event_id):
+    return send_from_directory(app.static_folder, "sequence.html")
+
+@app.route("/projector/<event_id>")
+def projector_page(event_id):
+    return send_from_directory(app.static_folder, "projector.html")
+
+# Static assets fallback
+@app.route("/<path:filename>")
+def serve_static(filename):
+    return send_from_directory(app.static_folder, filename)
+
+# --- API Endpoints ---
+
+@app.route("/api/network-info", methods=["GET"])
+def get_network_info():
+    local_ip = get_local_ip()
+    port = int(os.environ.get("PORT", 5005))
+    return jsonify({
+        "success": True,
+        "local_ip": local_ip,
+        "port": port,
+        "network_base_url": f"http://{local_ip}:{port}",
+        "localhost_base_url": f"http://127.0.0.1:{port}"
+    })
+
+@app.route("/api/events", methods=["GET"])
+def get_all_events():
+    events = db.get_events()
+    return jsonify({"success": True, "events": events})
+
+@app.route("/api/events/<event_id>", methods=["GET"])
+def get_single_event(event_id):
+    event = db.get_event(event_id)
+    if not event:
+        return jsonify({"success": False, "error": "Event not found"}), 404
+    
+    seq = event.get("sequence", [])
+    curr_idx = event.get("current_index", 0)
+    current_tag = seq[curr_idx]["tag_no"] if 0 <= curr_idx < len(seq) else None
+    next_tag = seq[curr_idx + 1]["tag_no"] if 0 <= curr_idx + 1 < len(seq) else None
+
+    remaining_secs = 0
+    if event.get("next_transition_time"):
+        remaining_secs = max(0, int(event["next_transition_time"] - time.time()))
+
+    return jsonify({
+        "success": True,
+        "event": event,
+        "current_tag": current_tag,
+        "next_tag": next_tag,
+        "current_index": curr_idx,
+        "completed_tags": event.get("completed_tags", []),
+        "remaining_transition_seconds": remaining_secs
+    })
+
+@app.route("/api/events", methods=["POST"])
+def create_event():
+    data = request.get_json() or {}
+    name = data.get("name")
+    description = data.get("description", "")
+    judge_names = data.get("judge_names", [])
+    tag_numbers = data.get("tag_numbers", [])
+    google_sheet_url = data.get("google_sheet_url", "")
+
+    if not name:
+        return jsonify({"success": False, "error": "Event name is required"}), 400
+    
+    if len(judge_names) < 2 or len(judge_names) > 10:
+        return jsonify({"success": False, "error": "Please provide between 2 and 10 judges"}), 400
+
+    if not tag_numbers:
+        return jsonify({"success": False, "error": "Please provide at least 1 team tag number"}), 400
+
+    event = db.create_event(
+        name=name,
+        description=description,
+        judge_names=judge_names,
+        tag_numbers=tag_numbers,
+        google_sheet_url=google_sheet_url
+    )
+
+    return jsonify({
+        "success": True,
+        "event": event,
+        "links": {
+            "judge_portal": f"/judge/{event['id']}",
+            "sequence_portal": f"/sequence/{event['id']}",
+            "projector_portal": f"/projector/{event['id']}",
+            "admin_portal": f"/admin"
+        }
+    })
+
+@app.route("/api/events/<event_id>", methods=["DELETE"])
+def delete_event(event_id):
+    db.delete_event(event_id)
+    return jsonify({"success": True, "message": "Event deleted successfully"})
+
+@app.route("/api/events/<event_id>/sequence", methods=["POST"])
+def update_sequence(event_id):
+    data = request.get_json() or {}
+    new_sequence = data.get("sequence", [])
+    current_index = data.get("current_index")
+
+    if new_sequence is None:
+        return jsonify({"success": False, "error": "Sequence is required"}), 400
+
+    updated = db.update_sequence(event_id, new_sequence, current_index)
+    if not updated:
+        return jsonify({"success": False, "error": "Event not found"}), 404
+
+    return jsonify({"success": True, "event": updated})
+
+@app.route("/api/events/<event_id>/current-tag", methods=["POST"])
+def set_current_tag(event_id):
+    data = request.get_json() or {}
+    target_index = data.get("index")
+
+    if target_index is None:
+        return jsonify({"success": False, "error": "Index required"}), 400
+
+    updated = db.set_current_tag(event_id, int(target_index))
+    if not updated:
+        return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
+
+    return jsonify({"success": True, "event": updated})
+
+@app.route("/api/events/<event_id>/complete-tag", methods=["POST"])
+def complete_tag(event_id):
+    data = request.get_json() or {}
+    tag_index = data.get("index")
+    tag_no = data.get("tag_no")
+
+    updated, msg = db.complete_and_remove_tag(
+        event_id=event_id,
+        tag_index=int(tag_index) if tag_index is not None else None,
+        tag_no=tag_no
+    )
+
+    if not updated:
+        return jsonify({"success": False, "error": msg}), 400
+
+    return jsonify({"success": True, "message": msg, "event": updated})
+
+@app.route("/api/events/<event_id>/restore-tag", methods=["POST"])
+def restore_tag(event_id):
+    data = request.get_json() or {}
+    tag_no = data.get("tag_no")
+    if not tag_no:
+        return jsonify({"success": False, "error": "Tag Number required"}), 400
+
+    updated = db.restore_completed_tag(event_id, tag_no)
+    if not updated:
+        return jsonify({"success": False, "error": "Could not restore tag"}), 400
+
+    return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated})
+
+# Reset Demo Presentation Data Endpoint
+@app.route("/api/events/<event_id>/reset-demo", methods=["POST"])
+def reset_demo_data(event_id):
+    db._init_defaults()
+    return jsonify({"success": True, "message": "Agrash demo event reset to presentation state!"})
+
+# Populate Sample Scores for Demo Endpoint
+@app.route("/api/events/<event_id>/sample-scores", methods=["POST"])
+def populate_sample_scores(event_id):
+    event = db.get_event(event_id)
+    if not event:
+        return jsonify({"success": False, "error": "Event not found"}), 404
+
+    import random
+    judges = event.get("judges", [])
+    all_tags = [item["tag_no"] for item in event.get("sequence", [])]
+    for c in event.get("completed_tags", []):
+        if c["tag_no"] not in all_tags:
+            all_tags.append(c["tag_no"])
+
+    for tag in all_tags[:5]:
+        for j in judges:
+            c_scores = {
+                "c1": random.randint(15, 20),
+                "c2": random.randint(14, 20),
+                "c3": random.randint(16, 20),
+                "c4": random.randint(15, 20),
+                "c5": random.randint(14, 20)
+            }
+            db.submit_score(event_id, tag, j["id"], j["name"], c_scores, "Sample Presentation Evaluation")
+
+    return jsonify({"success": True, "message": "Sample marks populated for top teams!"})
+
+# --- Scoring Endpoints ---
+
+@app.route("/api/events/<event_id>/scores", methods=["GET"])
+def get_event_scores(event_id):
+    scores = db.get_scores(event_id=event_id)
+    event = db.get_event(event_id)
+    return jsonify({"success": True, "scores": scores, "event": event})
+
+@app.route("/api/events/<event_id>/scores", methods=["POST"])
+def submit_score(event_id):
+    data = request.get_json() or {}
+    tag_no = data.get("tag_no")
+    judge_id = data.get("judge_id")
+    judge_name = data.get("judge_name", "")
+    criteria_scores = data.get("scores", {})
+    remarks = data.get("remarks", "")
+
+    if not tag_no or not judge_id:
+        return jsonify({"success": False, "error": "Missing tag_no or judge_id"}), 400
+
+    for k, v in criteria_scores.items():
+        try:
+            val = float(v)
+            if val < 0 or val > 20:
+                return jsonify({"success": False, "error": f"Score for {k} must be between 0 and 20"}), 400
+        except (ValueError, TypeError):
+            return jsonify({"success": False, "error": f"Invalid score value for {k}"}), 400
+
+    score_entry = db.submit_score(
+        event_id=event_id,
+        tag_no=tag_no,
+        judge_id=judge_id,
+        judge_name=judge_name,
+        criteria_scores=criteria_scores,
+        remarks=remarks
+    )
+
+    return jsonify({"success": True, "score": score_entry})
+
+@app.route("/api/scores/<score_id>", methods=["PUT"])
+def admin_override_score(score_id):
+    data = request.get_json() or {}
+    criteria_scores = data.get("scores", {})
+    remarks = data.get("remarks")
+
+    updated = db.admin_override_score(score_id, criteria_scores, remarks)
+    if not updated:
+        return jsonify({"success": False, "error": "Score entry not found"}), 404
+
+    return jsonify({"success": True, "score": updated})
+
+# --- Google Sheets Integration & Export ---
+
+@app.route("/api/events/<event_id>/sync-sheets", methods=["POST"])
+def sync_with_sheets(event_id):
+    event = db.get_event(event_id)
+    if not event:
+        return jsonify({"success": False, "error": "Event not found"}), 404
+
+    data = request.get_json() or {}
+    sheet_url = data.get("google_sheet_url") or event.get("google_sheet_url")
+
+    scores = db.get_scores(event_id=event_id)
+    success, msg = sheets_service.export_event_scores(event, scores, sheet_url)
+
+    if success and sheet_url:
+        db.update_event(event_id, {"google_sheet_url": sheet_url})
+
+    return jsonify({"success": success, "message": msg})
+
+@app.route("/api/import-sheet-tags", methods=["POST"])
+def import_tags():
+    data = request.get_json() or {}
+    url = data.get("google_sheet_url")
+    col = data.get("column_index", 1)
+    if not url:
+        return jsonify({"success": False, "error": "Sheet URL required"}), 400
+
+    success, msg, tags = sheets_service.import_tags_from_sheet(url, int(col))
+    return jsonify({"success": success, "message": msg, "tags": tags})
+
+@app.route("/api/events/<event_id>/export-csv", methods=["GET"])
+def export_csv(event_id):
+    event = db.get_event(event_id)
+    if not event:
+        return jsonify({"success": False, "error": "Event not found"}), 404
+
+    scores = db.get_scores(event_id=event_id)
+    judges = event.get("judges", [])
+    
+    all_tags = [item["tag_no"] for item in event.get("sequence", [])]
+    for c in event.get("completed_tags", []):
+        if c["tag_no"] not in all_tags:
+            all_tags.append(c["tag_no"])
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    headers = ["Tag No"]
+    for j in judges:
+        headers.append(f"{j['name']} (Total /100)")
+    headers.extend(["Overall Average", "Judges Evaluated"])
+    writer.writerow(headers)
+
+    for tag_no in all_tags:
+        row = [tag_no]
+        tag_scores = [s for s in scores if s.get("tag_no") == tag_no]
+        
+        j_totals = []
+        for j in judges:
+            j_score = next((s for s in tag_scores if s.get("judge_id") == j["id"]), None)
+            if j_score:
+                row.append(j_score["total"])
+                j_totals.append(j_score["total"])
+            else:
+                row.append("Pending")
+
+        avg = round(sum(j_totals) / len(j_totals), 2) if j_totals else "-"
+        row.append(avg)
+        row.append(len(j_totals))
+        writer.writerow(row)
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=judgement_{event['name'].replace(' ', '_')}.csv"}
+    )
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5005))
+    local_ip = get_local_ip()
+    print(f"\n=======================================================")
+    print(f"🔥 AGRASH - Production Judgement Hub is Live:")
+    print(f"   🌐 Localhost:  http://127.0.0.1:{port}")
+    print(f"   📲 Wi-Fi LAN:  http://{local_ip}:{port}")
+    print(f"   👑 Admin:      http://{local_ip}:{port}/admin")
+    print(f"   👥 Judges:     http://{local_ip}:{port}/judge/evt-agrash")
+    print(f"   🔄 Sequence:   http://{local_ip}:{port}/sequence/evt-agrash")
+    print(f"   📺 Projector:  http://{local_ip}:{port}/projector/evt-agrash")
+    print(f"=======================================================\n")
+    app.run(host="0.0.0.0", port=port, debug=True)

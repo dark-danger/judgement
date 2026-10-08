@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrash - Sequence Controller</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-glow-orb orb-red"></div>
+  <div class="bg-glow-orb orb-blue"></div>
+
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="app-navbar">
+      <a href="/" class="nav-brand">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #00e5ff, #ff2a4b);">
+          <i data-lucide="list-ordered"></i>
+        </div>
+        <div class="brand-title">
+          <h1 id="eventTitleNav">Agrash <span>Sequence</span></h1>
+          <span class="brand-subtitle">Stage & Queue Manager</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <span class="badge badge-done" id="totalTagsBadge" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.12);">
+          0 Tags in Queue
+        </span>
+        <a href="/admin" class="btn btn-ghost btn-sm"><i data-lucide="shield"></i> Admin</a>
+      </div>
+    </header>
+
+    <div class="sequence-container">
+      <!-- Left: Manipulable Sequence Queue -->
+      <main>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; text-transform: uppercase;">
+            Live Active Queue
+          </h3>
+          <span style="font-size: 0.8rem; color: #00e5ff; font-weight: 700;">
+            ⚡ Auto-syncs to Judge Screens
+          </span>
+        </div>
+
+        <div class="sequence-list" id="sequenceList">
+          <!-- Populated in JS -->
+        </div>
+
+        <!-- Completed Tags History Accordion -->
+        <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800;">
+              <i data-lucide="archive" style="color: #10b981; width: 20px; height: 20px;"></i>
+              <span>Completed Teams (Removed from Queue)</span>
+            </div>
+            <span class="badge badge-done" id="completedCountBadge">0 Completed</span>
+          </div>
+          <div id="completedContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Populated in JS -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Right: Stage Controls Sidebar -->
+      <aside class="sequence-sidebar">
+        <!-- Live Current & Next Box -->
+        <div class="control-box" style="border-color: rgba(255, 42, 75, 0.4);">
+          <span class="team-label-tag">Currently On Stage</span>
+          <div style="font-family: var(--font-heading); font-size: 2.6rem; font-weight: 900; color: #ffffff; text-shadow: 0 0 25px rgba(255, 42, 75, 0.6);" id="sidebarCurrentTag">
+            --
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+            Next Up: <strong id="sidebarNextTag" style="color: #00e5ff;">--</strong>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.25rem;">
+            <!-- Primary Action: Complete Current and Call Next -->
+            <button class="btn btn-emerald btn-lg" onclick="completeCurrentActiveTag()">
+              <i data-lucide="check-check"></i> Complete & Remove Current
+            </button>
+            <button class="btn btn-cyan btn-sm" onclick="trigger2MinNotice()">
+              <i data-lucide="bell"></i> Send 2-Min Transition Alert
+            </button>
+          </div>
+        </div>
+
+        <!-- Add Tag on the spot -->
+        <div class="control-box">
+          <h4 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; text-transform: uppercase;">
+            Add Tag to Sequence
+          </h4>
+          <form onsubmit="addNewTag(event)" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <input type="text" id="newTagInput" placeholder="e.g. TAG-111" required>
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i data-lucide="plus"></i> Add to Queue
+            </button>
+          </form>
+        </div>
+
+        <!-- Quick Info Box -->
+        <div class="control-box" style="background: rgba(255, 42, 75, 0.05); border-color: rgba(255, 42, 75, 0.25);">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 800; color: #ff2a4b; text-transform: uppercase;">
+            <i data-lucide="zap"></i> Quick Shortcuts
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+            • Click <strong>✓ Complete & Remove</strong> to finish that team & remove it from the active sequence.<br>
+            • Click <strong>▲ Up</strong> / <strong>▼ Down</strong> to change sequence order.<br>
+            • Click <strong>⏮ Top (Aga)</strong> to rush team next.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="/js/sequence.js"></script>
+</body>
+</html>
