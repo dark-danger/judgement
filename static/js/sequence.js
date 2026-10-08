@@ -3,11 +3,19 @@ let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
 let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
 
 let currentEvent = null;
+let sortableInstance = null;
+let isDragging = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
   loadSequenceData();
-  setInterval(loadSequenceData, 3000);
+  
+  // Background polling (paused while dragging)
+  setInterval(() => {
+    if (!isDragging) {
+      loadSequenceData();
+    }
+  }, 3000);
 });
 
 function getActiveEventId() {
@@ -15,6 +23,7 @@ function getActiveEventId() {
 }
 
 async function loadSequenceData() {
+  if (isDragging) return;
   try {
     const targetId = getActiveEventId();
     const res = await fetch(`/api/events/${targetId}`);
@@ -41,6 +50,46 @@ async function loadSequenceData() {
   } catch (err) {
     console.error('Error loading sequence:', err);
   }
+}
+
+function initSortable() {
+  const container = document.getElementById('sequenceList');
+  if (!container || !window.Sortable) return;
+
+  if (sortableInstance) {
+    sortableInstance.destroy();
+  }
+
+  sortableInstance = new Sortable(container, {
+    animation: 250,
+    handle: '.drag-handle',
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    dragClass: 'sortable-drag',
+    touchStartThreshold: 3,
+    scroll: true,
+    scrollSensitivity: 90,
+    scrollSpeed: 20,
+    onStart: function() {
+      isDragging = true;
+    },
+    onEnd: async function(evt) {
+      isDragging = false;
+      if (evt.oldIndex === evt.newIndex) return;
+      if (!currentEvent || !currentEvent.sequence) return;
+
+      const newSeq = [...currentEvent.sequence];
+      const [movedItem] = newSeq.splice(evt.oldIndex, 1);
+      newSeq.splice(evt.newIndex, 0, movedItem);
+
+      currentEvent.sequence = newSeq;
+      renderSequenceList(newSeq);
+      await saveSequenceToServer(newSeq);
+      
+      const newStageTag = newSeq[0] ? newSeq[0].tag_no : '';
+      showToast(`⚡ Queue updated! Live on stage: '${newStageTag}'`, 'success');
+    }
+  });
 }
 
 function renderSequenceList(sequence) {
@@ -94,8 +143,13 @@ function renderSequenceList(sequence) {
     }
 
     return `
-      <div class="sequence-item ${idx === 0 ? 'is-current' : ''} ${idx === 1 ? 'is-next' : ''}" id="seq-item-${idx}" style="${tierStyle}">
+      <div class="sequence-item ${idx === 0 ? 'is-current' : ''} ${idx === 1 ? 'is-next' : ''}" id="seq-item-${idx}" data-index="${idx}" style="${tierStyle}">
         <div class="item-left">
+          <!-- Touch & Mouse Drag Grip Handle -->
+          <div class="drag-handle" title="Touch & Drag to reorder queue">
+            <i data-lucide="grip-vertical" style="width: 18px; height: 18px;"></i>
+          </div>
+
           <span class="seq-order-badge" style="${orderBadgeStyle}">#${idx + 1}</span>
           <div>
             <div class="seq-tag-name" style="${tagNameStyle}">
@@ -123,13 +177,13 @@ function renderSequenceList(sequence) {
             </button>
           `}
 
-          <!-- Move Up (Uppar) -->
-          <button class="btn-icon" onclick="moveTagUp(${idx})" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.25;"' : ''}>
+          <!-- Quick Move Up Button -->
+          <button class="btn-icon" onclick="moveTagUp(${idx})" title="Move Up (Uppar)" ${idx === 0 ? 'disabled style="opacity:0.25;"' : ''}>
             <i data-lucide="chevron-up"></i>
           </button>
 
-          <!-- Move Down (Nicha) -->
-          <button class="btn-icon" onclick="moveTagDown(${idx})" title="Move Down" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>
+          <!-- Quick Move Down Button -->
+          <button class="btn-icon" onclick="moveTagDown(${idx})" title="Move Down (Nicha)" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>
             <i data-lucide="chevron-down"></i>
           </button>
         </div>
@@ -138,6 +192,7 @@ function renderSequenceList(sequence) {
   }).join('');
 
   if (window.lucide) lucide.createIcons();
+  initSortable();
 }
 
 function renderCompletedList(completedTags) {
@@ -240,22 +295,27 @@ async function restoreTagAction(tagNo) {
   }
 }
 
-// Sequence Order Shift (Uppar, Nicha)
+// Quick Move Up
 async function moveTagUp(idx) {
   if (idx <= 0 || !currentEvent) return;
   const seq = [...currentEvent.sequence];
   const temp = seq[idx - 1];
   seq[idx - 1] = seq[idx];
   seq[idx] = temp;
+  currentEvent.sequence = seq;
+  renderSequenceList(seq);
   await saveSequenceToServer(seq);
 }
 
+// Quick Move Down
 async function moveTagDown(idx) {
   if (!currentEvent || idx >= currentEvent.sequence.length - 1) return;
   const seq = [...currentEvent.sequence];
   const temp = seq[idx + 1];
   seq[idx + 1] = seq[idx];
   seq[idx] = temp;
+  currentEvent.sequence = seq;
+  renderSequenceList(seq);
   await saveSequenceToServer(seq);
 }
 
@@ -273,6 +333,8 @@ async function addNewTag(e) {
 
   const seq = [...currentEvent.sequence, { tag_no: val, notes: 'Added by Stage Coordinator' }];
   input.value = '';
+  currentEvent.sequence = seq;
+  renderSequenceList(seq);
   await saveSequenceToServer(seq);
   showToast(`Added '${val}' to sequence queue!`, 'success');
 }
@@ -291,7 +353,6 @@ async function saveSequenceToServer(newSequence) {
     const data = await res.json();
     if (data.success) {
       currentEvent = data.event;
-      renderSequenceList(currentEvent.sequence);
       const sideCurrent = document.getElementById('sidebarCurrentTag');
       if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[0] || {}).tag_no || 'Queue Finished';
       const sideNext = document.getElementById('sidebarNextTag');
