@@ -122,21 +122,24 @@ class SheetsService:
             # Check 1: Google Apps Script Webhook URL (Instant 0-auth sync)
             webhook_url = event.get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
             if webhook_url and webhook_url.startswith("http"):
-                payload = json.dumps({
-                    "event_name": event["name"],
-                    "tab_name": f"Live Scores",
-                    "rows": final_table_rows,
-                    "timestamp": datetime.now().isoformat()
-                }).encode("utf-8")
-                
-                req = urllib.request.Request(
-                    webhook_url,
-                    data=payload,
-                    headers={"Content-Type": "application/json"}
-                )
-                with urllib.request.urlopen(req, timeout=5) as response:
-                    logger.info(f"⚡ [Google Sheet Webhook] Auto-updated successfully!")
+                try:
+                    import requests
+                    resp = requests.post(
+                        webhook_url,
+                        json={
+                            "event_name": event["name"],
+                            "tab_name": "Live Scores",
+                            "rows": final_table_rows,
+                            "timestamp": datetime.now().isoformat()
+                        },
+                        headers={"Content-Type": "application/json"},
+                        timeout=10,
+                        allow_redirects=True
+                    )
+                    logger.info(f"⚡ [Google Sheet Webhook] Auto-updated successfully! Status: {resp.status_code}")
                     return True, "Auto-updated via Webhook"
+                except Exception as ex:
+                    logger.error(f"Webhook request failed: {ex}")
 
             # Check 2: Service account connection
             client = self._get_client()
