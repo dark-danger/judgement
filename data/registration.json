@@ -1677,5 +1677,81 @@
         "status": "PENDING"
       }
     ]
+  },
+  {
+    "id": "sch-59",
+    "seq_no": 59,
+    "school_name": "Test School 1",
+    "desk_no": 4,
+    "room_no": "G-101",
+    "is_arrived": false,
+    "arrived_at": null,
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Group Dance",
+        "event_id": "evt-group-dance",
+        "tag_no": "D-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Group Song",
+        "event_id": "evt-group-song",
+        "tag_no": "S-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Science Exhibition",
+        "event_id": "evt-science-exhibition",
+        "tag_no": "SC-99",
+        "status": "PENDING"
+      }
+    ]
+  },
+  {
+    "id": "sch-60",
+    "seq_no": 60,
+    "school_name": "Test International Model School Karnal",
+    "desk_no": 5,
+    "room_no": "G-101",
+    "is_arrived": false,
+    "arrived_at": null,
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Group Dance",
+        "event_id": "evt-group-dance",
+        "tag_no": "D-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Group Song",
+        "event_id": "evt-group-song",
+        "tag_no": "S-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-99",
+        "status": "PENDING"
+      },
+      {
+        "category": "Science Exhibition",
+        "event_id": "evt-science-exhibition",
+        "tag_no": "SC-99",
+        "status": "PENDING"
+      }
+    ]
   }
 ]

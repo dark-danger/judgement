@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from database import db
 from sheets_service import sheets_service
+from registration_service import registration_service
 
 app = Flask(__name__, static_folder="static", static_url_path="")
 CORS(app)
@@ -116,6 +117,47 @@ def sync_registration_sheets_api():
     try:
         ok, msg = sheets_service.sync_master_registrations()
         return jsonify({"success": ok, "message": msg})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/registration/sync-from-sheet", methods=["POST"])
+def sync_from_sheet_api():
+    try:
+        data = request.get_json(silent=True) or {}
+        schools_raw = data.get("schools", [])
+        if not schools_raw and "school_name" in data:
+            schools_raw = [data]
+
+        added_or_updated = []
+        for s in schools_raw:
+            school_name = s.get("school_name") or s.get("name") or s.get("School Name") or ""
+            if not school_name:
+                continue
+            dance_tag = s.get("dance_tag") or s.get("Dance Tag") or s.get("dance") or ""
+            song_tag = s.get("song_tag") or s.get("Song Tag") or s.get("song") or ""
+            dec_tag = s.get("declamation_tag") or s.get("Declamation Tag") or s.get("declamation") or ""
+            sci_tag = s.get("science_tag") or s.get("Science Tag") or s.get("science") or ""
+            room_no = s.get("room_no") or s.get("Room") or s.get("room") or "TBD"
+            desk_no = s.get("desk_no") or s.get("desk")
+
+            rec = registration_service.upsert_school(
+                school_name=school_name,
+                dance_tag=dance_tag,
+                song_tag=song_tag,
+                declamation_tag=dec_tag,
+                science_tag=sci_tag,
+                room_no=room_no,
+                desk_no=desk_no
+            )
+            if rec:
+                added_or_updated.append(rec)
+
+        sheets_service.trigger_background_sync()
+        return jsonify({
+            "success": True,
+            "count": len(added_or_updated),
+            "schools": added_or_updated
+        })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

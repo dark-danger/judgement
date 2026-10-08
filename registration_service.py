@@ -199,6 +199,80 @@ class RegistrationService:
             "categories": cat_stats
         }
 
+    def upsert_school(self, school_name, dance_tag="", song_tag="", declamation_tag="", science_tag="", room_no="TBD", desk_no=None):
+        data = self._load()
+        school_name = school_name.strip()
+        if not school_name:
+            return None
+
+        # Check if already exists
+        matched = None
+        for s in data:
+            if s["school_name"].strip().lower() == school_name.lower():
+                matched = s
+                break
+
+        events_list = []
+        if dance_tag:
+            events_list.append({"category": "Group Dance", "event_id": "evt-group-dance", "tag_no": dance_tag.strip(), "status": "PENDING"})
+        if song_tag:
+            events_list.append({"category": "Group Song", "event_id": "evt-group-song", "tag_no": song_tag.strip(), "status": "PENDING"})
+        if declamation_tag:
+            events_list.append({"category": "Declamation", "event_id": "evt-declamation", "tag_no": declamation_tag.strip(), "status": "PENDING"})
+        if science_tag:
+            events_list.append({"category": "Science Exhibition", "event_id": "evt-science-exhibition", "tag_no": science_tag.strip(), "status": "PENDING"})
+
+        if matched:
+            for ev in events_list:
+                for old_ev in matched.get("events", []):
+                    if old_ev.get("category") == ev["category"]:
+                        ev["status"] = old_ev.get("status", "PENDING")
+                        ev["marked_at"] = old_ev.get("marked_at")
+            matched["events"] = events_list
+            if room_no and room_no != "TBD":
+                matched["room_no"] = room_no
+            if desk_no:
+                matched["desk_no"] = desk_no
+            self._save(data)
+            return matched
+        else:
+            new_idx = len(data) + 1
+            calculated_desk = desk_no or (((new_idx - 1) % 5) + 1)
+            new_school = {
+                "id": f"sch-{new_idx:02d}",
+                "seq_no": new_idx,
+                "school_name": school_name,
+                "desk_no": calculated_desk,
+                "room_no": room_no or "TBD",
+                "is_arrived": False,
+                "arrived_at": None,
+                "contact_person": "",
+                "contact_phone": "",
+                "notes": "",
+                "events": events_list
+            }
+            data.append(new_school)
+            self._save(data)
+
+            # Add to event sequence queues if not present
+            try:
+                from database import db
+                for ev in events_list:
+                    event = db.get_event(ev["event_id"])
+                    if event:
+                        seq = list(event.get("sequence", []))
+                        existing_tags = [item["tag_no"] for item in seq] + [item["tag_no"] for item in event.get("completed_tags", [])]
+                        if ev["tag_no"] not in existing_tags:
+                            seq.append({
+                                "tag_no": ev["tag_no"],
+                                "notes": f"{school_name} [Room: {room_no}]"
+                            })
+                            db.update_sequence(ev["event_id"], seq)
+            except Exception as e:
+                logger.error(f"Error adding tag to sequence queue: {e}")
+
+            return new_school
+
     def _load(self):
         data = load_json(REG_FILE, [])
         if not data or len(data) < 58:
