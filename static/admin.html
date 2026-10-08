@@ -75,6 +75,9 @@
         </div>
 
         <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm" onclick="openEditEventModal()" title="Edit event name, add or remove judges, modify criteria">
+            <i data-lucide="edit-3"></i> Edit Event / Judges
+          </button>
           <button class="btn btn-sm" onclick="openGoogleSheetModal()" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.5); color: #34d399;" title="Connect a Google Sheet for 100% automated real-time background updates">
             <span id="sheetAutoSyncDot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span>
             <span>⚡ Permanent G-Sheet Auto-Sync</span>
@@ -410,7 +413,76 @@
     </div>
   </div>
 
+  <!-- EDIT EVENT & JUDGES MODAL -->
+  <div id="editEventModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="sliders" style="color: #ff2a4b;"></i>
+          <h3>Edit Event & Judges Configuration</h3>
+        </div>
+        <button class="modal-close" onclick="closeEditEventModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Event Title</label>
+          <input type="text" id="editEventNameInput" placeholder="e.g. Group Dance">
+        </div>
+
+        <div class="form-group">
+          <label>Description / Subtitle</label>
+          <input type="text" id="editEventDescInput" placeholder="e.g. Agrash 2026 - Inter-School Dance">
+        </div>
+
+        <!-- JUDGES MANAGEMENT -->
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div>
+              <strong style="color: #00e5ff; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                <i data-lucide="gavel"></i> Judges Evaluation Panel
+              </strong>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">Add, remove, or rename judges for this specific event.</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addJudgeToEditModal()">
+              <i data-lucide="user-plus"></i> + Add Judge
+            </button>
+          </div>
+
+          <div id="editJudgesContainer" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 220px; overflow-y: auto; padding-right: 0.3rem;">
+            <!-- Dynamically populated rows -->
+          </div>
+        </div>
+
+        <!-- CRITERIA MANAGEMENT (COLLAPSIBLE) -->
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <div>
+              <strong style="color: #fbbf24; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                <i data-lucide="check-square"></i> Scoring Criteria
+              </strong>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">Criteria parameters and maximum marks for each judge.</div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="addCriteriaToEditModal()">
+              <i data-lucide="plus"></i> + Add Parameter
+            </button>
+          </div>
+
+          <div id="editCriteriaContainer" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 200px; overflow-y: auto; padding-right: 0.3rem;">
+            <!-- Dynamically populated rows -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeEditEventModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnSaveEditEvent" onclick="saveEventEdits()">
+          <i data-lucide="save"></i> Save Event Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" class="toast-container"></div>
   <script src="/js/admin.js"></script>
 </body>
 </html>
+

@@ -157,6 +157,65 @@ def create_event():
         }
     })
 
+@app.route("/api/events/<event_id>", methods=["PUT", "POST"])
+def update_event(event_id):
+    try:
+        data = request.get_json(silent=True) or {}
+        event = db.get_event(event_id)
+        if not event:
+            return jsonify({"success": False, "error": "Event not found"}), 404
+
+        update_dict = {}
+        if "name" in data and data["name"]:
+            update_dict["name"] = data["name"].strip()
+        if "description" in data:
+            update_dict["description"] = data["description"].strip()
+
+        # Dynamic Judge Management: Add, Remove, Rename
+        if "judges" in data and isinstance(data["judges"], list):
+            formatted_judges = []
+            for idx, j in enumerate(data["judges"], start=1):
+                if isinstance(j, dict):
+                    j_id = j.get("id") or f"j{idx}"
+                    j_name = j.get("name", f"Judge {idx}").strip()
+                    if j_name:
+                        formatted_judges.append({
+                            "id": j_id,
+                            "name": j_name,
+                            "is_active": j.get("is_active", True)
+                        })
+                elif isinstance(j, str) and j.strip():
+                    formatted_judges.append({
+                        "id": f"j{idx}",
+                        "name": j.strip(),
+                        "is_active": True
+                    })
+            if formatted_judges:
+                update_dict["judges"] = formatted_judges
+                update_dict["judge_count"] = len(formatted_judges)
+
+        if "criteria" in data and isinstance(data["criteria"], list):
+            update_dict["criteria"] = data["criteria"]
+
+        if "google_sheet_url" in data:
+            update_dict["google_sheet_url"] = data["google_sheet_url"]
+        if "google_sheet_webhook_url" in data:
+            update_dict["google_sheet_webhook_url"] = data["google_sheet_webhook_url"]
+
+        updated = db.update_event(event_id, update_dict)
+        sheets_service.trigger_background_sync(event_id)
+        return jsonify({"success": True, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/sync-all-sheets", methods=["POST"])
+def sync_all_sheets_route():
+    try:
+        ok, res = sheets_service.sync_all_events()
+        return jsonify({"success": ok, "details": res})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/api/events/<event_id>", methods=["DELETE"])
 def delete_event(event_id):
     db.delete_event(event_id)

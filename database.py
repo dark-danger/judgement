@@ -95,42 +95,21 @@ class DB:
 
     def _init_defaults(self):
         events = load_json(EVENTS_FILE, [])
-        agrash_event = {
-            "id": "evt-agrash",
-            "name": "Agrash",
-            "description": "Agrash Grand Finale - Live Judgement & Stage Evaluation",
-            "created_at": datetime.now().isoformat(),
-            "judge_count": 5,
-            "judges": [
-                {"id": "j1", "name": "Judge 1", "is_active": True},
-                {"id": "j2", "name": "Judge 2", "is_active": True},
-                {"id": "j3", "name": "Judge 3", "is_active": True},
-                {"id": "j4", "name": "Judge 4", "is_active": True},
-                {"id": "j5", "name": "Judge 5", "is_active": True}
-            ],
-            "criteria": DEFAULT_CRITERIA,
-            "sequence": [
-                {"tag_no": "TAG-101", "notes": "Slot 1"},
-                {"tag_no": "TAG-102", "notes": "Slot 2"},
-                {"tag_no": "TAG-103", "notes": "Slot 3"},
-                {"tag_no": "TAG-104", "notes": "Slot 4"},
-                {"tag_no": "TAG-105", "notes": "Slot 5"},
-                {"tag_no": "TAG-106", "notes": "Slot 6"},
-                {"tag_no": "TAG-107", "notes": "Slot 7"},
-                {"tag_no": "TAG-108", "notes": "Slot 8"},
-                {"tag_no": "TAG-109", "notes": "Slot 9"},
-                {"tag_no": "TAG-110", "notes": "Slot 10"}
-            ],
-            "completed_tags": [],
-            "current_index": 0,
-            "next_transition_time": None,
-            "transition_seconds": 120,
-            "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
-            "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbyr_3MfnGGtZp4qUKEJ1-afuVPpSrOeD0U6wZ2HLAP3QHwTflRLJ-34fhDQRL3SaA88BA/exec"
-        }
-        if not any(e.get("id") == "evt-agrash" for e in events):
-            events.insert(0, agrash_event)
-            save_json(EVENTS_FILE, events)
+        try:
+            from seed_events import build_category_events
+            default_events = build_category_events()
+            existing_ids = {e.get("id") for e in events}
+            added = False
+            for def_ev in default_events:
+                if def_ev["id"] not in existing_ids:
+                    events.append(def_ev)
+                    added = True
+            if added or not events:
+                if not events:
+                    events = default_events
+                save_json(EVENTS_FILE, events)
+        except Exception as e:
+            print(f"⚠️ Error initializing default events: {e}")
 
     def _init_supabase(self, url=None, key=None):
         """Initialize connection to Supabase cloud database"""

@@ -721,6 +721,212 @@ function copyLink(inputId) {
   });
 }
 
+// -------------------------------------------------------------
+// EDIT EVENT & JUDGES HANDLERS
+// -------------------------------------------------------------
+function openEditEventModal() {
+  if (!currentEventData) {
+    showToast('Please select an active event first', 'error');
+    return;
+  }
+
+  document.getElementById('editEventNameInput').value = currentEventData.name || '';
+  document.getElementById('editEventDescInput').value = currentEventData.description || '';
+
+  // Render Judges
+  const judgesContainer = document.getElementById('editJudgesContainer');
+  judgesContainer.innerHTML = '';
+  const judges = currentEventData.judges || [];
+  if (judges.length === 0) {
+    for (let i = 1; i <= 5; i++) {
+      addJudgeToEditModal(`Judge ${i}`, `j${i}`);
+    }
+  } else {
+    judges.forEach((j, idx) => {
+      addJudgeToEditModal(j.name || `Judge ${idx + 1}`, j.id || `j${idx + 1}`);
+    });
+  }
+
+  // Render Criteria
+  const criteriaContainer = document.getElementById('editCriteriaContainer');
+  criteriaContainer.innerHTML = '';
+  const criteria = currentEventData.criteria || [];
+  criteria.forEach((c, idx) => {
+    addCriteriaToEditModal(c.name || `Criterion ${idx + 1}`, c.max_marks || 20, c.id || `c${idx + 1}`);
+  });
+
+  document.getElementById('editEventModal').classList.add('active');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeEditEventModal() {
+  document.getElementById('editEventModal').classList.remove('active');
+}
+
+function addJudgeToEditModal(name = '', id = '') {
+  const container = document.getElementById('editJudgesContainer');
+  const count = container.children.length + 1;
+  const judgeId = id || `j${Date.now().toString().slice(-4)}`;
+  const judgeName = name || `Judge ${count}`;
+
+  const row = document.createElement('div');
+  row.className = 'judge-edit-row';
+  row.dataset.judgeId = judgeId;
+  row.style.display = 'flex';
+  row.style.alignItems = 'center';
+  row.style.gap = '0.5rem';
+
+  row.innerHTML = `
+    <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #00e5ff; min-width: 45px; font-weight: 700;">#${count}</span>
+    <input type="text" class="judge-name-val" value="${escapeHtml(judgeName)}" placeholder="e.g. Judge ${count} or Dr. Sharma" style="flex-grow: 1; padding: 0.45rem 0.65rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 6px; color: #fff; font-size: 0.85rem;">
+    <button type="button" class="btn btn-ghost btn-sm" style="color: #f87171; padding: 0.4rem 0.6rem;" onclick="removeJudgeFromEditModal(this)" title="Remove Judge">
+      <i data-lucide="trash-2"></i>
+    </button>
+  `;
+  container.appendChild(row);
+  if (window.lucide) lucide.createIcons();
+}
+
+function removeJudgeFromEditModal(btn) {
+  const container = document.getElementById('editJudgesContainer');
+  if (container.children.length <= 1) {
+    showToast('At least 1 judge is required for evaluation', 'error');
+    return;
+  }
+  const row = btn.closest('.judge-edit-row');
+  if (row) {
+    row.remove();
+    // Re-index tags
+    Array.from(container.children).forEach((child, i) => {
+      const tag = child.querySelector('span');
+      if (tag) tag.textContent = `#${i + 1}`;
+    });
+  }
+}
+
+function addCriteriaToEditModal(name = '', maxMarks = 20, id = '') {
+  const container = document.getElementById('editCriteriaContainer');
+  const count = container.children.length + 1;
+  const critId = id || `c${Date.now().toString().slice(-4)}`;
+  const critName = name || `Parameter ${count}`;
+
+  const row = document.createElement('div');
+  row.className = 'criteria-edit-row';
+  row.dataset.critId = critId;
+  row.style.display = 'flex';
+  row.style.alignItems = 'center';
+  row.style.gap = '0.5rem';
+
+  row.innerHTML = `
+    <input type="text" class="crit-name-val" value="${escapeHtml(critName)}" placeholder="e.g. Choreography" style="flex-grow: 1; padding: 0.45rem 0.65rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 6px; color: #fff; font-size: 0.85rem;">
+    <div style="display: flex; align-items: center; gap: 0.25rem;">
+      <span style="font-size: 0.75rem; color: var(--text-dim);">Max:</span>
+      <input type="number" class="crit-max-val" value="${maxMarks}" min="5" max="100" style="width: 60px; padding: 0.45rem 0.45rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 6px; color: #fbbf24; font-weight: 700; text-align: center; font-size: 0.85rem;">
+    </div>
+    <button type="button" class="btn btn-ghost btn-sm" style="color: #f87171; padding: 0.4rem 0.6rem;" onclick="removeCriteriaFromEditModal(this)" title="Remove Criterion">
+      <i data-lucide="trash-2"></i>
+    </button>
+  `;
+  container.appendChild(row);
+  if (window.lucide) lucide.createIcons();
+}
+
+function removeCriteriaFromEditModal(btn) {
+  const container = document.getElementById('editCriteriaContainer');
+  if (container.children.length <= 1) {
+    showToast('At least 1 scoring criterion is required', 'error');
+    return;
+  }
+  const row = btn.closest('.criteria-edit-row');
+  if (row) row.remove();
+}
+
+async function saveEventEdits() {
+  if (!activeEventId) return;
+
+  const nameVal = document.getElementById('editEventNameInput').value.trim();
+  const descVal = document.getElementById('editEventDescInput').value.trim();
+
+  if (!nameVal) {
+    showToast('Event title is required', 'error');
+    return;
+  }
+
+  // Gather Judges
+  const judgeRows = document.querySelectorAll('#editJudgesContainer .judge-edit-row');
+  const judgesList = [];
+  judgeRows.forEach((row, idx) => {
+    const input = row.querySelector('.judge-name-val');
+    const jName = input ? input.value.trim() : `Judge ${idx + 1}`;
+    if (jName) {
+      judgesList.append ? judgesList.push({
+        id: row.dataset.judgeId || `j${idx + 1}`,
+        name: jName,
+        is_active: true
+      }) : judgesList.push({
+        id: row.dataset.judgeId || `j${idx + 1}`,
+        name: jName,
+        is_active: true
+      });
+    }
+  });
+
+  if (judgesList.length === 0) {
+    showToast('Please add at least 1 judge', 'error');
+    return;
+  }
+
+  // Gather Criteria
+  const critRows = document.querySelectorAll('#editCriteriaContainer .criteria-edit-row');
+  const criteriaList = [];
+  critRows.forEach((row, idx) => {
+    const nameInput = row.querySelector('.crit-name-val');
+    const maxInput = row.querySelector('.crit-max-val');
+    const cName = nameInput ? nameInput.value.trim() : `Criterion ${idx + 1}`;
+    const maxVal = maxInput ? parseInt(maxInput.value) || 20 : 20;
+    if (cName) {
+      criteriaList.push({
+        id: row.dataset.critId || `c${idx + 1}`,
+        name: cName,
+        max_marks: maxVal
+      });
+    }
+  });
+
+  const btn = document.getElementById('btnSaveEditEvent');
+  btn.disabled = true;
+  btn.textContent = 'Saving Changes...';
+
+  try {
+    const res = await fetch(`/api/events/${activeEventId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: nameVal,
+        description: descVal,
+        judges: judgesList,
+        criteria: criteriaList.length > 0 ? criteriaList : undefined
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Event & Judges updated successfully!', 'success');
+      closeEditEventModal();
+      await loadAllEvents();
+      await loadAdminData();
+    } else {
+      showToast(`Error: ${data.error || 'Failed to update event'}`, 'error');
+    }
+  } catch (err) {
+    showToast('Failed to save changes. Check server connection.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Save Event Changes';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
@@ -744,3 +950,4 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+

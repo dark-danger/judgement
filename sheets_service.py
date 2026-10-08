@@ -45,6 +45,20 @@ class SheetsService:
         thread = threading.Thread(target=self.auto_sync_event, args=(event_id,), daemon=True)
         thread.start()
 
+    def sync_all_events(self):
+        """Syncs all registered events to their respective tabs in Google Sheet"""
+        try:
+            from database import db
+            events = db.get_events()
+            results = {}
+            for ev in events:
+                ok, msg = self.auto_sync_event(ev["id"])
+                results[ev["name"]] = {"success": ok, "message": msg}
+            return True, results
+        except Exception as e:
+            logger.error(f"Error in sync_all_events: {e}")
+            return False, str(e)
+
     def auto_sync_event(self, event_id):
         """Automatically pushes live leaderboard and marksheet to connected Google Sheet"""
         try:
@@ -128,7 +142,7 @@ class SheetsService:
                         webhook_url,
                         json={
                             "event_name": event["name"],
-                            "tab_name": "Live Scores",
+                            "tab_name": event.get("name", "Live Scores"),
                             "rows": final_table_rows,
                             "timestamp": datetime.now().isoformat()
                         },

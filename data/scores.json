@@ -457,5 +457,90 @@
     "total": 97.0,
     "remarks": "Sample Presentation Evaluation",
     "updated_at": "2026-10-08T19:56:46.119429"
+  },
+  {
+    "id": "sc-a23901a1",
+    "event_id": "evt-agrash",
+    "tag_no": "#101",
+    "judge_id": "j1",
+    "judge_name": "Judge 1",
+    "scores": {
+      "c1": 20,
+      "c2": 19,
+      "c3": 19,
+      "c4": 20,
+      "c5": 20
+    },
+    "total": 98.0,
+    "remarks": "Outstanding performance!",
+    "updated_at": "2026-10-08T22:50:19.552660"
+  },
+  {
+    "id": "sc-da16300d",
+    "event_id": "evt-agrash",
+    "tag_no": "#101",
+    "judge_id": "j2",
+    "judge_name": "Judge 2",
+    "scores": {
+      "c1": 19,
+      "c2": 19,
+      "c3": 18,
+      "c4": 19,
+      "c5": 20
+    },
+    "total": 95.0,
+    "remarks": "Great rhythm",
+    "updated_at": "2026-10-08T22:50:19.553386"
+  },
+  {
+    "id": "sc-aae8813c",
+    "event_id": "evt-agrash",
+    "tag_no": "#102",
+    "judge_id": "j1",
+    "judge_name": "Judge 1",
+    "scores": {
+      "c1": 18,
+      "c2": 17,
+      "c3": 18,
+      "c4": 18,
+      "c5": 19
+    },
+    "total": 90.0,
+    "remarks": "Good attempt",
+    "updated_at": "2026-10-08T22:50:19.553891"
+  },
+  {
+    "id": "sc-701c6a22",
+    "event_id": "evt-agrash",
+    "tag_no": "#103",
+    "judge_id": "j1",
+    "judge_name": "Judge 1",
+    "scores": {
+      "c1": 16,
+      "c2": 17,
+      "c3": 16,
+      "c4": 15,
+      "c5": 16
+    },
+    "total": 80.0,
+    "remarks": "Needs practice",
+    "updated_at": "2026-10-08T22:50:19.554304"
+  },
+  {
+    "id": "sc-682fe1eb",
+    "event_id": "evt-agrash",
+    "tag_no": "#101",
+    "judge_id": "j3",
+    "judge_name": "Judge 3",
+    "scores": {
+      "c1": 20,
+      "c2": 20,
+      "c3": 20,
+      "c4": 20,
+      "c5": 20
+    },
+    "total": 100.0,
+    "remarks": "Perfect 100/100 from Judge 3!",
+    "updated_at": "2026-10-08T22:50:27.317239"
   }
 ]
