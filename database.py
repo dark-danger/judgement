@@ -2,19 +2,46 @@ import os
 import json
 import uuid
 import time
+import shutil
 from datetime import datetime
 from dotenv import load_dotenv
 
 # Load .env if present
 load_dotenv()
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-os.makedirs(DATA_DIR, exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INITIAL_DATA_DIR = os.path.join(BASE_DIR, "data")
 
+def get_writable_data_dir():
+    """Returns a writable directory (e.g. /tmp/agrash_data on Vercel/serverless)"""
+    candidate = os.path.join(BASE_DIR, "data")
+    try:
+        os.makedirs(candidate, exist_ok=True)
+        test_file = os.path.join(candidate, ".write_test")
+        with open(test_file, "w") as f:
+            f.write("ok")
+        os.remove(test_file)
+        return candidate
+    except Exception:
+        tmp_dir = "/tmp/agrash_data"
+        os.makedirs(tmp_dir, exist_ok=True)
+        for fname in ["events.json", "scores.json", "config.json", "supabase_config.json"]:
+            src = os.path.join(INITIAL_DATA_DIR, fname)
+            dst = os.path.join(tmp_dir, fname)
+            if os.path.exists(src) and not os.path.exists(dst):
+                try:
+                    shutil.copyfile(src, dst)
+                except Exception:
+                    pass
+        return tmp_dir
+
+DATA_DIR = get_writable_data_dir()
 EVENTS_FILE = os.path.join(DATA_DIR, "events.json")
 SCORES_FILE = os.path.join(DATA_DIR, "scores.json")
 CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
 SUPABASE_CONFIG_FILE = os.path.join(DATA_DIR, "supabase_config.json")
+
+_IN_MEMORY_CACHE = {}
 
 DEFAULT_CRITERIA = [
     {"id": "c1", "name": "Innovation & Concept", "max_marks": 20},
@@ -25,17 +52,37 @@ DEFAULT_CRITERIA = [
 ]
 
 def load_json(filepath, default):
+    if filepath in _IN_MEMORY_CACHE:
+        return _IN_MEMORY_CACHE[filepath]
     if os.path.exists(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                _IN_MEMORY_CACHE[filepath] = data
+                return data
         except Exception:
-            return default
+            pass
+    # Fallback to initial data folder
+    base_name = os.path.basename(filepath)
+    fallback_path = os.path.join(INITIAL_DATA_DIR, base_name)
+    if os.path.exists(fallback_path):
+        try:
+            with open(fallback_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                _IN_MEMORY_CACHE[filepath] = data
+                return data
+        except Exception:
+            pass
+    _IN_MEMORY_CACHE[filepath] = default
     return default
 
 def save_json(filepath, data):
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    _IN_MEMORY_CACHE[filepath] = data
+    try:
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"⚠️ [Storage] Could not write to {filepath}: {e}. Preserved in memory.")
 
 class DB:
     def __init__(self):
@@ -94,32 +141,28 @@ class DB:
             try:
                 from supabase import create_client
                 client = create_client(self.supabase_url, self.supabase_key)
-                # Test query to check credentials and connection
                 client.table("events").select("id").limit(1).execute()
                 self.supabase = client
                 self.is_supabase_connected = True
                 print(f"⚡ [Supabase] Connected successfully to: {self.supabase_url}")
-                # Synchronize initial events if empty
                 self.sync_local_to_supabase()
                 return True, "Connected to Supabase successfully"
             except Exception as e:
                 self.supabase = None
                 self.is_supabase_connected = False
                 err_msg = str(e)
-                print(f"⚠️ [Supabase] Connection failed: {err_msg}. Using local storage fallback.")
-                return False, f"Supabase connection failed: {err_msg}"
+                print(f"⚠️ [Supabase] Connection notice: {err_msg}. Using local fallback.")
+                return False, f"Supabase notice: {err_msg}"
         else:
             self.supabase = None
             self.is_supabase_connected = False
             return False, "Supabase credentials not configured"
 
     def configure_supabase(self, url, key):
-        """Save credentials and establish Supabase connection"""
         url = url.strip()
         key = key.strip()
         save_json(SUPABASE_CONFIG_FILE, {"url": url, "key": key})
-        # Also write to .env
-        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        env_path = os.path.join(BASE_DIR, ".env")
         try:
             with open(env_path, "w", encoding="utf-8") as f:
                 f.write(f"SUPABASE_URL={url}\nSUPABASE_KEY={key}\n")
@@ -136,14 +179,12 @@ class DB:
         }
 
     def sync_local_to_supabase(self):
-        """Push local events and scores to Supabase if not present"""
         if not self.is_supabase_connected or not self.supabase:
             return False, "Supabase not connected"
 
         try:
             local_events = load_json(EVENTS_FILE, [])
             for evt in local_events:
-                # Upsert into supabase
                 clean_evt = dict(evt)
                 self.supabase.table("events").upsert(clean_evt).execute()
 
@@ -168,18 +209,16 @@ class DB:
         return load_json(EVENTS_FILE, [])
 
     def get_event(self, event_id):
-        if self.is_supabase_connected and self.supabase:
-            try:
-                res = self.supabase.table("events").select("*").eq("id", event_id).execute()
-                if res.data and len(res.data) > 0:
-                    return res.data[0]
-            except Exception as e:
-                print(f"⚠️ [Supabase] get_event error: {e}")
-
         events = self.get_events()
+        # Direct match
         for e in events:
             if e["id"] == event_id:
                 return e
+        # Special keywords fallback or first event
+        if event_id in ["judge", "judges", "sequence", "projector", "admin", "default", None, ""]:
+            if events:
+                return events[0]
+        # Single event fallback
         if events:
             return events[0]
         return None
@@ -218,11 +257,9 @@ class DB:
             "google_sheet_url": google_sheet_url
         }
 
-        # Save locally
         events.insert(0, new_event)
         save_json(EVENTS_FILE, events)
 
-        # Save to Supabase
         if self.is_supabase_connected and self.supabase:
             try:
                 self.supabase.table("events").insert(new_event).execute()
@@ -234,18 +271,28 @@ class DB:
     def update_event(self, event_id, update_dict):
         events = load_json(EVENTS_FILE, [])
         updated_event = None
+        target_id = event_id
+
         for i, e in enumerate(events):
             if e["id"] == event_id:
                 events[i].update(update_dict)
                 updated_event = events[i]
+                target_id = e["id"]
                 break
+
+        # If not found by event_id, fallback to first event if generic
+        if not updated_event and events:
+            events[0].update(update_dict)
+            updated_event = events[0]
+            target_id = events[0]["id"]
 
         if updated_event:
             save_json(EVENTS_FILE, events)
 
         if self.is_supabase_connected and self.supabase:
             try:
-                self.supabase.table("events").update(update_dict).eq("id", event_id).execute()
+                clean_update = dict(update_dict)
+                self.supabase.table("events").update(clean_update).eq("id", target_id).execute()
             except Exception as e:
                 print(f"⚠️ [Supabase] update_event error: {e}")
 
@@ -273,7 +320,7 @@ class DB:
         if current_index is not None:
             event["current_index"] = max(0, min(current_index, len(new_sequence) - 1)) if new_sequence else 0
         event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
-        return self.update_event(event_id, event)
+        return self.update_event(event["id"], event)
 
     def set_current_tag(self, event_id, target_index):
         event = self.get_event(event_id)
@@ -282,17 +329,20 @@ class DB:
         if 0 <= target_index < len(event["sequence"]):
             event["current_index"] = target_index
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
-            return self.update_event(event_id, event)
+            return self.update_event(event["id"], event)
         return None
 
     def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None):
         """Marks a tag as completed, stores in completed_tags history, and removes from active sequence"""
         event = self.get_event(event_id)
-        if not event or not event.get("sequence"):
-            return None, "No active tags in sequence"
+        if not event:
+            return None, "Event not found"
+        
+        seq = list(event.get("sequence", []))
+        if not seq:
+            return None, "No active tags in sequence queue"
 
-        seq = list(event["sequence"])
-        completed_list = event.get("completed_tags", [])
+        completed_list = list(event.get("completed_tags", []))
 
         idx_to_remove = None
         if tag_index is not None and 0 <= tag_index < len(seq):
@@ -316,7 +366,7 @@ class DB:
             event["current_index"] = max(0, min(idx_to_remove, len(seq) - 1)) if seq else 0
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
 
-            updated = self.update_event(event_id, event)
+            updated = self.update_event(event["id"], event)
             return updated, f"Tag '{removed_item['tag_no']}' completed and removed from queue"
         
         return None, "Could not find tag to complete"
@@ -327,7 +377,7 @@ class DB:
         if not event:
             return None
         
-        completed_list = event.get("completed_tags", [])
+        completed_list = list(event.get("completed_tags", []))
         matched = None
         for i, c in enumerate(completed_list):
             if c["tag_no"] == tag_no:
@@ -335,9 +385,11 @@ class DB:
                 break
         
         if matched:
-            event["sequence"].append({"tag_no": matched["tag_no"], "notes": ""})
+            seq = list(event.get("sequence", []))
+            seq.append({"tag_no": matched["tag_no"], "notes": ""})
+            event["sequence"] = seq
             event["completed_tags"] = completed_list
-            return self.update_event(event_id, event)
+            return self.update_event(event["id"], event)
         return None
 
     def get_scores(self, event_id=None, tag_no=None):
@@ -391,7 +443,6 @@ class DB:
 
         save_json(SCORES_FILE, scores)
 
-        # Upsert to Supabase
         if self.is_supabase_connected and self.supabase:
             try:
                 self.supabase.table("scores").upsert(score_entry).execute()

@@ -165,62 +165,74 @@ def delete_event(event_id):
 
 @app.route("/api/events/<event_id>/sequence", methods=["POST"])
 def update_sequence(event_id):
-    data = request.get_json() or {}
-    new_sequence = data.get("sequence", [])
-    current_index = data.get("current_index")
+    try:
+        data = request.get_json(silent=True) or {}
+        new_sequence = data.get("sequence", [])
+        current_index = data.get("current_index")
 
-    if new_sequence is None:
-        return jsonify({"success": False, "error": "Sequence is required"}), 400
+        if new_sequence is None:
+            return jsonify({"success": False, "error": "Sequence is required"}), 400
 
-    updated = db.update_sequence(event_id, new_sequence, current_index)
-    if not updated:
-        return jsonify({"success": False, "error": "Event not found"}), 404
+        updated = db.update_sequence(event_id, new_sequence, current_index)
+        if not updated:
+            return jsonify({"success": False, "error": "Event not found"}), 404
 
-    return jsonify({"success": True, "event": updated})
+        return jsonify({"success": True, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/events/<event_id>/current-tag", methods=["POST"])
 def set_current_tag(event_id):
-    data = request.get_json() or {}
-    target_index = data.get("index")
+    try:
+        data = request.get_json(silent=True) or {}
+        target_index = data.get("index")
 
-    if target_index is None:
-        return jsonify({"success": False, "error": "Index required"}), 400
+        if target_index is None:
+            return jsonify({"success": False, "error": "Index required"}), 400
 
-    updated = db.set_current_tag(event_id, int(target_index))
-    if not updated:
-        return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
+        updated = db.set_current_tag(event_id, int(target_index))
+        if not updated:
+            return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
 
-    return jsonify({"success": True, "event": updated})
+        return jsonify({"success": True, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/events/<event_id>/complete-tag", methods=["POST"])
 def complete_tag(event_id):
-    data = request.get_json() or {}
-    tag_index = data.get("index")
-    tag_no = data.get("tag_no")
+    try:
+        data = request.get_json(silent=True) or {}
+        tag_index = data.get("index")
+        tag_no = data.get("tag_no")
 
-    updated, msg = db.complete_and_remove_tag(
-        event_id=event_id,
-        tag_index=int(tag_index) if tag_index is not None else None,
-        tag_no=tag_no
-    )
+        updated, msg = db.complete_and_remove_tag(
+            event_id=event_id,
+            tag_index=int(tag_index) if tag_index is not None and str(tag_index).isdigit() else None,
+            tag_no=tag_no
+        )
 
-    if not updated:
-        return jsonify({"success": False, "error": msg}), 400
+        if not updated:
+            return jsonify({"success": False, "error": msg}), 400
 
-    return jsonify({"success": True, "message": msg, "event": updated})
+        return jsonify({"success": True, "message": msg, "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/events/<event_id>/restore-tag", methods=["POST"])
 def restore_tag(event_id):
-    data = request.get_json() or {}
-    tag_no = data.get("tag_no")
-    if not tag_no:
-        return jsonify({"success": False, "error": "Tag Number required"}), 400
+    try:
+        data = request.get_json(silent=True) or {}
+        tag_no = data.get("tag_no")
+        if not tag_no:
+            return jsonify({"success": False, "error": "Tag Number required"}), 400
 
-    updated = db.restore_completed_tag(event_id, tag_no)
-    if not updated:
-        return jsonify({"success": False, "error": "Could not restore tag"}), 400
+        updated = db.restore_completed_tag(event_id, tag_no)
+        if not updated:
+            return jsonify({"success": False, "error": "Could not restore tag"}), 400
 
-    return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated})
+        return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # Reset Demo Presentation Data Endpoint
 @app.route("/api/events/<event_id>/reset-demo", methods=["POST"])

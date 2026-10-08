@@ -10,18 +10,30 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(loadSequenceData, 3000);
 });
 
+function getActiveEventId() {
+  return (currentEvent && currentEvent.id) ? currentEvent.id : eventId;
+}
+
 async function loadSequenceData() {
   try {
-    const res = await fetch(`/api/events/${eventId}`);
+    const targetId = getActiveEventId();
+    const res = await fetch(`/api/events/${targetId}`);
     const data = await res.json();
-    if (data.success) {
+    if (data.success && data.event) {
       currentEvent = data.event;
+      eventId = currentEvent.id;
       
-      document.getElementById('eventTitleNav').innerHTML = `${escapeHtml(currentEvent.name)} • <span>Sequence</span>`;
-      document.getElementById('totalTagsBadge').textContent = `${currentEvent.sequence.length} Active in Queue`;
+      const navTitle = document.getElementById('eventTitleNav');
+      if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Sequence</span>`;
       
-      document.getElementById('sidebarCurrentTag').textContent = data.current_tag || 'Queue Finished';
-      document.getElementById('sidebarNextTag').textContent = data.next_tag || 'None';
+      const badge = document.getElementById('totalTagsBadge');
+      if (badge) badge.textContent = `${currentEvent.sequence.length} Active in Queue`;
+      
+      const sideCurrent = document.getElementById('sidebarCurrentTag');
+      if (sideCurrent) sideCurrent.textContent = data.current_tag || 'Queue Finished';
+      
+      const sideNext = document.getElementById('sidebarNextTag');
+      if (sideNext) sideNext.textContent = data.next_tag || 'None';
 
       renderSequenceList(currentEvent.sequence, data.current_index);
       renderCompletedList(data.completed_tags || []);
@@ -33,6 +45,8 @@ async function loadSequenceData() {
 
 function renderSequenceList(sequence, currentIndex) {
   const container = document.getElementById('sequenceList');
+  if (!container) return;
+
   if (!sequence || sequence.length === 0) {
     container.innerHTML = `
       <div class="current-team-card" style="text-align: center; padding: 3rem;">
@@ -65,17 +79,19 @@ function renderSequenceList(sequence, currentIndex) {
         </div>
 
         <div class="item-actions">
-          <!-- Complete & Remove Tag Button (User Request) -->
+          <!-- Complete & Remove Tag Button -->
           <button class="btn btn-sm btn-emerald" onclick="completeTagAction(${idx}, '${escapeHtml(item.tag_no)}')" title="Mark presentation completed and remove from queue">
             <i data-lucide="check-check"></i> Complete & Remove
           </button>
 
           <!-- Set to Stage Button -->
           ${!isCurrent ? `
-            <button class="btn btn-sm btn-secondary" onclick="setCurrentStage(${idx})" title="Set on stage">
-              <i data-lucide="crosshair"></i> Stage
+            <button class="btn btn-sm btn-secondary" onclick="setCurrentStage(${idx})" title="Set as live on stage">
+              <i data-lucide="crosshair"></i> Set On Stage
             </button>
-          ` : ''}
+          ` : `
+            <span class="badge badge-live" style="font-size: 0.75rem;"><span class="dot-pulse"></span> ON STAGE</span>
+          `}
 
           <!-- Move to Top (Aga) -->
           <button class="btn-icon" onclick="moveTagToTop(${idx})" title="Rush to Front (Aga)" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
@@ -133,8 +149,9 @@ function renderCompletedList(completedTags) {
 
 // Complete and Remove Tag
 async function completeTagAction(idx, tagNo) {
+  const targetId = getActiveEventId();
   try {
-    const res = await fetch(`/api/events/${eventId}/complete-tag`, {
+    const res = await fetch(`/api/events/${targetId}/complete-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: idx, tag_no: tagNo })
@@ -144,7 +161,7 @@ async function completeTagAction(idx, tagNo) {
       showToast(`✓ Tag '${tagNo}' completed & removed from queue!`, 'success');
       loadSequenceData();
     } else {
-      showToast(`Error: ${data.error}`, 'error');
+      showToast(`Error: ${data.error || 'Failed to complete tag'}`, 'error');
     }
   } catch (e) {
     showToast('Failed to complete tag', 'error');
@@ -154,18 +171,19 @@ async function completeTagAction(idx, tagNo) {
 // Complete Current Active Stage Tag
 async function completeCurrentActiveTag() {
   if (!currentEvent || !currentEvent.sequence || currentEvent.sequence.length === 0) {
-    showToast('No active tag to complete!', 'info');
+    showToast('No active tag in queue to complete!', 'info');
     return;
   }
   const currIdx = currentEvent.current_index || 0;
-  const tagNo = currentEvent.sequence[currIdx].tag_no;
+  const tagNo = currentEvent.sequence[currIdx] ? currentEvent.sequence[currIdx].tag_no : currentEvent.sequence[0].tag_no;
   await completeTagAction(currIdx, tagNo);
 }
 
 // Restore Tag
 async function restoreTagAction(tagNo) {
+  const targetId = getActiveEventId();
   try {
-    const res = await fetch(`/api/events/${eventId}/restore-tag`, {
+    const res = await fetch(`/api/events/${targetId}/restore-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tag_no: tagNo })
@@ -175,7 +193,7 @@ async function restoreTagAction(tagNo) {
       showToast(`Tag '${tagNo}' restored to queue!`, 'success');
       loadSequenceData();
     } else {
-      showToast(`Error: ${data.error}`, 'error');
+      showToast(`Error: ${data.error || 'Failed to restore tag'}`, 'error');
     }
   } catch (e) {
     showToast('Failed to restore tag', 'error');
@@ -218,19 +236,23 @@ async function moveTagToBottom(idx) {
 }
 
 async function setCurrentStage(idx) {
+  const targetId = getActiveEventId();
   try {
-    const res = await fetch(`/api/events/${eventId}/current-tag`, {
+    const res = await fetch(`/api/events/${targetId}/current-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: idx })
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Set '${currentEvent.sequence[idx].tag_no}' as live on stage!`, 'success');
+      const tagText = (currentEvent && currentEvent.sequence[idx]) ? currentEvent.sequence[idx].tag_no : `Slot #${idx+1}`;
+      showToast(`Set '${tagText}' as live on stage!`, 'success');
       loadSequenceData();
+    } else {
+      showToast(`Error: ${data.error || 'Failed to set on stage'}`, 'error');
     }
   } catch (e) {
-    showToast('Failed to set current tag', 'error');
+    showToast('Failed to set on stage', 'error');
   }
 }
 
@@ -253,8 +275,9 @@ async function addNewTag(e) {
 }
 
 async function saveSequenceToServer(newSequence) {
+  const targetId = getActiveEventId();
   try {
-    const res = await fetch(`/api/events/${eventId}/sequence`, {
+    const res = await fetch(`/api/events/${targetId}/sequence`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -266,8 +289,10 @@ async function saveSequenceToServer(newSequence) {
     if (data.success) {
       currentEvent = data.event;
       renderSequenceList(currentEvent.sequence, currentEvent.current_index);
-      document.getElementById('sidebarCurrentTag').textContent = (currentEvent.sequence[currentEvent.current_index] || {}).tag_no || 'Queue Finished';
-      document.getElementById('sidebarNextTag').textContent = (currentEvent.sequence[currentEvent.current_index + 1] || {}).tag_no || 'None';
+      const sideCurrent = document.getElementById('sidebarCurrentTag');
+      if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[currentEvent.current_index] || {}).tag_no || 'Queue Finished';
+      const sideNext = document.getElementById('sidebarNextTag');
+      if (sideNext) sideNext.textContent = (currentEvent.sequence[currentEvent.current_index + 1] || {}).tag_no || 'None';
     }
   } catch (err) {
     showToast('Failed to save sequence', 'error');
@@ -276,6 +301,7 @@ async function saveSequenceToServer(newSequence) {
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
