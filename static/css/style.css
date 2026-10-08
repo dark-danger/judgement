@@ -1327,53 +1327,93 @@ body {
 }
 
 /* ======================================================== */
-/* 🎪 FULLSCREEN GRAND STAGE / NEXT TEAM COMING ARENA */
+/* 🚪 REALITY SHOW STAGE DOORS (OPEN / CLOSE ANIMATIONS) */
 /* ======================================================== */
 
-.next-team-fullscreen-screen {
-  background: radial-gradient(circle at top center, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.98) 70%, rgba(2, 6, 23, 1) 100%);
-  border: 2px solid rgba(251, 191, 36, 0.4);
-  border-radius: var(--radius-xl);
-  padding: 2.5rem 1.5rem;
-  margin-top: 1rem;
-  margin-bottom: 2.5rem;
-  text-align: center;
-  backdrop-filter: blur(20px);
-  position: relative;
+.stage-doors-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
   overflow: hidden;
-  box-shadow: 0 0 60px rgba(251, 191, 36, 0.15), 0 25px 80px rgba(0, 0, 0, 0.9);
-  animation: arenaGlow 4s infinite alternate;
+  display: flex;
 }
 
-@keyframes arenaGlow {
-  0% { border-color: rgba(251, 191, 36, 0.35); box-shadow: 0 0 40px rgba(251, 191, 36, 0.15); }
-  100% { border-color: rgba(0, 229, 255, 0.5); box-shadow: 0 0 70px rgba(0, 229, 255, 0.25); }
+.stage-doors-viewport.active {
+  pointer-events: auto;
 }
 
-.submitted-summary-pill {
-  display: inline-flex;
+.stage-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5vw;
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 60%, #020617 100%);
+  border-top: 2px solid rgba(251, 191, 36, 0.4);
+  border-bottom: 2px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+  transition: transform 0.85s cubic-bezier(0.77, 0, 0.175, 1);
+  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid #10b981;
-  color: #34d399;
-  padding: 0.6rem 1.25rem;
-  border-radius: 30px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  margin-bottom: 1.75rem;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-  flex-wrap: wrap;
-  justify-content: center;
+  overflow: hidden;
+  z-index: 10;
 }
 
-.grand-next-team-box {
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-lg);
-  padding: 2rem 1.5rem;
+.door-left {
+  left: 0;
+  transform: translateX(-100%);
+  border-right: 4px solid #00e5ff;
+  box-shadow: inset -15px 0 35px rgba(0, 229, 255, 0.35), 20px 0 50px rgba(0, 0, 0, 0.9);
+  justify-content: flex-end;
+}
+
+.door-right {
+  right: 0;
+  transform: translateX(100%);
+  border-left: 4px solid #00e5ff;
+  box-shadow: inset 15px 0 35px rgba(0, 229, 255, 0.35), -20px 0 50px rgba(0, 0, 0, 0.9);
+  justify-content: flex-start;
+}
+
+/* When Doors are Closed */
+.stage-doors-viewport.doors-closed .door-left {
+  transform: translateX(0);
+}
+.stage-doors-viewport.doors-closed .door-right {
+  transform: translateX(0);
+}
+
+/* Door Content Overlay */
+.door-center-card-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 1.5rem;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s;
+  pointer-events: none;
+}
+
+.stage-doors-viewport.doors-closed .door-center-card-wrap {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.next-team-door-card {
   max-width: 650px;
-  margin: 0 auto 1.75rem auto;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid rgba(251, 191, 36, 0.6);
+  border-radius: var(--radius-xl);
+  padding: 2.75rem 2rem;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(251, 191, 36, 0.3), 0 30px 90px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(25px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1381,36 +1421,55 @@ body {
   position: relative;
 }
 
-.grand-next-tag-badge {
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
+.door-card-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1));
+  border: 1px solid #fbbf24;
   color: #fbbf24;
+  padding: 0.45rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  padding: 0.35rem 0.9rem;
-  border-radius: 20px;
 }
 
-.grand-next-tag-num {
+.door-next-tag-title {
   font-family: var(--font-heading);
-  font-size: 3.8rem;
+  font-size: 4.5rem;
   font-weight: 900;
   letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #ffffff 0%, #00e5ff 60%, #38bdf8 100%);
+  margin: 0.1rem 0;
+  background: linear-gradient(135deg, #ffffff 0%, #00e5ff 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.6));
-  line-height: 1;
+  filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.7));
+  line-height: 1.1;
 }
 
-.grand-next-school-name {
+.door-next-school-name {
   font-family: var(--font-heading);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.35;
+  margin: 0.25rem 0;
 }
+
+.submitted-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #34d399;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 
 

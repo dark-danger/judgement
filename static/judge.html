@@ -46,86 +46,56 @@
       </div>
     </header>
 
-    <!-- 2-MINUTE STAGE PREPARATION & TRANSITION SCREEN -->
-    <div id="stageTransitionScreen" class="stage-transition-screen" style="display: none;">
-      <div class="transition-container">
-        <div class="transition-pulse-ring"></div>
-        <div class="transition-timer-circle">
-          <svg class="timer-svg" viewBox="0 0 100 100">
-            <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
-            <circle class="timer-progress" id="timerProgressCircle" cx="50" cy="50" r="45"></circle>
-          </svg>
-          <div class="timer-content">
-            <span class="timer-label">STAGE PREP</span>
-            <span class="timer-digits" id="transitionCountdownDigits">02:00</span>
-            <span class="timer-sub">MINUTES</span>
+    <!-- REALITY SHOW STAGE DOORS VIEWPORT -->
+    <div id="stageDoorsViewport" class="stage-doors-viewport">
+      <!-- Left Sliding Door -->
+      <div class="stage-door door-left"></div>
+      
+      <!-- Right Sliding Door -->
+      <div class="stage-door door-right"></div>
+      
+      <!-- Center Seam Neon Glow -->
+      <div class="door-seam-glow"></div>
+
+      <!-- Content Card Displayed on the Closed Doors -->
+      <div class="door-center-card-wrap" id="doorCenterCardWrap">
+        <div class="next-team-door-card">
+          <div class="door-card-header-badge">
+            <i data-lucide="sparkles"></i> ⚡ NEXT TEAM COMING
           </div>
-        </div>
 
-        <div class="transition-info-box">
-          <span class="transition-next-badge">⚡ UP NEXT ON STAGE</span>
-          <h2 class="transition-next-tag" id="transitionNextTag">Tag: D-22</h2>
-          <p class="transition-next-school" id="transitionNextSchool">Next School Team</p>
-        </div>
+          <div id="doorSubmittedStatusBadge" class="submitted-summary-badge" style="display: none;">
+            <span>🎉 Score of <strong id="doorSubmittedTotal">0</strong>/100 Locked for <strong id="doorSubmittedTag">--</strong></span>
+          </div>
 
-        <div class="transition-actions">
-          <button class="btn btn-gold btn-md" onclick="skipTransitionCountdown()">
-            <i data-lucide="zap"></i> Team On Stage • Open Scoring Now
+          <h1 class="door-next-tag-title" id="doorNextTagTitle">
+            --
+          </h1>
+
+          <div>
+            <h2 class="door-next-school-name" id="doorNextSchoolName">
+              Next School Team
+            </h2>
+            <span style="font-size: 0.9rem; color: #38bdf8; font-weight: 600;" id="doorNextCategoryBadge">
+              Stage Sequence Active
+            </span>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.25rem;">
+            <span style="font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; gap: 0.45rem;">
+              <span class="dot-pulse" style="width: 8px; height: 8px; border-radius: 50%; background: #00e5ff; display: inline-block;"></span>
+              Stage Queue Ready • Doors open automatically on stage call
+            </span>
+          </div>
+
+          <button type="button" id="btnDoorReopen" class="btn btn-ghost btn-sm" onclick="reopenCurrentScoring()" style="display: none; color: #fbbf24; font-size: 0.8rem; text-decoration: underline; margin-top: 0.25rem;">
+            <i data-lucide="edit-3"></i> Edit Previous Submitted Score
           </button>
         </div>
       </div>
     </div>
 
-    <!-- FULLSCREEN GRAND STAGE / NEXT TEAM COMING ARENA -->
-    <div id="nextTeamComingScreen" class="next-team-fullscreen-screen" style="display: none;">
-      <div class="submitted-summary-pill">
-        <span>🎉 Score Submitted & Locked:</span>
-        <strong id="lockedScoreSummaryText">100/100 for Current Tag</strong>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="reopenCurrentScoring()" style="color: #fbbf24; padding: 0.2rem 0.6rem; font-size: 0.78rem; text-decoration: underline;">
-          <i data-lucide="edit-3"></i> Edit Submitted Marks
-        </button>
-      </div>
-
-      <div class="grand-next-team-box">
-        <div class="grand-next-tag-badge">
-          <i data-lucide="sparkles"></i> ⚡ UP NEXT ON STAGE
-        </div>
-
-        <div class="grand-next-tag-num" id="arenaNextTagNumber">
-          --
-        </div>
-
-        <div>
-          <h2 class="grand-next-school-name" id="arenaNextSchoolName">
-            Next School Team
-          </h2>
-          <span style="font-size: 0.88rem; color: #38bdf8; font-weight: 600;" id="arenaNextCategoryBadge">
-            Live Category
-          </span>
-        </div>
-
-        <!-- Animated Countdown Ring -->
-        <div class="transition-timer-circle" style="margin-top: 0.5rem;">
-          <svg class="timer-svg" viewBox="0 0 100 100">
-            <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
-            <circle class="timer-progress" id="arenaTimerProgress" cx="50" cy="50" r="45"></circle>
-          </svg>
-          <div class="timer-content">
-            <span class="timer-label">STAGE PREP</span>
-            <span class="timer-digits" id="arenaTimerDigits">02:00</span>
-            <span class="timer-sub">MINUTES</span>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem;">
-          <button type="button" class="btn-gold" onclick="startScoringNextTeam()">
-            <i data-lucide="play"></i> ⚡ Team On Stage • Start Scoring Now →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIVE SCORING VIEW CONTAINER -->
+    <!-- ACTIVE SCORING VIEW CONTAINER (BEHIND THE DOORS) -->
     <div id="scoringView">
       <!-- Top Banner for Current Team & Next Coming Team -->
       <section class="judge-header-hero" id="judgeHeaderHero">
@@ -138,11 +108,11 @@
               <span class="dot-pulse"></span> LIVE NOW
             </span>
           </div>
-          <p style="color: #38bdf8; font-size: 0.95rem; font-weight: 700; margin-top: 0.35rem;" id="currentTagSchool">
+          <p style="color: #38bdf8; font-size: 1rem; font-weight: 700; margin-top: 0.35rem;" id="currentTagSchool">
             Loading School Name...
           </p>
           <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.2rem;" id="currentTagNotes">
-            Evaluate across 5 criteria (20 marks each). Total: 100 Marks.
+            Evaluate across criteria parameters.
           </p>
         </div>
 
@@ -153,12 +123,6 @@
             <div class="next-tag-number" id="nextTagDisplay">--</div>
             <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;" id="nextTagSchool">
               Queue Active
-            </div>
-          </div>
-          <div style="margin-top: 0.75rem;">
-            <div class="timer-pill" id="transitionTimerPill">
-              <i data-lucide="clock"></i>
-              <span id="transitionTimerText">Queue Active</span>
             </div>
           </div>
         </div>
