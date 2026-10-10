@@ -117,29 +117,29 @@ function renderSequenceList(sequence) {
     let tagNameStyle = '';
 
     if (idx === 0) {
-      // 🟢 1. Sabse Upar - On Stage (GREEN)
-      tierStyle = 'border: 2px solid #10b981; background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(4, 6, 10, 0.95)); box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);';
-      orderBadgeStyle = 'background: #10b981; color: #fff; font-weight: 900; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);';
-      tagNameStyle = 'font-size: 1.5rem; color: #fff; text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);';
-      badgeHtml = '<span class="badge" style="background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid #10b981; font-size: 0.78rem; padding: 0.2rem 0.6rem;"><span class="dot-pulse" style="background: #10b981;"></span> 🟢 LIVE ON STAGE</span>';
+      // 🟢 1. On Stage (EMERALD)
+      tierStyle = 'border: 1.5px solid #10b981; background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(15, 23, 42, 0.95)); box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);';
+      orderBadgeStyle = 'background: #10b981; color: #fff; font-weight: 900; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);';
+      tagNameStyle = 'font-size: 1.5rem; color: #fff; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);';
+      badgeHtml = '<span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.78rem; padding: 0.2rem 0.6rem;"><span class="dot-pulse" style="background: #10b981;"></span> LIVE ON STAGE</span>';
     } else if (idx === 1) {
-      // 🟡 2. Nicha wala - Next Up (YELLOW)
-      tierStyle = 'border: 2px solid rgba(245, 158, 11, 0.75); background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(4, 6, 10, 0.95)); box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);';
-      orderBadgeStyle = 'background: #f59e0b; color: #000; font-weight: 900;';
+      // 🟡 2. Next Up (AMBER GOLD)
+      tierStyle = 'border: 1.5px solid rgba(251, 191, 36, 0.65); background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(15, 23, 42, 0.95)); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);';
+      orderBadgeStyle = 'background: #fbbf24; color: #000; font-weight: 900;';
       tagNameStyle = 'font-size: 1.35rem; color: #fef08a;';
-      badgeHtml = '<span class="badge" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid #f59e0b; font-size: 0.75rem; padding: 0.2rem 0.55rem;">🟡 NEXT UP</span>';
+      badgeHtml = '<span class="badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); font-size: 0.75rem; padding: 0.2rem 0.55rem;">NEXT UP</span>';
     } else if (idx === 2) {
-      // 🔴 3. Ussa nicha wala - 3rd in queue (RED)
-      tierStyle = 'border: 2px solid rgba(255, 42, 75, 0.65); background: linear-gradient(135deg, rgba(255, 42, 75, 0.14), rgba(4, 6, 10, 0.95)); box-shadow: 0 0 18px rgba(255, 42, 75, 0.2);';
-      orderBadgeStyle = 'background: #ff2a4b; color: #fff; font-weight: 800;';
+      // 🔴 3. Preparing (CRIMSON ROSE)
+      tierStyle = 'border: 1.5px solid rgba(244, 63, 94, 0.55); background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(15, 23, 42, 0.95)); box-shadow: 0 0 18px rgba(244, 63, 94, 0.15);';
+      orderBadgeStyle = 'background: #f43f5e; color: #fff; font-weight: 800;';
       tagNameStyle = 'font-size: 1.25rem; color: #fecdd3;';
-      badgeHtml = '<span class="badge" style="background: rgba(255, 42, 75, 0.25); color: #ff4d6a; border: 1px solid #ff2a4b; font-size: 0.75rem; padding: 0.2rem 0.55rem;">🔴 PREPARING</span>';
+      badgeHtml = '<span class="badge" style="background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); font-size: 0.75rem; padding: 0.2rem 0.55rem;">PREPARING</span>';
     } else {
-      // 🔵 4. Baki nicha wale (BLUE)
-      tierStyle = 'border: 1px solid rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.04);';
-      orderBadgeStyle = 'background: rgba(0, 229, 255, 0.2); color: #00e5ff; font-weight: 700;';
+      // 🔵 4. In Queue (CYAN SKY)
+      tierStyle = 'border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.04);';
+      orderBadgeStyle = 'background: rgba(56, 189, 248, 0.18); color: #38bdf8; font-weight: 700;';
       tagNameStyle = 'font-size: 1.15rem; color: #e0f2fe;';
-      badgeHtml = '<span class="badge" style="background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.3); font-size: 0.72rem; padding: 0.15rem 0.5rem;">🔵 IN QUEUE</span>';
+      badgeHtml = '<span class="badge" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); font-size: 0.72rem; padding: 0.15rem 0.5rem;">IN QUEUE</span>';
     }
 
     return `

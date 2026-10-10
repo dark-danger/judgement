@@ -1,10 +1,20 @@
 import os
+import sys
 import io
 import csv
 import json
 import time
 import socket
 from datetime import datetime
+
+# Configure Windows console encoding for UTF-8
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from database import db

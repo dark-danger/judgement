@@ -103,7 +103,7 @@ function renderSchools(schools) {
         <div class="cat-tag-box ${boxClass}" id="cat-box-${s.id}-${ev.tag_no}">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <strong style="color: #fff; font-size: 0.85rem;">${escapeHtml(ev.category)}</strong>
-            <span style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; background: rgba(0,0,0,0.6); padding: 0.15rem 0.45rem; border-radius: 4px; color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.3);">
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; background: rgba(7,10,17,0.7); padding: 0.15rem 0.45rem; border-radius: 4px; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
               ${escapeHtml(ev.tag_no)}
             </span>
           </div>
@@ -123,7 +123,7 @@ function renderSchools(schools) {
     card.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 900; color: #fbbf24; background: rgba(0,0,0,0.6); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">
+          <span style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 900; color: #fbbf24; background: rgba(7,10,17,0.7); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">
             #${s.seq_no}
           </span>
           <div>
@@ -131,7 +131,7 @@ function renderSchools(schools) {
               ${escapeHtml(s.school_name)}
             </h3>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; font-size: 0.78rem;">
-              <span class="badge" style="background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.3);">
+              <span class="badge" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                 Desk ${s.desk_no}
               </span>
               <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">

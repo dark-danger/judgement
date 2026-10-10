@@ -274,13 +274,13 @@ function renderJudgesPanel() {
   }
 
   chipsContainer.innerHTML = judges.map((j, idx) => `
-    <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.35); padding: 0.3rem 0.65rem; border-radius: 20px; font-size: 0.82rem; color: #fff;">
-      <span style="color: #00e5ff; font-weight: 700; font-family: var(--font-mono);">#${idx + 1}</span>
+    <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); padding: 0.3rem 0.65rem; border-radius: 20px; font-size: 0.82rem; color: #fff;">
+      <span style="color: #38bdf8; font-weight: 700; font-family: var(--font-mono);">#${idx + 1}</span>
       <strong>${escapeHtml(j.name)}</strong>
       <button type="button" onclick="quickRenameJudge('${j.id}', '${escapeHtml(j.name)}')" title="Rename ${escapeHtml(j.name)}" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0 0.15rem; display: inline-flex; align-items: center;">
         <i data-lucide="edit-2" style="width: 12px; height: 12px;"></i>
       </button>
-      <button type="button" onclick="quickDeleteJudge('${j.id}', '${escapeHtml(j.name)}')" title="Remove ${escapeHtml(j.name)}" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 0 0.15rem; display: inline-flex; align-items: center;">
+      <button type="button" onclick="quickDeleteJudge('${j.id}', '${escapeHtml(j.name)}')" title="Remove ${escapeHtml(j.name)}" style="background: none; border: none; color: #fb7185; cursor: pointer; padding: 0 0.15rem; display: inline-flex; align-items: center;">
         <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
       </button>
     </div>
@@ -1111,7 +1111,7 @@ function renderChampionshipUI(list) {
       rowBg = 'rgba(249, 115, 22, 0.08)';
     } else if (isTop10 && item.total_score > 0) {
       standing = `⭐ Top 10 (#${idx + 1})`;
-      rowBg = 'rgba(0, 229, 255, 0.04)';
+      rowBg = 'rgba(56, 189, 248, 0.05)';
     }
 
     const tr = document.createElement('tr');

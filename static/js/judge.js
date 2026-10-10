@@ -258,7 +258,7 @@ function triggerStageReveal(tagNo, schoolInfo, eventName) {
       particleCount: 75,
       spread: 80,
       origin: { y: 0.6 },
-      colors: ['#fbbf24', '#ff2a4b', '#00e5ff', '#ffffff']
+      colors: ['#fbbf24', '#f43f5e', '#38bdf8', '#ffffff']
     });
   }
 
@@ -299,7 +299,7 @@ function initParticleCanvas() {
       vx: (Math.random() - 0.5) * 1.5,
       vy: (Math.random() - 0.5) * 1.5 - 0.5,
       alpha: Math.random() * 0.8 + 0.2,
-      color: Math.random() > 0.5 ? '#fbbf24' : (Math.random() > 0.5 ? '#00e5ff' : '#ff4d6a')
+      color: Math.random() > 0.5 ? '#fbbf24' : (Math.random() > 0.5 ? '#38bdf8' : '#f43f5e')
     });
   }
 }
