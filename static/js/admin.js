@@ -1410,7 +1410,7 @@ function copyAllJudgeLinksForEvent() {
     base = networkInfo.localhost_base_url;
   }
 
-  let text = `🎯 Agrash 2026 - ${currentEventData.name} (Judge Direct Links):\n\n`;
+  let text = `🎯 Agrash 2026 (12 October 2026) - ${currentEventData.name} (Judge Direct Links):\n\n`;
   currentEventData.judges.forEach((j, idx) => {
     text += `👤 ${j.name} (Judge #${idx + 1}):\n${base}/judge/${currentEventData.id}?judge=${j.id}\n\n`;
   });
@@ -1495,7 +1495,7 @@ function copyEntireJudgesDirectory() {
     base = networkInfo.localhost_base_url;
   }
 
-  let text = `🔥 AGRASH 2026 - COMPLETE JUDGES DIRECTORY 🔥\n=========================================\n\n`;
+  let text = `🔥 AGRASH 2026 (12 OCTOBER 2026) - COMPLETE JUDGES DIRECTORY 🔥\n=========================================\n\n`;
   allEvents.forEach(ev => {
     text += `🏆 EVENT: ${ev.name.toUpperCase()}\n`;
     text += `-----------------------------------------\n`;

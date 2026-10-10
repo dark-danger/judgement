@@ -120,7 +120,7 @@ def build_category_events():
         {
             "id": "evt-group-song",
             "name": "Group Song",
-            "description": f"Agrash 2026 - Group Song & Choir Competition ({len(song_seq)} Teams)",
+            "description": f"Agrash 2026 (12 October 2026) - Group Song & Choir Competition ({len(song_seq)} Teams)",
             "created_at": datetime.now().isoformat(),
             "judge_count": 5,
             "judges": create_judges(5),
@@ -188,7 +188,7 @@ def build_category_events():
         {
             "id": "evt-declamation",
             "name": "Declamation",
-            "description": f"Agrash 2026 - Declamation & Oratory Contest ({len(dec_seq)} Teams)",
+            "description": f"Agrash 2026 (12 October 2026) - Declamation & Oratory Contest ({len(dec_seq)} Teams)",
             "created_at": datetime.now().isoformat(),
             "judge_count": 5,
             "judges": create_judges(5),
@@ -258,7 +258,7 @@ def build_category_events():
         {
             "id": "evt-science-exhibition",
             "name": "Science Exhibition",
-            "description": f"Agrash 2026 - Science Exhibition & Working Models ({len(sci_seq)} Teams)",
+            "description": f"Agrash 2026 (12 October 2026) - Science Exhibition & Working Models ({len(sci_seq)} Teams)",
             "created_at": datetime.now().isoformat(),
             "judge_count": 5,
             "judges": create_judges(5),
