@@ -37,6 +37,9 @@
         </div>
       </a>
       <div class="nav-actions">
+        <button id="viewRulesBtn" class="btn btn-secondary btn-sm" onclick="showRulesModal()" style="display: inline-flex; align-items: center; gap: 0.4rem; border-color: rgba(251, 191, 36, 0.4); color: #fbbf24;">
+          <i data-lucide="book-open"></i> Rules & Themes
+        </button>
         <div id="activeJudgeBadge" class="badge badge-done" style="display: none; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; background: rgba(56, 189, 248, 0.12);">
           <i data-lucide="user-check"></i> <span id="activeJudgeNameText">Judge Name</span>
         </div>
@@ -228,6 +231,29 @@
             <i data-lucide="user-plus"></i> + Register / Add My Name
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENT RULES & GUIDELINES MODAL -->
+  <div id="rulesModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 680px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="book-open" style="color: #fbbf24;"></i>
+          <h3 id="rulesModalTitle">Event Rules & Guidelines</h3>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeRulesModal()" style="color: #94a3b8; padding: 0.25rem 0.5rem;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="rulesModalBody" style="overflow-y: auto; padding-right: 0.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Dynamically injected in JS -->
+      </div>
+      <div style="margin-top: 1rem; border-top: 1px solid var(--border-glass); padding-top: 0.75rem; text-align: right;">
+        <button type="button" class="btn btn-primary btn-sm" onclick="closeRulesModal()">
+          Understood • Back to Scoring
+        </button>
       </div>
     </div>
   </div>

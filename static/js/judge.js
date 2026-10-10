@@ -663,11 +663,12 @@ function renderCriteriaSection() {
     return `
       <div class="criteria-card animate-in" id="card-${crit.id}" style="animation-delay: ${idx * 0.08}s;">
         <div class="criteria-header">
-          <div class="criteria-title">
+          <div class="criteria-title" style="align-items: flex-start;">
             <div class="criteria-number">${idx + 1}</div>
             <div>
               <h3>${escapeHtml(crit.name)}</h3>
-              <span style="font-size: 0.78rem; color: var(--text-dim);">Evaluated out of ${crit.max_marks || 20} marks</span>
+              ${crit.description ? `<p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; line-height: 1.35;">${escapeHtml(crit.description)}</p>` : ''}
+              <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 600; display: inline-block; margin-top: 0.3rem;">Max Marks: ${crit.max_marks || 20}</span>
             </div>
           </div>
           <div class="criteria-score-display">
@@ -684,7 +685,7 @@ function renderCriteriaSection() {
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
           <input 
             type="range" 
             class="score-slider" 
@@ -810,6 +811,104 @@ function showToast(message, type = 'info') {
     toast.style.transform = 'translateY(10px)';
     setTimeout(() => toast.remove(), 300);
   }, duration);
+}
+
+function showRulesModal() {
+  const modal = document.getElementById('rulesModal');
+  const title = document.getElementById('rulesModalTitle');
+  const body = document.getElementById('rulesModalBody');
+  if (!modal || !body) return;
+
+  if (!currentEvent) {
+    body.innerHTML = `<p style="color: var(--text-muted);">No event data loaded yet.</p>`;
+    modal.classList.add('active');
+    return;
+  }
+
+  title.textContent = `${currentEvent.name} • Official Rules & Guidelines`;
+
+  let html = '';
+
+  // Quick Stats Grid
+  html += `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;">
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.75rem;">
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">⏱️ DURATION</span>
+        <strong style="color: #fbbf24; font-size: 0.95rem;">${escapeHtml(currentEvent.duration || '4 to 6 minutes')}</strong>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.75rem;">
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">🔔 WARNING BELL</span>
+        <strong style="color: #38bdf8; font-size: 0.95rem;">${escapeHtml(currentEvent.warning_bell || 'At warning mark')}</strong>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.75rem;">
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">🚨 FINAL BELL</span>
+        <strong style="color: #f43f5e; font-size: 0.95rem;">${escapeHtml(currentEvent.final_bell || 'At final mark')}</strong>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.75rem;">
+        <span style="font-size: 0.75rem; color: #94a3b8; display: block;">👥 TEAM SIZE</span>
+        <strong style="color: #34d399; font-size: 0.95rem;">${escapeHtml(currentEvent.team_size || 'Per guidelines')}</strong>
+      </div>
+    </div>
+  `;
+
+  // Themes / Topics
+  if (currentEvent.themes && currentEvent.themes.length > 0) {
+    html += `
+      <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 0.85rem;">
+        <h4 style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Prescribed Themes / Topics
+        </h4>
+        <ul style="padding-left: 1.2rem; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5; margin: 0;">
+          ${currentEvent.themes.map(t => `<li style="margin-bottom: 0.35rem;">${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  // Official Rules
+  if (currentEvent.rules && currentEvent.rules.length > 0) {
+    html += `
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.85rem;">
+        <h4 style="color: #fbbf24; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="shield-alert" style="width: 16px; height: 16px;"></i> Official Competition Rules & Disqualification Conditions
+        </h4>
+        <ul style="padding-left: 1.2rem; color: #e2e8f0; font-size: 0.84rem; line-height: 1.5; margin: 0;">
+          ${currentEvent.rules.map(r => `<li style="margin-bottom: 0.35rem;">${escapeHtml(r)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  // Criteria Summary
+  if (currentEvent.criteria && currentEvent.criteria.length > 0) {
+    html += `
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.85rem;">
+        <h4 style="color: #34d399; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+          <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Judging Criteria Breakdown (Total: 100 Marks)
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          ${currentEvent.criteria.map((c, i) => `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; font-size: 0.83rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.35rem;">
+              <div>
+                <strong style="color: #f1f5f9;">${i + 1}. ${escapeHtml(c.name)}</strong>
+                ${c.description ? `<div style="color: #94a3b8; font-size: 0.78rem; margin-top: 0.15rem;">${escapeHtml(c.description)}</div>` : ''}
+              </div>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; white-space: nowrap;">${c.max_marks || 20} Marks</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  body.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+  modal.classList.add('active');
+}
+
+function closeRulesModal() {
+  const modal = document.getElementById('rulesModal');
+  if (modal) modal.classList.remove('active');
 }
 
 function escapeHtml(text) {
