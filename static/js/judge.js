@@ -1,16 +1,20 @@
-// Judge Portal Logic with Reality-Show Stage Doors (Open/Close) and Next Team Real-Time Display
+// Judge Portal Logic with Reality-Show Stage Doors (Open/Close) and Strict Non-Interruption Scoring
 let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
 let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
 
 let currentEvent = null;
 let activeJudge = null; // { id, name }
 let currentScores = {};
-let currentTagNo = null;
-let currentNotes = '';
-let nextTagNo = null;
-let nextNotes = '';
+
+// Active evaluation session for the judge:
+let evaluatingTagNo = null;              // Tag currently loaded on judge's scoring sheet
+let hasSubmittedForEvaluatingTag = false; // Whether judge has submitted score for evaluatingTagNo
 let lastSubmittedTag = null;
 let isDoorsClosed = false;
+
+// Server state:
+let serverCurrentTag = null;
+let serverNextTag = null;
 
 // Particle Canvas for DID Stage Reveal
 let particleCanvas = null;
@@ -73,65 +77,108 @@ async function loadEventData() {
     const data = await res.json();
     if (data.success) {
       const isFirstLoad = !currentEvent;
-      const prevTag = currentTagNo;
-      const prevNextTag = nextTagNo;
-
       currentEvent = data.event;
-      currentTagNo = data.current_tag || 'NO TAG';
-      currentNotes = data.current_notes || '';
-      nextTagNo = data.next_tag || 'End of Queue';
-      nextNotes = data.next_notes || '';
+
+      serverCurrentTag = data.current_tag || 'NO TAG';
+      serverNextTag = data.next_tag || 'End of Queue';
 
       // Update Nav title
       const navTitle = document.getElementById('eventTitleNav');
       if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Judge Panel</span>`;
 
-      // Update Current Tag Display
+      // 1. Initial startup logic
+      if (isFirstLoad) {
+        evaluatingTagNo = serverCurrentTag;
+        hasSubmittedForEvaluatingTag = false;
+
+        if (activeJudge) {
+          // Check if judge has already submitted score for this tag
+          const existingScore = await checkExistingScoreForTag(evaluatingTagNo);
+          if (existingScore) {
+            hasSubmittedForEvaluatingTag = true;
+            lastSubmittedTag = evaluatingTagNo;
+            document.getElementById('doorSubmittedTotal').textContent = existingScore.total;
+            document.getElementById('doorSubmittedTag').textContent = evaluatingTagNo;
+            document.getElementById('doorSubmittedStatusBadge').style.display = 'inline-flex';
+            document.getElementById('btnDoorReopen').style.display = 'inline-flex';
+            closeStageDoors();
+          } else {
+            renderCriteriaSection();
+            openStageDoors();
+          }
+        } else {
+          showJudgeSelectionModal();
+        }
+      } 
+      // 2. Subsequent live synchronization logic
+      else {
+        // SCENARIO A: Judge has NOT submitted yet for evaluatingTagNo and doors are open
+        // CRITICAL: Keep judge locked on evaluatingTagNo even if sequence moves ahead on stage!
+        if (!hasSubmittedForEvaluatingTag && !isDoorsClosed && evaluatingTagNo && evaluatingTagNo !== 'NO TAG') {
+          // Keep evaluatingTagNo active
+          const pendingBadge = document.getElementById('currentTagPendingNotice');
+          if (pendingBadge) {
+            pendingBadge.style.display = (serverCurrentTag !== evaluatingTagNo) ? 'block' : 'none';
+          }
+
+          // Update Next Coming Team Box in Hero
+          const nextTagDisp = document.getElementById('nextTagDisplay');
+          const nextTagLabel = document.getElementById('nextTagSchool');
+          if (nextTagDisp) {
+            const displayNext = (serverCurrentTag !== evaluatingTagNo) ? serverCurrentTag : serverNextTag;
+            if (nextTagDisp.textContent !== displayNext) {
+              nextTagDisp.textContent = displayNext;
+              nextTagDisp.classList.remove('tag-updated-anim');
+              void nextTagDisp.offsetWidth;
+              nextTagDisp.classList.add('tag-updated-anim');
+            }
+          }
+          if (nextTagLabel) {
+            nextTagLabel.textContent = (serverCurrentTag !== evaluatingTagNo) 
+              ? 'Live On Stage Now' 
+              : (serverNextTag !== 'End of Queue' ? 'Next Up in Queue' : 'Queue Finished');
+          }
+        }
+        // SCENARIO B: Judge HAS submitted evaluatingTagNo OR Doors are Closed waiting for next team
+        else {
+          // If server's on-stage team is different from evaluatingTagNo (and valid), advance to the new team!
+          if (serverCurrentTag !== evaluatingTagNo && serverCurrentTag !== 'NO TAG') {
+            evaluatingTagNo = serverCurrentTag;
+            hasSubmittedForEvaluatingTag = false;
+
+            const pendingBadge = document.getElementById('currentTagPendingNotice');
+            if (pendingBadge) pendingBadge.style.display = 'none';
+
+            openStageDoors();
+            renderCriteriaSection();
+            loadExistingScoresForTag(evaluatingTagNo);
+            triggerStageReveal(evaluatingTagNo, '', currentEvent.name);
+          } else {
+            // Keep doors closed, showing updated next team in queue
+            const nextTagDisp = document.getElementById('nextTagDisplay');
+            if (nextTagDisp && nextTagDisp.textContent !== serverNextTag) {
+              nextTagDisp.textContent = serverNextTag;
+              nextTagDisp.classList.remove('tag-updated-anim');
+              void nextTagDisp.offsetWidth;
+              nextTagDisp.classList.add('tag-updated-anim');
+            }
+          }
+        }
+      }
+
+      // Update Current Tag Display for whichever tag the judge is evaluating
       const currentTagDisp = document.getElementById('currentTagDisplay');
-      if (currentTagDisp) currentTagDisp.textContent = currentTagNo;
+      if (currentTagDisp) currentTagDisp.textContent = evaluatingTagNo || serverCurrentTag || '--';
 
       const submitTagDisp = document.getElementById('btnSubmitTag');
-      if (submitTagDisp) submitTagDisp.textContent = currentTagNo;
+      if (submitTagDisp) submitTagDisp.textContent = evaluatingTagNo || serverCurrentTag || '--';
 
-      // Update Next Tag Display in Top Hero
-      const nextTagDisp = document.getElementById('nextTagDisplay');
-      if (nextTagDisp) {
-        if (nextTagDisp.textContent !== nextTagNo) {
-          nextTagDisp.textContent = nextTagNo;
-          nextTagDisp.classList.remove('tag-updated-anim');
-          void nextTagDisp.offsetWidth;
-          nextTagDisp.classList.add('tag-updated-anim');
-        }
-      }
-      
-      // TRANSPARENCY: Remove school names from judge portal frontend (blind evaluation protocol)
+      // TRANSPARENCY: Remove school names from judge portal frontend
       const curSchool = document.getElementById('currentTagSchool');
       if (curSchool) curSchool.textContent = 'Official Stage Performance • Blind Evaluation Active';
-      
-      const nxtSchool = document.getElementById('nextTagSchool');
-      if (nxtSchool) nxtSchool.textContent = nextTagNo !== 'End of Queue' ? 'Next Up in Queue' : 'Queue Finished';
 
-      // Always update Door Card Next Team Info in real-time (especially while doors are closed!)
+      // Update Door Card Next Team Info
       updateDoorCardInfo();
-
-      // If active tag changed from sequence manager (e.g. Next team brought to stage):
-      if (prevTag && prevTag !== currentTagNo && currentTagNo !== 'NO TAG') {
-        // Automatically open the stage doors and reveal the new team on stage!
-        openStageDoors();
-        renderCriteriaSection();
-        loadExistingScoresForTag();
-        triggerStageReveal(currentTagNo, '', currentEvent.name);
-      }
-
-      // If no judge chosen, show modal
-      if (!activeJudge) {
-        showJudgeSelectionModal();
-      } else {
-        if (isFirstLoad) {
-          renderCriteriaSection();
-          loadExistingScoresForTag();
-        }
-      }
     }
   } catch (err) {
     console.error('Error fetching event data:', err);
@@ -143,8 +190,14 @@ function updateDoorCardInfo() {
   const doorSchool = document.getElementById('doorNextSchoolName');
   const doorCat = document.getElementById('doorNextCategoryBadge');
 
+  // Next team to show on closed doors is serverCurrentTag (if judge just finished previous) or serverNextTag
+  let targetNext = serverNextTag;
+  if (serverCurrentTag && serverCurrentTag !== evaluatingTagNo && serverCurrentTag !== 'NO TAG') {
+    targetNext = serverCurrentTag;
+  }
+
   if (doorTag) {
-    const formattedTag = nextTagNo || '--';
+    const formattedTag = targetNext || '--';
     if (doorTag.textContent !== formattedTag) {
       doorTag.textContent = formattedTag;
       doorTag.classList.remove('tag-updated-anim');
@@ -155,7 +208,7 @@ function updateDoorCardInfo() {
 
   // TRANSPARENCY: Keep school names hidden on Judge Portal frontend
   if (doorSchool) {
-    doorSchool.textContent = nextTagNo !== 'End of Queue' ? 'Next Performance on Deck' : 'Stage Queue Finished';
+    doorSchool.textContent = targetNext !== 'End of Queue' ? 'Next Performance on Deck' : 'Stage Queue Finished';
   }
 
   if (doorCat) {
@@ -204,8 +257,14 @@ function openStageDoors() {
 }
 
 function reopenCurrentScoring() {
+  hasSubmittedForEvaluatingTag = false;
+  if (lastSubmittedTag) {
+    evaluatingTagNo = lastSubmittedTag;
+  }
   openStageDoors();
-  showToast('Stage doors opened. You can edit your submitted marks and click update.', 'info');
+  renderCriteriaSection();
+  loadExistingScoresForTag(evaluatingTagNo);
+  showToast(`Stage doors opened for ${evaluatingTagNo}. Edit your submitted marks and click update.`, 'info');
 }
 
 /**
@@ -218,8 +277,9 @@ async function submitEvaluation() {
     return;
   }
 
-  if (!currentTagNo || currentTagNo === 'NO TAG') {
-    showToast('No active team currently on stage to evaluate', 'error');
+  const targetTag = evaluatingTagNo || serverCurrentTag;
+  if (!targetTag || targetTag === 'NO TAG') {
+    showToast('No active team currently to evaluate', 'error');
     return;
   }
 
@@ -232,7 +292,7 @@ async function submitEvaluation() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tag_no: currentTagNo,
+        tag_no: targetTag,
         judge_id: activeJudge.id,
         judge_name: activeJudge.name,
         scores: currentScores
@@ -254,23 +314,46 @@ async function submitEvaluation() {
         confetti({
           particleCount: 75,
           spread: 80,
-          origin: { y: 0.7 },
-          colors: ['#fbbf24', '#ff2a4b', '#00e5ff', '#34d399', '#ffffff']
+          origin: { y: 0.6 },
+          colors: ['#fbbf24', '#f43f5e', '#38bdf8', '#ffffff']
         });
       }
 
-      showToast(`🎯 Score of ${data.score.total}/100 locked for ${currentTagNo}!`, 'success');
+      showToast(`🎯 Score of ${data.score.total}/100 locked for ${targetTag}!`, 'success');
 
-      // 2. Update Closed Door Summary & Reopen button
-      lastSubmittedTag = currentTagNo;
+      hasSubmittedForEvaluatingTag = true;
+      lastSubmittedTag = targetTag;
+
       document.getElementById('doorSubmittedTotal').textContent = data.score.total;
-      document.getElementById('doorSubmittedTag').textContent = currentTagNo;
+      document.getElementById('doorSubmittedTag').textContent = targetTag;
       document.getElementById('doorSubmittedStatusBadge').style.display = 'inline-flex';
       document.getElementById('btnDoorReopen').style.display = 'inline-flex';
 
-      // 3. Immediately refresh latest event sequence info and close the Stage Doors
-      await loadEventData();
-      closeStageDoors();
+      // 2. Fetch latest server state to see if stage sequence already moved ahead
+      const resLatest = await fetch(`/api/events/${eventId}`);
+      const latestData = await resLatest.json();
+      if (latestData.success) {
+        currentEvent = latestData.event;
+        serverCurrentTag = latestData.current_tag || 'NO TAG';
+        serverNextTag = latestData.next_tag || 'End of Queue';
+      }
+
+      // 3. If stage sequence has already moved ahead to another team (e.g. D34 while judge was scoring D22):
+      if (serverCurrentTag && serverCurrentTag !== targetTag && serverCurrentTag !== 'NO TAG') {
+        // Quick 1.2s closed door transition, then seamlessly open doors for the new on-stage team!
+        closeStageDoors();
+        setTimeout(() => {
+          evaluatingTagNo = serverCurrentTag;
+          hasSubmittedForEvaluatingTag = false;
+          openStageDoors();
+          renderCriteriaSection();
+          loadExistingScoresForTag(evaluatingTagNo);
+          triggerStageReveal(evaluatingTagNo, '', currentEvent.name);
+        }, 1200);
+      } else {
+        // Sequence has not advanced yet -> Stay closed waiting for next team call
+        closeStageDoors();
+      }
 
     } else {
       showToast(data.error || 'Failed to submit score', 'error');
@@ -279,7 +362,7 @@ async function submitEvaluation() {
     showToast('Network error while submitting score', 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="check-circle-2"></i> Submit Score for <span id="btnSubmitTag">${currentTagNo}</span>`;
+    btn.innerHTML = `<i data-lucide="check-circle-2"></i> Submit Score for <span id="btnSubmitTag">${evaluatingTagNo || '--'}</span>`;
     if (window.lucide) lucide.createIcons();
   }
 }
@@ -437,13 +520,30 @@ function showJudgeSelectionModal() {
   }
 }
 
-function selectJudge(id, name) {
+async function selectJudge(id, name) {
   activeJudge = { id, name };
   localStorage.setItem(`judge_session_${eventId}`, JSON.stringify(activeJudge));
   document.getElementById('judgeModal').classList.remove('active');
   updateJudgeUI();
-  renderCriteriaSection();
-  loadExistingScoresForTag();
+
+  // Check if judge already submitted for evaluatingTagNo
+  const target = evaluatingTagNo || serverCurrentTag;
+  const existing = await checkExistingScoreForTag(target);
+  if (existing) {
+    hasSubmittedForEvaluatingTag = true;
+    lastSubmittedTag = target;
+    document.getElementById('doorSubmittedTotal').textContent = existing.total;
+    document.getElementById('doorSubmittedTag').textContent = lastSubmittedTag;
+    document.getElementById('doorSubmittedStatusBadge').style.display = 'inline-flex';
+    document.getElementById('btnDoorReopen').style.display = 'inline-flex';
+    closeStageDoors();
+  } else {
+    hasSubmittedForEvaluatingTag = false;
+    renderCriteriaSection();
+    loadExistingScoresForTag(target);
+    openStageDoors();
+  }
+
   showToast(`Welcome, ${name}! Your judging session is active.`, 'success');
 }
 
@@ -594,29 +694,39 @@ function recalculateTotal() {
 }
 
 // Fetch any existing scores judge already gave to this tag
-async function loadExistingScoresForTag() {
-  if (!activeJudge || !currentTagNo || currentTagNo === 'NO TAG') return;
-
+async function checkExistingScoreForTag(tagNo) {
+  if (!activeJudge || !tagNo || tagNo === 'NO TAG') return null;
   try {
     const res = await fetch(`/api/events/${eventId}/scores`);
     const data = await res.json();
     if (data.success && data.scores) {
-      const myScore = data.scores.find(s => s.tag_no === currentTagNo && s.judge_id === activeJudge.id);
-      if (myScore && myScore.scores) {
-        currentScores = myScore.scores;
-        for (let critId in myScore.scores) {
-          const val = myScore.scores[critId];
-          const numInput = document.getElementById(`num-${critId}`);
-          const slider = document.getElementById(`slider-${critId}`);
-          if (numInput) numInput.value = val;
-          if (slider) slider.value = val;
-          updateQuickBtnHighlight(critId, val);
-        }
-        recalculateTotal();
-        document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/100)</span>`;
-      }
-      if (window.lucide) lucide.createIcons();
+      return data.scores.find(s => s.tag_no === tagNo && s.judge_id === activeJudge.id) || null;
     }
+  } catch (e) {}
+  return null;
+}
+
+async function loadExistingScoresForTag(tagNo) {
+  if (!activeJudge || !tagNo || tagNo === 'NO TAG') return;
+
+  try {
+    const myScore = await checkExistingScoreForTag(tagNo);
+    if (myScore && myScore.scores) {
+      currentScores = myScore.scores;
+      for (let critId in myScore.scores) {
+        const val = myScore.scores[critId];
+        const numInput = document.getElementById(`num-${critId}`);
+        const slider = document.getElementById(`slider-${critId}`);
+        if (numInput) numInput.value = val;
+        if (slider) slider.value = val;
+        updateQuickBtnHighlight(critId, val);
+      }
+      recalculateTotal();
+      document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/100)</span>`;
+    } else {
+      document.getElementById('scoreStatusMessage').innerHTML = `All criteria ready for evaluation`;
+    }
+    if (window.lucide) lucide.createIcons();
   } catch (e) {}
 }
 
