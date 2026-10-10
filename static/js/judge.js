@@ -1,4 +1,4 @@
-// Judge Portal Logic with Reality-Show Stage Doors (Open/Close) and Next Team Display
+// Judge Portal Logic with Reality-Show Stage Doors (Open/Close) and Next Team Real-Time Display
 let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
 let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
 
@@ -18,6 +18,21 @@ let particleCtx = null;
 let particleAnimationId = null;
 let particles = [];
 
+// Real-time synchronization channel
+let syncChannel = null;
+if (typeof BroadcastChannel !== 'undefined') {
+  try {
+    syncChannel = new BroadcastChannel('stage_sequence_sync');
+    syncChannel.onmessage = (e) => {
+      if (e.data && (!e.data.eventId || e.data.eventId === eventId)) {
+        loadEventData();
+      }
+    };
+  } catch (err) {
+    console.warn('BroadcastChannel not supported/available:', err);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
   
@@ -33,8 +48,23 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticleCanvas();
   loadEventData();
   
-  // Real-time polling every 3 seconds for sequence changes
-  setInterval(loadEventData, 3000);
+  // Continuous real-time polling (every 1 second) for zero-delay synchronization across devices
+  setInterval(loadEventData, 1000);
+
+  // Instant local storage event for multi-tab sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'stage_sequence_last_update') {
+      loadEventData();
+    }
+  });
+
+  // Re-sync on window focus or tab visibility
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      loadEventData();
+    }
+  });
+  window.addEventListener('focus', loadEventData);
 });
 
 async function loadEventData() {
@@ -44,6 +74,7 @@ async function loadEventData() {
     if (data.success) {
       const isFirstLoad = !currentEvent;
       const prevTag = currentTagNo;
+      const prevNextTag = nextTagNo;
 
       currentEvent = data.event;
       currentTagNo = data.current_tag || 'NO TAG';
@@ -55,27 +86,41 @@ async function loadEventData() {
       const navTitle = document.getElementById('eventTitleNav');
       if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Judge Panel</span>`;
 
-      // Update Current & Next Tag in Hero
-      document.getElementById('currentTagDisplay').textContent = currentTagNo;
-      document.getElementById('btnSubmitTag').textContent = currentTagNo;
-      document.getElementById('nextTagDisplay').textContent = nextTagNo;
+      // Update Current Tag Display
+      const currentTagDisp = document.getElementById('currentTagDisplay');
+      if (currentTagDisp) currentTagDisp.textContent = currentTagNo;
+
+      const submitTagDisp = document.getElementById('btnSubmitTag');
+      if (submitTagDisp) submitTagDisp.textContent = currentTagNo;
+
+      // Update Next Tag Display in Top Hero
+      const nextTagDisp = document.getElementById('nextTagDisplay');
+      if (nextTagDisp) {
+        if (nextTagDisp.textContent !== nextTagNo) {
+          nextTagDisp.textContent = nextTagNo;
+          nextTagDisp.classList.remove('tag-updated-anim');
+          void nextTagDisp.offsetWidth;
+          nextTagDisp.classList.add('tag-updated-anim');
+        }
+      }
       
+      // TRANSPARENCY: Remove school names from judge portal frontend (blind evaluation protocol)
       const curSchool = document.getElementById('currentTagSchool');
-      if (curSchool) curSchool.textContent = currentNotes || 'On Stage Performance';
+      if (curSchool) curSchool.textContent = 'Official Stage Performance • Blind Evaluation Active';
       
       const nxtSchool = document.getElementById('nextTagSchool');
-      if (nxtSchool) nxtSchool.textContent = nextNotes || (nextTagNo !== 'End of Queue' ? 'Preparing Next' : 'End of Queue');
+      if (nxtSchool) nxtSchool.textContent = nextTagNo !== 'End of Queue' ? 'Next Up in Queue' : 'Queue Finished';
 
-      // Update Door Card Next Team Info
+      // Always update Door Card Next Team Info in real-time (especially while doors are closed!)
       updateDoorCardInfo();
 
-      // If active tag changed from sequence manager:
+      // If active tag changed from sequence manager (e.g. Next team brought to stage):
       if (prevTag && prevTag !== currentTagNo && currentTagNo !== 'NO TAG') {
         // Automatically open the stage doors and reveal the new team on stage!
         openStageDoors();
         renderCriteriaSection();
         loadExistingScoresForTag();
-        triggerStageReveal(currentTagNo, currentNotes, currentEvent.name);
+        triggerStageReveal(currentTagNo, '', currentEvent.name);
       }
 
       // If no judge chosen, show modal
@@ -98,9 +143,24 @@ function updateDoorCardInfo() {
   const doorSchool = document.getElementById('doorNextSchoolName');
   const doorCat = document.getElementById('doorNextCategoryBadge');
 
-  if (doorTag) doorTag.textContent = nextTagNo || '--';
-  if (doorSchool) doorSchool.textContent = nextNotes || (nextTagNo !== 'End of Queue' ? 'Next School Team' : 'Queue Finished');
-  if (doorCat) doorCat.textContent = currentEvent ? `${currentEvent.name} • Stage Sequence` : 'Live Category';
+  if (doorTag) {
+    const formattedTag = nextTagNo || '--';
+    if (doorTag.textContent !== formattedTag) {
+      doorTag.textContent = formattedTag;
+      doorTag.classList.remove('tag-updated-anim');
+      void doorTag.offsetWidth;
+      doorTag.classList.add('tag-updated-anim');
+    }
+  }
+
+  // TRANSPARENCY: Keep school names hidden on Judge Portal frontend
+  if (doorSchool) {
+    doorSchool.textContent = nextTagNo !== 'End of Queue' ? 'Next Performance on Deck' : 'Stage Queue Finished';
+  }
+
+  if (doorCat) {
+    doorCat.textContent = currentEvent ? `${currentEvent.name} • Stage Sequence` : 'Live Category';
+  }
 }
 
 /**
@@ -208,7 +268,8 @@ async function submitEvaluation() {
       document.getElementById('doorSubmittedStatusBadge').style.display = 'inline-flex';
       document.getElementById('btnDoorReopen').style.display = 'inline-flex';
 
-      // 3. Close the Stage Doors! (Locks and stays steady on next team until sequence advances)
+      // 3. Immediately refresh latest event sequence info and close the Stage Doors
+      await loadEventData();
       closeStageDoors();
 
     } else {
@@ -230,18 +291,21 @@ function triggerStageReveal(tagNo, schoolInfo, eventName) {
   const overlay = document.getElementById('stageRevealOverlay');
   if (!overlay) return;
 
-  document.getElementById('revealTagNumber').textContent = tagNo;
-  document.getElementById('revealEventName').textContent = (eventName || 'AGRASH 2026').toUpperCase();
+  const tagText = document.getElementById('revealTagNumber');
+  if (tagText) tagText.textContent = tagNo || '--';
+
+  const evText = document.getElementById('revealEventName');
+  if (evText) evText.textContent = (eventName || 'AGRASH 2026').toUpperCase();
   
+  // TRANSPARENCY: Mask school info on judge portal for 100% blind scoring
   const schoolTitle = document.getElementById('revealSchoolName');
   const roomInfo = document.getElementById('revealRoomInfo');
 
-  if (schoolInfo) {
-    schoolTitle.textContent = schoolInfo;
-    roomInfo.textContent = `Live On Stage • ${eventName || 'Competition'}`;
-  } else {
-    schoolTitle.textContent = 'Team Ready on Stage';
-    roomInfo.textContent = 'Live Evaluation Active';
+  if (schoolTitle) {
+    schoolTitle.textContent = 'Official Participant Performance';
+  }
+  if (roomInfo) {
+    roomInfo.textContent = 'Live Stage Session • Blind Evaluation Active';
   }
 
   // Play Sound & Confetti
@@ -263,21 +327,20 @@ function triggerStageReveal(tagNo, schoolInfo, eventName) {
   }
 
   overlay.classList.add('active');
-  startParticleLoop();
+  startParticleAnimation();
 
-  if (window.lucide) lucide.createIcons();
-
-  // Auto dismiss after 3.2 seconds
-  clearTimeout(window.revealAutoTimeout);
-  window.revealAutoTimeout = setTimeout(() => {
+  // Auto-dismiss reveal after 3.5 seconds
+  setTimeout(() => {
     dismissStageReveal();
-  }, 3200);
+  }, 3500);
 }
 
 function dismissStageReveal() {
   const overlay = document.getElementById('stageRevealOverlay');
-  if (overlay) overlay.classList.remove('active');
-  stopParticleLoop();
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+  stopParticleAnimation();
 }
 
 /**
@@ -289,19 +352,6 @@ function initParticleCanvas() {
   particleCtx = particleCanvas.getContext('2d');
   resizeParticleCanvas();
   window.addEventListener('resize', resizeParticleCanvas);
-
-  particles = [];
-  for (let i = 0; i < 45; i++) {
-    particles.push({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      radius: Math.random() * 3 + 1,
-      vx: (Math.random() - 0.5) * 1.5,
-      vy: (Math.random() - 0.5) * 1.5 - 0.5,
-      alpha: Math.random() * 0.8 + 0.2,
-      color: Math.random() > 0.5 ? '#fbbf24' : (Math.random() > 0.5 ? '#38bdf8' : '#f43f5e')
-    });
-  }
 }
 
 function resizeParticleCanvas() {
@@ -310,35 +360,60 @@ function resizeParticleCanvas() {
   particleCanvas.height = window.innerHeight;
 }
 
-function startParticleLoop() {
-  if (particleAnimationId) cancelAnimationFrame(particleAnimationId);
-  function render() {
-    if (!particleCtx || !particleCanvas) return;
-    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+function startParticleAnimation() {
+  if (!particleCanvas || !particleCtx) return;
+  particles = [];
+  const count = Math.min(window.innerWidth > 768 ? 120 : 60, 150);
+  const colors = ['#fbbf24', '#00e5ff', '#ff2a4b', '#34d399', '#ffffff'];
 
-    particles.forEach(p => {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * particleCanvas.width,
+      y: Math.random() * particleCanvas.height,
+      radius: Math.random() * 3 + 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: -Math.random() * 4 - 1,
+      alpha: Math.random() * 0.8 + 0.2,
+      decay: Math.random() * 0.005 + 0.002
+    });
+  }
+
+  function loop() {
+    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      if (p.x < 0) p.x = particleCanvas.width;
-      if (p.x > particleCanvas.width) p.x = 0;
-      if (p.y < 0) p.y = particleCanvas.height;
-      if (p.y > particleCanvas.height) p.y = 0;
+      p.alpha -= p.decay;
+
+      if (p.alpha <= 0 || p.y < 0) {
+        p.x = Math.random() * particleCanvas.width;
+        p.y = particleCanvas.height + 10;
+        p.alpha = Math.random() * 0.8 + 0.2;
+      }
 
       particleCtx.beginPath();
       particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       particleCtx.fillStyle = p.color;
-      particleCtx.globalAlpha = p.alpha;
-      particleCtx.shadowBlur = 12;
+      particleCtx.globalAlpha = Math.max(0, p.alpha);
+      particleCtx.shadowBlur = 10;
       particleCtx.shadowColor = p.color;
       particleCtx.fill();
-    });
-    particleAnimationId = requestAnimationFrame(render);
+    }
+    particleCtx.globalAlpha = 1;
+    particleAnimationId = requestAnimationFrame(loop);
   }
-  render();
+
+  if (particleAnimationId) cancelAnimationFrame(particleAnimationId);
+  loop();
 }
 
-function stopParticleLoop() {
-  if (particleAnimationId) cancelAnimationFrame(particleAnimationId);
+function stopParticleAnimation() {
+  if (particleAnimationId) {
+    cancelAnimationFrame(particleAnimationId);
+    particleAnimationId = null;
+  }
   if (particleCtx && particleCanvas) {
     particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
   }

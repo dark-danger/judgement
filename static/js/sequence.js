@@ -1,3 +1,16 @@
+
+function notifySequenceBroadcast(targetId) {
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const channel = new BroadcastChannel('stage_sequence_sync');
+      channel.postMessage({ type: 'SEQUENCE_UPDATED', eventId: targetId || 'all', timestamp: Date.now() });
+    } catch (e) {}
+  }
+  try {
+    localStorage.setItem('stage_sequence_last_update', Date.now().toString());
+  } catch (e) {}
+}
+
 // Sequence Controller Logic
 let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
 let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
@@ -234,6 +247,7 @@ async function completeTagAction(idx, tagNo) {
     const data = await res.json();
     if (data.success) {
       showToast(`✓ Completed '${tagNo}'! Next team is now live on stage.`, 'success');
+      notifySequenceBroadcast(targetId);
       loadSequenceData();
     } else {
       showToast(`Notice: ${data.error || 'Could not complete tag'}`, 'error');
@@ -265,6 +279,7 @@ async function bringToStageAction(idx) {
     const data = await res.json();
     if (data.success) {
       showToast(`Brought '${currentEvent.sequence[idx].tag_no}' to Stage!`, 'success');
+      notifySequenceBroadcast(targetId);
       loadSequenceData();
     } else {
       showToast(`Notice: ${data.error || 'Could not bring to stage'}`, 'error');
@@ -286,6 +301,7 @@ async function restoreTagAction(tagNo) {
     const data = await res.json();
     if (data.success) {
       showToast(`Tag '${tagNo}' restored to queue!`, 'success');
+      notifySequenceBroadcast(targetId);
       loadSequenceData();
     } else {
       showToast(`Notice: ${data.error || 'Failed to restore tag'}`, 'error');
@@ -357,6 +373,7 @@ async function saveSequenceToServer(newSequence) {
       if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[0] || {}).tag_no || 'Queue Finished';
       const sideNext = document.getElementById('sidebarNextTag');
       if (sideNext) sideNext.textContent = (currentEvent.sequence[1] || {}).tag_no || 'None';
+      notifySequenceBroadcast(targetId);
     }
   } catch (err) {
     showToast('Failed to save sequence', 'error');
