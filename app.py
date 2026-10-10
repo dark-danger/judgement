@@ -49,7 +49,8 @@ def admin_page():
 @app.route("/judge")
 @app.route("/judges")
 @app.route("/judge/<event_id>")
-def judge_page(event_id=None):
+@app.route("/judge/<event_id>/<judge_id>")
+def judge_page(event_id=None, judge_id=None):
     return send_from_directory(app.static_folder, "judge.html")
 
 @app.route("/sequence")
@@ -341,9 +342,15 @@ def add_judge_route(event_id):
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/events/<event_id>/remove-judge", methods=["POST"])
 @app.route("/api/events/<event_id>/judges/<judge_id>", methods=["DELETE"])
-def remove_judge_route(event_id, judge_id):
+def remove_judge_route(event_id, judge_id=None):
     try:
+        if not judge_id:
+            data = request.get_json(silent=True) or {}
+            judge_id = data.get("judge_id")
+        if not judge_id:
+            return jsonify({"success": False, "error": "judge_id is required"}), 400
         updated = db.remove_judge(event_id, judge_id)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404

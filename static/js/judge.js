@@ -1,6 +1,23 @@
 // Judge Portal Logic with Reality-Show Stage Doors (Open/Close) and Strict Non-Interruption Scoring
-let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
-let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
+const pathParts = window.location.pathname.split('/').filter(Boolean);
+let eventId = 'evt-agrash';
+let targetJudgeId = null;
+
+// Parse Query parameters (e.g. ?judge=j1 or ?judge_id=j1 or ?event=evt-dance)
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('judge')) targetJudgeId = urlParams.get('judge').trim();
+if (urlParams.get('judge_id')) targetJudgeId = urlParams.get('judge_id').trim();
+if (urlParams.get('event')) eventId = urlParams.get('event').trim();
+
+// Parse Path segments: e.g. /judge/evt-dance/j1 or /judge/evt-dance
+if (pathParts.length >= 2 && pathParts[0] === 'judge') {
+  eventId = pathParts[1];
+  if (pathParts.length >= 3) {
+    targetJudgeId = pathParts[2];
+  }
+} else if (pathParts.length === 1 && !['judge', 'judges', 'sequence', 'projector', 'admin', 'registration'].includes(pathParts[0])) {
+  eventId = pathParts[0];
+}
 
 let currentEvent = null;
 let activeJudge = null; // { id, name }
@@ -94,7 +111,21 @@ async function loadEventData() {
         evaluatingTagNo = serverCurrentTag;
         hasSubmittedForEvaluatingTag = false;
 
+        // Auto-detect judge from personalized link if targetJudgeId is present in URL
+        if (targetJudgeId && currentEvent.judges) {
+          const matched = currentEvent.judges.find(j => 
+            String(j.id).toLowerCase() === String(targetJudgeId).toLowerCase() || 
+            String(j.name).toLowerCase() === String(targetJudgeId).toLowerCase()
+          );
+          if (matched) {
+            activeJudge = { id: matched.id, name: matched.name };
+            localStorage.setItem(`judge_session_${eventId}`, JSON.stringify(activeJudge));
+            updateJudgeUI();
+          }
+        }
+
         if (activeJudge) {
+          updateJudgeUI();
           // Check if judge has already submitted score for this tag
           const existingScore = await checkExistingScoreForTag(evaluatingTagNo);
           if (existingScore) {

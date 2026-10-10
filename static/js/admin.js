@@ -380,6 +380,8 @@ function updateShareableLinks() {
   document.getElementById('openProjLinkBtn').href = projLink;
 
   // 4. Registration Desk Link
+  renderPerJudgeLinks();
+
   const regInput = document.getElementById('regLinkInput');
   if (regInput) {
     regInput.value = regLink;
@@ -1181,3 +1183,194 @@ function escapeHtml(text) {
 }
 
 
+
+
+// -------------------------------------------------------------
+// JUDGE ALIGNMENT & DIRECTORY MODAL HANDLERS
+// -------------------------------------------------------------
+
+function openAddJudgeModal(preselectedEventId = null) {
+  const modal = document.getElementById('addJudgeModal');
+  const select = document.getElementById('addJudgeEventSelect');
+  const nameInput = document.getElementById('addJudgeNameInput');
+
+  if (!modal || !select) return;
+
+  select.innerHTML = allEvents.map(e => `
+    <option value="${e.id}" ${e.id === (preselectedEventId || activeEventId) ? 'selected' : ''}>
+      ${escapeHtml(e.name)} (${(e.judges || []).length} Judges currently)
+    </option>
+  `).join('');
+
+  if (nameInput) {
+    nameInput.value = '';
+    setTimeout(() => nameInput.focus(), 100);
+  }
+
+  modal.classList.add('active');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeAddJudgeModal() {
+  const modal = document.getElementById('addJudgeModal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function submitAddJudgeForm(e) {
+  e.preventDefault();
+  const select = document.getElementById('addJudgeEventSelect');
+  const nameInput = document.getElementById('addJudgeNameInput');
+  const targetEventId = select ? select.value : activeEventId;
+  const judgeName = nameInput ? nameInput.value.trim() : '';
+
+  if (!judgeName) {
+    showToast('Please enter judge name or title', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnAddJudgeSubmit');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Adding Judge...';
+  }
+
+  try {
+    const res = await fetch(`/api/events/${targetEventId}/add-judge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: judgeName })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`✅ Judge "${judgeName}" aligned & added successfully!`, 'success');
+      closeAddJudgeModal();
+      await loadAllEvents();
+      if (activeEventId === targetEventId) {
+        await loadAdminData();
+      } else {
+        await selectEvent(targetEventId);
+      }
+    } else {
+      showToast(data.error || 'Failed to add judge', 'error');
+    }
+  } catch (err) {
+    showToast('Network error adding judge', 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="user-check"></i> Align & Create Judge Link`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
+
+function copyAllJudgeLinksForEvent() {
+  if (!currentEventData || !currentEventData.judges) return;
+  let base = window.location.origin;
+  if (linkHostMode === 'network' && networkInfo && networkInfo.network_base_url) {
+    base = networkInfo.network_base_url;
+  } else if (linkHostMode === 'localhost' && networkInfo && networkInfo.localhost_base_url) {
+    base = networkInfo.localhost_base_url;
+  }
+
+  let text = `🎯 Agrash 2026 - ${currentEventData.name} (Judge Direct Links):\n\n`;
+  currentEventData.judges.forEach((j, idx) => {
+    text += `👤 ${j.name} (Judge #${idx + 1}):\n${base}/judge/${currentEventData.id}?judge=${j.id}\n\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`📋 All ${currentEventData.judges.length} judge links for "${currentEventData.name}" copied to clipboard!`, 'success');
+  }).catch(() => {
+    showToast('Failed to copy to clipboard', 'error');
+  });
+}
+
+function openAllJudgesDirectoryModal() {
+  const modal = document.getElementById('allJudgesDirectoryModal');
+  const container = document.getElementById('allJudgesDirectoryContent');
+  if (!modal || !container) return;
+
+  let base = window.location.origin;
+  if (linkHostMode === 'network' && networkInfo && networkInfo.network_base_url) {
+    base = networkInfo.network_base_url;
+  } else if (linkHostMode === 'localhost' && networkInfo && networkInfo.localhost_base_url) {
+    base = networkInfo.localhost_base_url;
+  }
+
+  container.innerHTML = allEvents.map(ev => {
+    const judges = ev.judges || [];
+    return `
+      <div style="background: rgba(12, 17, 29, 0.85); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem;">
+          <strong style="color: #38bdf8; font-size: 1rem; font-family: var(--font-heading);">
+            <i data-lucide="award"></i> ${escapeHtml(ev.name)}
+          </strong>
+          <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+            ${judges.length} Judges Aligned
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          ${judges.map((j, idx) => {
+            const url = `${base}/judge/${ev.id}?judge=${j.id}`;
+            const wa = encodeURIComponent(`Agrash Portal - ${j.name} (${ev.name}):\n${url}`);
+            const uniqueId = `dirLink_${ev.id}_${j.id}`;
+            return `
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.5rem 0.75rem; border-radius: 6px; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #fbbf24; font-weight: 700;">#${idx + 1}</span>
+                  <strong style="color: #fff; font-size: 0.88rem;">${escapeHtml(j.name)}</strong>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <input type="text" id="${uniqueId}" readonly value="${url}" style="font-family: var(--font-mono); font-size: 0.72rem; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); padding: 0.3rem 0.5rem; border-radius: 4px; color: #38bdf8; width: 220px;">
+                  <button class="btn btn-cyan btn-sm" onclick="copyLink('${uniqueId}')" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+                    <i data-lucide="copy"></i> Copy
+                  </button>
+                  <a href="https://api.whatsapp.com/send?text=${wa}" target="_blank" class="btn btn-emerald btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+                    <i data-lucide="share-2"></i>
+                  </a>
+                  <a href="${url}" target="_blank" class="btn btn-ghost btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+                    <i data-lucide="external-link"></i>
+                  </a>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  modal.classList.add('active');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeAllJudgesDirectoryModal() {
+  const modal = document.getElementById('allJudgesDirectoryModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function copyEntireJudgesDirectory() {
+  let base = window.location.origin;
+  if (linkHostMode === 'network' && networkInfo && networkInfo.network_base_url) {
+    base = networkInfo.network_base_url;
+  } else if (linkHostMode === 'localhost' && networkInfo && networkInfo.localhost_base_url) {
+    base = networkInfo.localhost_base_url;
+  }
+
+  let text = `🔥 AGRASH 2026 - COMPLETE JUDGES DIRECTORY 🔥\n=========================================\n\n`;
+  allEvents.forEach(ev => {
+    text += `🏆 EVENT: ${ev.name.toUpperCase()}\n`;
+    text += `-----------------------------------------\n`;
+    (ev.judges || []).forEach((j, idx) => {
+      text += `• ${j.name} (Judge #${idx + 1}):\n  ${base}/judge/${ev.id}?judge=${j.id}\n`;
+    });
+    text += `\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Complete Agrash Judge Directory copied to clipboard!', 'success');
+  }).catch(() => {
+    showToast('Failed to copy to clipboard', 'error');
+  });
+}

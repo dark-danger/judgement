@@ -283,7 +283,10 @@ class DB:
         if not event:
             return None
         judges = list(event.get("judges", []))
-        new_id = f"j{len(judges) + 1}_{int(time.time()) % 10000}"
+        existing_ids = {j.get("id") for j in judges}
+        new_id = f"j{len(judges) + 1}"
+        if new_id in existing_ids:
+            new_id = f"j{len(judges) + 1}_{int(time.time()) % 10000}"
         judges.append({
             "id": new_id,
             "name": judge_name.strip() if judge_name.strip() else f"Judge {len(judges) + 1}",
