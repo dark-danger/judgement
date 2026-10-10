@@ -109,6 +109,127 @@ class SheetsService:
             logger.error(f"Error calculating championship data: {e}")
             return []
 
+    def calculate_event_winners(self):
+        """Calculates individual event rankings and winners for each of the 4 categories"""
+        try:
+            from create_excel import schools_data
+            from database import db
+
+            all_scores = db.get_scores()
+            events = db.get_events()
+            events_dict = {ev["id"]: ev for ev in events}
+
+            categories = [
+                {
+                    "event_id": "evt-group-dance",
+                    "event_name": "Group Dance Championship",
+                    "short_name": "Group Dance",
+                    "tag_idx": 2,
+                    "reg_idx": 1,
+                    "icon": "sparkles"
+                },
+                {
+                    "event_id": "evt-group-song",
+                    "event_name": "Group Song Championship",
+                    "short_name": "Group Song",
+                    "tag_idx": 4,
+                    "reg_idx": 3,
+                    "icon": "music"
+                },
+                {
+                    "event_id": "evt-declamation",
+                    "event_name": "Declamation Championship",
+                    "short_name": "Declamation",
+                    "tag_idx": 6,
+                    "reg_idx": 5,
+                    "icon": "mic"
+                },
+                {
+                    "event_id": "evt-science-exhibition",
+                    "event_name": "Science Exhibition Championship",
+                    "short_name": "Science Exhibition",
+                    "tag_idx": 8,
+                    "reg_idx": 7,
+                    "icon": "atom"
+                }
+            ]
+
+            category_results = {}
+
+            for cat in categories:
+                ev_id = cat["event_id"]
+                ev_data = events_dict.get(ev_id, {})
+                judges = ev_data.get("judges", [])
+                total_judges = len(judges)
+
+                cat_scores = [s for s in all_scores if s.get("event_id") == ev_id]
+
+                # Map schools that participate in this category
+                team_items = []
+                for row in schools_data:
+                    is_registered = row[cat["reg_idx"]] == "YES"
+                    tag_no = row[cat["tag_idx"]]
+                    if is_registered and tag_no:
+                        school_name = row[0]
+                        room_no = row[9] or "TBD"
+
+                        tag_scores = [s for s in cat_scores if s.get("tag_no") == tag_no]
+                        totals = [s.get("total", 0) for s in tag_scores]
+                        judges_scored = len(totals)
+                        avg_score = round(sum(totals) / judges_scored, 2) if judges_scored > 0 else 0
+
+                        # Check status
+                        is_completed = any(c.get("tag_no") == tag_no for c in ev_data.get("completed_tags", []))
+                        is_live = bool(ev_data.get("sequence") and ev_data["sequence"][0]["tag_no"] == tag_no)
+                        status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else ("EVALUATED" if judges_scored > 0 else "IN QUEUE"))
+
+                        team_items.append({
+                            "tag_no": tag_no,
+                            "school_name": school_name,
+                            "room_no": room_no,
+                            "average_score": avg_score,
+                            "judges_scored": judges_scored,
+                            "total_judges": total_judges,
+                            "status": status
+                        })
+
+                # Sort by average score descending, then judges scored
+                team_items.sort(key=lambda x: (x["average_score"], x["judges_scored"]), reverse=True)
+
+                # Assign ranks
+                for idx, team in enumerate(team_items, start=1):
+                    if team["average_score"] > 0:
+                        team["rank"] = idx
+                        if idx == 1:
+                            team["standing"] = "🥇 1st Place (Gold Winner)"
+                        elif idx == 2:
+                            team["standing"] = "🥈 2nd Place (Silver Winner)"
+                        elif idx == 3:
+                            team["standing"] = "🥉 3rd Place (Bronze Winner)"
+                        else:
+                            team["standing"] = f"Position #{idx}"
+                    else:
+                        team["rank"] = "-"
+                        team["standing"] = "Pending Evaluation"
+
+                top3 = [t for t in team_items if t["average_score"] > 0][:3]
+
+                category_results[ev_id] = {
+                    "event_id": ev_id,
+                    "event_name": cat["event_name"],
+                    "short_name": cat["short_name"],
+                    "icon": cat["icon"],
+                    "total_participants": len(team_items),
+                    "evaluated_count": sum(1 for t in team_items if t["average_score"] > 0),
+                    "top3": top3,
+                    "rankings": team_items
+                }
+
+            return category_results
+        except Exception as e:
+            logger.error(f"Error calculating individual event winners: {e}")
+            return {}
+
     def sync_final_championship(self, webhook_url=None):
         """Pushes the combined 4-event Top 10 Championship results to Google Sheet 'Final Result' tab"""
         try:

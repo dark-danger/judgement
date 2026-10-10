@@ -186,7 +186,7 @@
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
               <strong style="color: #34d399; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                <i data-lucide="clipboard-check"></i> 4. Registration Desk (5 Desks)
+                <i data-lucide="clipboard-check"></i> 4. Registration Desk (6 Desks)
               </strong>
               <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.68rem; padding: 0.15rem 0.5rem;">Front Desk</span>
             </div>
@@ -553,15 +553,15 @@
     </div>
   </div>
 
-  <!-- COMBINED 4-EVENT TOP 10 CHAMPIONSHIP MODAL -->
+  <!-- COMBINED 4-EVENT CHAMPIONSHIP & INDIVIDUAL EVENT WINNERS LEADERBOARD MODAL -->
   <div id="championshipModal" class="modal-overlay">
-    <div class="modal-card" style="max-width: 900px; width: 95vw;">
+    <div class="modal-card" style="max-width: 1050px; width: 95vw;">
       <div class="modal-header" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05)); border-bottom: 1px solid rgba(251, 191, 36, 0.3);">
         <div class="modal-title">
-          <i data-lucide="trophy" style="color: #fbbf24; font-size: 1.5rem;"></i>
+          <i data-lucide="trophy" style="color: #fbbf24; font-size: 1.6rem;"></i>
           <div>
-            <h3 style="color: #fbbf24; font-family: var(--font-heading); font-size: 1.25rem;">Agrash 2026 - Overall Final Championship</h3>
-            <span style="font-size: 0.75rem; color: var(--text-dim);">Aggregated leaderboard of all 58 schools across Dance, Song, Declamation & Science</span>
+            <h3 style="color: #fbbf24; font-family: var(--font-heading); font-size: 1.3rem;">Agrash 2026 - Leaderboard & Event Winners</h3>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Live standings across Overall School Championship and Individual Event Winners</span>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -571,35 +571,48 @@
           <button class="modal-close" onclick="closeChampionshipModal()"><i data-lucide="x"></i></button>
         </div>
       </div>
-      <div class="modal-body" style="padding: 1.25rem; max-height: 70vh; overflow-y: auto;">
+      <div class="modal-body" style="padding: 1.25rem; max-height: 75vh; overflow-y: auto;">
         
-        <!-- Top 3 Podium Cards -->
-        <div id="podiumCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-          <!-- Populated in JS -->
+        <!-- Navigation Tabs + Search -->
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+            <div class="desk-nav-pills" id="champTabNav">
+              <button class="desk-pill active" onclick="switchChampionshipTab('overall', this)">
+                <i data-lucide="trophy"></i> Overall Championship
+              </button>
+              <button class="desk-pill" onclick="switchChampionshipTab('summary', this)">
+                <i data-lucide="award"></i> Winners Summary
+              </button>
+              <button class="desk-pill" onclick="switchChampionshipTab('evt-group-dance', this)">
+                <i data-lucide="sparkles"></i> Group Dance
+              </button>
+              <button class="desk-pill" onclick="switchChampionshipTab('evt-group-song', this)">
+                <i data-lucide="music"></i> Group Song
+              </button>
+              <button class="desk-pill" onclick="switchChampionshipTab('evt-declamation', this)">
+                <i data-lucide="mic"></i> Declamation
+              </button>
+              <button class="desk-pill" onclick="switchChampionshipTab('evt-science-exhibition', this)">
+                <i data-lucide="atom"></i> Science Exhibition
+              </button>
+            </div>
+
+            <!-- Modal Search Input -->
+            <div style="position: relative; min-width: 240px; flex-grow: 1; max-width: 320px;">
+              <i data-lucide="search" style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-dim);"></i>
+              <input type="text" id="champSearchInput" oninput="onChampSearchInput(this.value)" placeholder="Search school, tag, room..." style="width: 100%; padding: 0.45rem 0.65rem 0.45rem 2rem; background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); color: #fff; font-size: 0.82rem; outline: none;">
+            </div>
+          </div>
         </div>
 
-        <!-- Full Breakdown Table -->
-        <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass); overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
-            <thead>
-              <tr style="background: #0f172a; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-glass);">
-                <th style="padding: 0.75rem 0.6rem; text-align: center;">Rank</th>
-                <th style="padding: 0.75rem 0.75rem;">School Name</th>
-                <th style="padding: 0.75rem 0.5rem; text-align: center;">Dance</th>
-                <th style="padding: 0.75rem 0.5rem; text-align: center;">Song</th>
-                <th style="padding: 0.75rem 0.5rem; text-align: center;">Declamation</th>
-                <th style="padding: 0.75rem 0.5rem; text-align: center;">Science</th>
-                <th style="padding: 0.75rem 0.6rem; text-align: center; color: #fbbf24;">Combined Total</th>
-                <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
-              </tr>
-            </thead>
-            <tbody id="championshipTableBody">
-              <!-- Populated in JS -->
-            </tbody>
-          </table>
+        <!-- Dynamic Content Render Area -->
+        <div id="champContentContainer">
+          <!-- Populated dynamically via renderChampionshipContent() in JS -->
         </div>
+
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="champFooterInfo" style="font-size: 0.78rem; color: var(--text-dim);">Real-time synchronized leaderboard</span>
         <button type="button" class="btn btn-ghost" onclick="closeChampionshipModal()">Close</button>
       </div>
     </div>

@@ -10,22 +10,26 @@ logger = logging.getLogger("registration_service")
 REG_FILE = os.path.join(DATA_DIR, "registration.json")
 
 def init_registration_data():
-    """Builds initial 58 schools registration records divided into 5 desks"""
+    """Builds initial 58 schools registration records divided into 6 desks"""
     existing = load_json(REG_FILE, [])
-    if existing and len(existing) >= 58:
-        return existing
-
-
     records = []
     total_schools = len(schools_data)
-    schools_per_desk = (total_schools + 4) // 5 # ~12 schools per desk
+    schools_per_desk = (total_schools + 5) // 6 # ~10 schools per desk (10, 10, 10, 10, 10, 8)
+
+    if existing and len(existing) >= 58:
+        # Re-assign desk_no for 6 desks
+        for idx, s in enumerate(existing, start=1):
+            desk_no = min(6, ((idx - 1) // schools_per_desk) + 1)
+            s["desk_no"] = desk_no
+        save_json(REG_FILE, existing)
+        return existing
 
     for idx, row in enumerate(schools_data, start=1):
         school_name = row[0]
         room_no = row[9] if row[9] else "TBD"
         
-        # Calculate Desk 1 to 5
-        desk_no = min(5, ((idx - 1) // schools_per_desk) + 1)
+        # Calculate Desk 1 to 6
+        desk_no = min(6, ((idx - 1) // schools_per_desk) + 1)
         
         events_list = []
         # Dance
@@ -76,7 +80,7 @@ def init_registration_data():
         })
 
     save_json(REG_FILE, records)
-    logger.info(f"✅ Initialized {len(records)} school registration records across 5 desks.")
+    logger.info(f"✅ Initialized {len(records)} school registration records across 6 desks.")
     return records
 
 class RegistrationService:
@@ -169,7 +173,7 @@ class RegistrationService:
         
         # Desks stats
         desk_stats = {}
-        for d in range(1, 6):
+        for d in range(1, 7):
             d_schools = [s for s in data if s.get("desk_no") == d]
             desk_stats[f"Desk {d}"] = {
                 "total": len(d_schools),
@@ -237,7 +241,7 @@ class RegistrationService:
             return matched
         else:
             new_idx = len(data) + 1
-            calculated_desk = desk_no or (((new_idx - 1) % 5) + 1)
+            calculated_desk = desk_no or (((new_idx - 1) % 6) + 1)
             new_school = {
                 "id": f"sch-{new_idx:02d}",
                 "seq_no": new_idx,

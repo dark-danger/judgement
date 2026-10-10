@@ -474,7 +474,7 @@ function updateShareableLinks() {
     const openRegBtn = document.getElementById('openRegLinkBtn');
     if (openRegBtn) openRegBtn.href = regLink;
     const shareRegWa = document.getElementById('shareRegWhatsApp');
-    if (shareRegWa) shareRegWa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Agrash 5-Desk Registration Portal Link: ${regLink}`)}`;
+    if (shareRegWa) shareRegWa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Agrash 6-Desk Registration Portal Link: ${regLink}`)}`;
   }
 }
 
@@ -1147,27 +1147,34 @@ async function saveEventEdits() {
 }
 
 // -------------------------------------------------------------
-// COMBINED 4-EVENT CHAMPIONSHIP HANDLERS
+// COMBINED 4-EVENT CHAMPIONSHIP & INDIVIDUAL EVENT WINNERS HANDLERS
 // -------------------------------------------------------------
+let currentChampTab = 'overall';
+let cachedChampionshipData = [];
+let cachedEventWinnersData = {};
+let champSearchQuery = '';
+
 async function openChampionshipModal() {
   document.getElementById('championshipModal').classList.add('active');
-  const tbody = document.getElementById('championshipTableBody');
-  const podiumContainer = document.getElementById('podiumCardsContainer');
-
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">Loading Combined Championship Scores...</td></tr>';
-  podiumContainer.innerHTML = '';
+  const container = document.getElementById('champContentContainer');
+  if (container) {
+    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: var(--text-dim);"><i data-lucide="loader-2" class="spin"></i> Loading Standings & Winners...</div>';
+    if (window.lucide) lucide.createIcons();
+  }
 
   try {
     const res = await fetch('/api/championship');
     const data = await res.json();
 
-    if (data.success && data.championship) {
-      renderChampionshipUI(data.championship);
+    if (data.success) {
+      cachedChampionshipData = data.championship || [];
+      cachedEventWinnersData = data.event_winners || {};
+      renderCurrentChampionshipTab();
     } else {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #f87171;">Failed to load championship scores</td></tr>';
+      if (container) container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Failed to load championship scores</div>';
     }
   } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #f87171;">Connection error loading championship</td></tr>';
+    if (container) container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Connection error loading championship</div>';
   }
 }
 
@@ -1175,93 +1182,369 @@ function closeChampionshipModal() {
   document.getElementById('championshipModal').classList.remove('active');
 }
 
-function renderChampionshipUI(list) {
-  const tbody = document.getElementById('championshipTableBody');
-  const podiumContainer = document.getElementById('podiumCardsContainer');
+function switchChampionshipTab(tabKey, btn) {
+  currentChampTab = tabKey;
+  document.querySelectorAll('#champTabNav .desk-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCurrentChampionshipTab();
+}
 
-  tbody.innerHTML = '';
-  podiumContainer.innerHTML = '';
+let champSearchDebounceTimer = null;
+function onChampSearchInput(val) {
+  clearTimeout(champSearchDebounceTimer);
+  champSearchDebounceTimer = setTimeout(() => {
+    champSearchQuery = (val || '').trim().toLowerCase();
+    renderCurrentChampionshipTab();
+  }, 200);
+}
 
-  // Render Top 3 Podium Cards
-  const top3 = list.slice(0, 3);
+function renderCurrentChampionshipTab() {
+  const container = document.getElementById('champContentContainer');
+  const footerInfo = document.getElementById('champFooterInfo');
+  if (!container) return;
+
+  if (currentChampTab === 'overall') {
+    if (footerInfo) footerInfo.textContent = 'Showing Combined 4-Event School Championship Standings (58 Schools)';
+    renderOverallChampionshipView(container);
+  } else if (currentChampTab === 'summary') {
+    if (footerInfo) footerInfo.textContent = 'Showing Top 3 Podium Winners across all 4 events side-by-side';
+    renderAllWinnersSummaryView(container);
+  } else {
+    const cat = cachedEventWinnersData[currentChampTab];
+    const catTitle = cat ? cat.event_name : 'Event';
+    if (footerInfo) footerInfo.textContent = `Showing Individual Winners & Standings for ${catTitle}`;
+    renderCategoryWinnersView(container, currentChampTab);
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderOverallChampionshipView(container) {
+  let list = cachedChampionshipData;
+  if (champSearchQuery) {
+    list = list.filter(item => 
+      item.school.toLowerCase().includes(champSearchQuery) ||
+      (item.room && item.room.toLowerCase().includes(champSearchQuery)) ||
+      (item.dance && item.dance.toLowerCase().includes(champSearchQuery)) ||
+      (item.song && item.song.toLowerCase().includes(champSearchQuery)) ||
+      (item.declamation && item.declamation.toLowerCase().includes(champSearchQuery)) ||
+      (item.science && item.science.toLowerCase().includes(champSearchQuery))
+    );
+  }
+
+  const top3 = cachedChampionshipData.slice(0, 3);
   const podiumColors = [
-    { title: '🏆 1st Champion', bg: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(0,0,0,0.6))', border: '#fbbf24', text: '#fbbf24' },
-    { title: '🥈 1st Runner Up', bg: 'linear-gradient(135deg, rgba(226, 232, 240, 0.15), rgba(0,0,0,0.6))', border: '#cbd5e1', text: '#f1f5f9' },
-    { title: '🥉 2nd Runner Up', bg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(0,0,0,0.6))', border: '#f97316', text: '#fdba74' }
+    { title: '🏆 1st Champion (Gold)', bg: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(0,0,0,0.7))', border: '#fbbf24', text: '#fbbf24' },
+    { title: '🥈 1st Runner Up (Silver)', bg: 'linear-gradient(135deg, rgba(226, 232, 240, 0.15), rgba(0,0,0,0.7))', border: '#cbd5e1', text: '#f1f5f9' },
+    { title: '🥉 2nd Runner Up (Bronze)', bg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(0,0,0,0.7))', border: '#f97316', text: '#fdba74' }
   ];
 
+  let podiumHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">';
   top3.forEach((item, idx) => {
     const conf = podiumColors[idx];
-    const card = document.createElement('div');
-    card.style.background = conf.bg;
-    card.style.border = `1px solid ${conf.border}`;
-    card.style.borderRadius = 'var(--radius-md)';
-    card.style.padding = '1rem';
-    card.style.display = 'flex';
-    card.style.flexDirection = 'column';
-    card.style.justifyContent = 'space-between';
-
-    card.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-        <span style="font-weight: 800; font-size: 0.85rem; color: ${conf.text}; text-transform: uppercase;">${conf.title}</span>
-        <span style="font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.5); padding: 0.15rem 0.45rem; border-radius: 4px; color: ${conf.text};">#${idx + 1}</span>
-      </div>
-      <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 0.4rem; line-height: 1.3;">
-        ${escapeHtml(item.school)}
-      </div>
-      <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid var(--border-glass); padding-top: 0.4rem; margin-top: 0.4rem;">
-        <span>Combined Score:</span>
-        <strong style="color: ${conf.text}; font-size: 0.9rem;">${item.total_score > 0 ? item.total_score + ' pts' : 'Pending'}</strong>
+    podiumHtml += `
+      <div style="background: ${conf.bg}; border: 1px solid ${conf.border}; border-radius: var(--radius-md); padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="font-weight: 800; font-size: 0.85rem; color: ${conf.text}; text-transform: uppercase; letter-spacing: 0.04em;">${conf.title}</span>
+          <span style="font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.6); padding: 0.15rem 0.5rem; border-radius: 4px; color: ${conf.text}; font-weight: 800;">#${idx + 1}</span>
+        </div>
+        <div style="font-weight: 800; color: #fff; font-size: 1.05rem; margin-bottom: 0.5rem; line-height: 1.3;">
+          ${escapeHtml(item.school)}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.4rem;">
+          <span>Combined 4-Event Score:</span>
+          <strong style="color: ${conf.text}; font-size: 1.05rem; font-family: var(--font-mono);">${item.total_score > 0 ? item.total_score + ' / 400' : 'Pending'}</strong>
+        </div>
       </div>
     `;
-    podiumContainer.appendChild(card);
   });
+  podiumHtml += '</div>';
 
-  // Render Full Table
-  list.forEach((item, idx) => {
-    const isTop10 = idx < 10;
+  let tableRowsHtml = '';
+  list.forEach((item) => {
+    const originalRank = cachedChampionshipData.findIndex(x => x.school === item.school) + 1;
+    const isTop10 = originalRank <= 10;
     let standing = 'Participant';
     let rowBg = 'transparent';
 
-    if (idx === 0 && item.total_score > 0) {
+    if (originalRank === 1 && item.total_score > 0) {
       standing = '🏆 1st Champion';
       rowBg = 'rgba(251, 191, 36, 0.1)';
-    } else if (idx === 1 && item.total_score > 0) {
+    } else if (originalRank === 2 && item.total_score > 0) {
       standing = '🥈 1st Runner Up';
       rowBg = 'rgba(226, 232, 240, 0.07)';
-    } else if (idx === 2 && item.total_score > 0) {
+    } else if (originalRank === 3 && item.total_score > 0) {
       standing = '🥉 2nd Runner Up';
       rowBg = 'rgba(249, 115, 22, 0.08)';
     } else if (isTop10 && item.total_score > 0) {
-      standing = `⭐ Top 10 (#${idx + 1})`;
+      standing = `⭐ Top 10 (#${originalRank})`;
       rowBg = 'rgba(56, 189, 248, 0.05)';
     }
 
-    const tr = document.createElement('tr');
-    tr.style.background = rowBg;
-    tr.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
-
-    tr.innerHTML = `
-      <td style="padding: 0.65rem 0.5rem; text-align: center; font-weight: 800; color: ${isTop10 ? '#fbbf24' : 'var(--text-dim)'}; font-family: var(--font-mono);">
-        #${idx + 1}
-      </td>
-      <td style="padding: 0.65rem 0.75rem; font-weight: ${isTop10 ? '700' : '500'}; color: #fff;">
-        ${escapeHtml(item.school)}
-        ${item.room !== '-' ? `<span style="font-size: 0.72rem; color: var(--text-dim); margin-left: 0.4rem;">[${escapeHtml(item.room)}]</span>` : ''}
-      </td>
-      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.dance)}</td>
-      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.song)}</td>
-      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.declamation)}</td>
-      <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.science)}</td>
-      <td style="padding: 0.65rem 0.6rem; text-align: center; font-weight: 800; color: ${item.total_score > 0 ? '#fbbf24' : 'var(--text-dim)'}; font-size: 0.9rem;">
-        ${item.total_score > 0 ? item.total_score : '-'}
-      </td>
-      <td style="padding: 0.65rem 0.6rem; text-align: center; font-size: 0.78rem; font-weight: 700; color: ${isTop10 ? '#34d399' : 'var(--text-dim)'};">
-        ${standing}
-      </td>
+    tableRowsHtml += `
+      <tr style="background: ${rowBg}; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-weight: 800; color: ${isTop10 ? '#fbbf24' : 'var(--text-dim)'}; font-family: var(--font-mono);">
+          #${originalRank}
+        </td>
+        <td style="padding: 0.65rem 0.75rem; font-weight: ${isTop10 ? '700' : '500'}; color: #fff;">
+          ${escapeHtml(item.school)}
+          ${item.room !== '-' ? `<span style="font-size: 0.72rem; color: var(--text-dim); margin-left: 0.4rem;">[${escapeHtml(item.room)}]</span>` : ''}
+        </td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.dance)}</td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.song)}</td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.declamation)}</td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(item.science)}</td>
+        <td style="padding: 0.65rem 0.6rem; text-align: center; font-weight: 800; color: ${item.total_score > 0 ? '#fbbf24' : 'var(--text-dim)'}; font-size: 0.92rem; font-family: var(--font-mono);">
+          ${item.total_score > 0 ? item.total_score : '-'}
+        </td>
+        <td style="padding: 0.65rem 0.6rem; text-align: center; font-size: 0.78rem; font-weight: 700; color: ${isTop10 ? '#34d399' : 'var(--text-dim)'};">
+          ${standing}
+        </td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
+
+  if (list.length === 0) {
+    tableRowsHtml = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">No matching schools found</td></tr>';
+  }
+
+  container.innerHTML = `
+    ${podiumHtml}
+    <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass); overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+        <thead>
+          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-glass);">
+            <th style="padding: 0.75rem 0.6rem; text-align: center;">Rank</th>
+            <th style="padding: 0.75rem 0.75rem;">School Name</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Dance (/100)</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Song (/100)</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Declamation (/100)</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Science (/100)</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #fbbf24;">Combined Total</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHtml}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAllWinnersSummaryView(container) {
+  const categories = [
+    { key: 'evt-group-dance', label: 'Group Dance', icon: 'sparkles', badgeColor: '#f43f5e' },
+    { key: 'evt-group-song', label: 'Group Song', icon: 'music', badgeColor: '#38bdf8' },
+    { key: 'evt-declamation', label: 'Declamation', icon: 'mic', badgeColor: '#a855f7' },
+    { key: 'evt-science-exhibition', label: 'Science Exhibition', icon: 'atom', badgeColor: '#10b981' }
+  ];
+
+  let gridHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">';
+
+  categories.forEach(catMeta => {
+    const catData = cachedEventWinnersData[catMeta.key] || { top3: [], total_participants: 0, evaluated_count: 0 };
+    const top3 = catData.top3 || [];
+
+    const p1 = top3[0] || null;
+    const p2 = top3[1] || null;
+    const p3 = top3[2] || null;
+
+    gridHtml += `
+      <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.25rem; backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="color: ${catMeta.badgeColor};"><i data-lucide="${catMeta.icon}"></i></span>
+              <strong style="color: #fff; font-size: 1.05rem; font-family: var(--font-heading);">${catMeta.label}</strong>
+            </div>
+            <span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-dim); font-size: 0.72rem;">
+              ${catData.evaluated_count} / ${catData.total_participants} Evaluated
+            </span>
+          </div>
+
+          <!-- Winners List -->
+          <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+            
+            <!-- Gold Winner -->
+            <div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(0,0,0,0.4)); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 8px; padding: 0.75rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 0.78rem; color: #fbbf24;">🥇 1ST PLACE (GOLD)</span>
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 900; color: #fbbf24;">
+                  ${p1 ? p1.average_score + ' pts' : '--'}
+                </span>
+              </div>
+              <div style="font-weight: 700; color: #fff; font-size: 0.92rem; margin-top: 0.25rem;">
+                ${p1 ? escapeHtml(p1.school_name) : '<span style="color: var(--text-dim); font-style: italic;">Evaluation Pending</span>'}
+              </div>
+              ${p1 ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.15rem;">Tag: <strong style="color: #38bdf8;">${escapeHtml(p1.tag_no)}</strong> • Room: ${escapeHtml(p1.room_no)}</div>` : ''}
+            </div>
+
+            <!-- Silver Winner -->
+            <div style="background: linear-gradient(135deg, rgba(226, 232, 240, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(226, 232, 240, 0.25); border-radius: 8px; padding: 0.75rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 0.78rem; color: #cbd5e1;">🥈 2ND PLACE (SILVER)</span>
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 900; color: #cbd5e1;">
+                  ${p2 ? p2.average_score + ' pts' : '--'}
+                </span>
+              </div>
+              <div style="font-weight: 700; color: #fff; font-size: 0.92rem; margin-top: 0.25rem;">
+                ${p2 ? escapeHtml(p2.school_name) : '<span style="color: var(--text-dim); font-style: italic;">Evaluation Pending</span>'}
+              </div>
+              ${p2 ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.15rem;">Tag: <strong style="color: #38bdf8;">${escapeHtml(p2.tag_no)}</strong> • Room: ${escapeHtml(p2.room_no)}</div>` : ''}
+            </div>
+
+            <!-- Bronze Winner -->
+            <div style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 8px; padding: 0.75rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; font-size: 0.78rem; color: #f97316;">🥉 3RD PLACE (BRONZE)</span>
+                <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 900; color: #f97316;">
+                  ${p3 ? p3.average_score + ' pts' : '--'}
+                </span>
+              </div>
+              <div style="font-weight: 700; color: #fff; font-size: 0.92rem; margin-top: 0.25rem;">
+                ${p3 ? escapeHtml(p3.school_name) : '<span style="color: var(--text-dim); font-style: italic;">Evaluation Pending</span>'}
+              </div>
+              ${p3 ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.15rem;">Tag: <strong style="color: #38bdf8;">${escapeHtml(p3.tag_no)}</strong> • Room: ${escapeHtml(p3.room_no)}</div>` : ''}
+            </div>
+
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" onclick="switchChampionshipTab('${catMeta.key}', document.querySelector('#champTabNav button[onclick*=\\'${catMeta.key}\\']'))" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+          <i data-lucide="list-ordered"></i> View Full ${catMeta.label} Standings
+        </button>
+      </div>
+    `;
+  });
+
+  gridHtml += '</div>';
+  container.innerHTML = gridHtml;
+}
+
+function renderCategoryWinnersView(container, eventId) {
+  const cat = cachedEventWinnersData[eventId];
+  if (!cat) {
+    container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-dim);">No data available for this category</div>';
+    return;
+  }
+
+  let list = cat.rankings || [];
+  if (champSearchQuery) {
+    list = list.filter(item => 
+      item.school_name.toLowerCase().includes(champSearchQuery) ||
+      item.tag_no.toLowerCase().includes(champSearchQuery) ||
+      (item.room_no && item.room_no.toLowerCase().includes(champSearchQuery))
+    );
+  }
+
+  // Top 3 Podium Cards
+  const top3 = (cat.top3 || []).slice(0, 3);
+  const podiumColors = [
+    { title: '🥇 1st Place (Gold Winner)', bg: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(0,0,0,0.7))', border: '#fbbf24', text: '#fbbf24' },
+    { title: '🥈 2nd Place (Silver Winner)', bg: 'linear-gradient(135deg, rgba(226, 232, 240, 0.15), rgba(0,0,0,0.7))', border: '#cbd5e1', text: '#f1f5f9' },
+    { title: '🥉 3rd Place (Bronze Winner)', bg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(0,0,0,0.7))', border: '#f97316', text: '#fdba74' }
+  ];
+
+  let podiumHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">';
+  for (let idx = 0; idx < 3; idx++) {
+    const conf = podiumColors[idx];
+    const item = top3[idx];
+    podiumHtml += `
+      <div style="background: ${conf.bg}; border: 1px solid ${conf.border}; border-radius: var(--radius-md); padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="font-weight: 800; font-size: 0.85rem; color: ${conf.text}; text-transform: uppercase;">${conf.title}</span>
+          <span style="font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.6); padding: 0.15rem 0.5rem; border-radius: 4px; color: ${conf.text}; font-weight: 800;">
+            ${item ? item.tag_no : '#'}
+          </span>
+        </div>
+        <div style="font-weight: 800; color: #fff; font-size: 1.05rem; margin-bottom: 0.5rem; line-height: 1.3;">
+          ${item ? escapeHtml(item.school_name) : '<span style="color: var(--text-dim); font-style: italic; font-weight: 500;">Pending Score</span>'}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.4rem;">
+          <span>Average Score:</span>
+          <strong style="color: ${conf.text}; font-size: 1.1rem; font-family: var(--font-mono);">
+            ${item && item.average_score > 0 ? item.average_score + ' / 100' : '--'}
+          </strong>
+        </div>
+      </div>
+    `;
+  }
+  podiumHtml += '</div>';
+
+  // Table rows
+  let tableRowsHtml = '';
+  list.forEach((item, idx) => {
+    let standingHtml = `<span style="color: var(--text-dim); font-size: 0.78rem;">${escapeHtml(item.standing)}</span>`;
+    let rowBg = 'transparent';
+
+    if (item.rank === 1) {
+      standingHtml = '<span class="badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4);">🥇 1st Place (Gold)</span>';
+      rowBg = 'rgba(251, 191, 36, 0.08)';
+    } else if (item.rank === 2) {
+      standingHtml = '<span class="badge" style="background: rgba(226, 232, 240, 0.15); color: #f1f5f9; border: 1px solid rgba(226, 232, 240, 0.3);">🥈 2nd Place (Silver)</span>';
+      rowBg = 'rgba(226, 232, 240, 0.06)';
+    } else if (item.rank === 3) {
+      standingHtml = '<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3);">🥉 3rd Place (Bronze)</span>';
+      rowBg = 'rgba(249, 115, 22, 0.06)';
+    } else if (item.average_score > 0) {
+      standingHtml = `<span class="badge badge-done">Position #${item.rank}</span>`;
+    }
+
+    tableRowsHtml += `
+      <tr style="background: ${rowBg}; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-weight: 800; color: ${item.rank <= 3 && item.rank > 0 ? '#fbbf24' : 'var(--text-dim)'}; font-family: var(--font-mono);">
+          ${item.rank !== '-' ? '#' + item.rank : '-'}
+        </td>
+        <td style="padding: 0.65rem 0.6rem; text-align: center;">
+          <span style="font-family: var(--font-mono); font-weight: 900; color: #38bdf8; background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(56,189,248,0.3);">
+            ${escapeHtml(item.tag_no)}
+          </span>
+        </td>
+        <td style="padding: 0.65rem 0.75rem; font-weight: 700; color: #fff;">
+          ${escapeHtml(item.school_name)}
+        </td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; color: var(--text-dim); font-size: 0.8rem;">
+          ${escapeHtml(item.room_no)}
+        </td>
+        <td style="padding: 0.65rem 0.6rem; text-align: center; font-weight: 800; color: ${item.average_score > 0 ? '#00e5ff' : 'var(--text-dim)'}; font-size: 0.95rem; font-family: var(--font-mono);">
+          ${item.average_score > 0 ? item.average_score : '--'}
+        </td>
+        <td style="padding: 0.65rem 0.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+          ${item.judges_scored} / ${item.total_judges}
+        </td>
+        <td style="padding: 0.65rem 0.6rem; text-align: center;">
+          ${standingHtml}
+        </td>
+      </tr>
+    `;
+  });
+
+  if (list.length === 0) {
+    tableRowsHtml = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No participating teams found matching search</td></tr>';
+  }
+
+  container.innerHTML = `
+    ${podiumHtml}
+    <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass); overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+        <thead>
+          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-glass);">
+            <th style="padding: 0.75rem 0.6rem; text-align: center;">Rank</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center;">Tag No</th>
+            <th style="padding: 0.75rem 0.75rem;">School Name</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Room</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #00e5ff;">Average (/100)</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Judges Scored</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHtml}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 async function syncFinalResultSheetNow() {

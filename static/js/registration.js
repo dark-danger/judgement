@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   if (pathParts.length > 1 && !isNaN(pathParts[1])) {
     const deskParam = parseInt(pathParts[1]);
-    if (deskParam >= 1 && deskParam <= 5) {
+    if (deskParam >= 1 && deskParam <= 6) {
       currentDeskFilter = deskParam;
       // Highlight pill
       document.querySelectorAll('.desk-pill').forEach((btn, idx) => {

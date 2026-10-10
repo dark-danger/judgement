@@ -24,12 +24,11 @@ def reset_all():
     from create_excel import schools_data
     records = []
     total_schools = len(schools_data)
-    schools_per_desk = (total_schools + 4) // 5
-
+    schools_per_desk = (total_schools + 5) // 6
     for idx, row in enumerate(schools_data, start=1):
         school_name = row[0]
         room_no = row[9] if row[9] else "TBD"
-        desk_no = min(5, ((idx - 1) // schools_per_desk) + 1)
+        desk_no = min(6, ((idx - 1) // schools_per_desk) + 1)
         
         events_list = []
         if row[1] == "YES" and row[2]:

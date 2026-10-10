@@ -93,9 +93,9 @@
       </div>
     </div>
 
-    <!-- Live Active on Stage Box -->
+    <!-- Live Active on Stage Box & Controls -->
     <div style="display: flex; align-items: center; gap: 1rem;">
-      <div style="background: rgba(12, 17, 29, 0.85); border: 1.5px solid #f43f5e; padding: 0.6rem 1.5rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 0 20px rgba(244, 63, 94, 0.3); backdrop-filter: blur(16px);">
+      <div id="projectorStageBox" style="background: rgba(12, 17, 29, 0.85); border: 1.5px solid #f43f5e; padding: 0.6rem 1.5rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 0 20px rgba(244, 63, 94, 0.3); backdrop-filter: blur(16px);">
         <span style="font-size: 0.72rem; font-weight: 800; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.06em;">
           <span class="dot-pulse"></span> NOW ON STAGE
         </span>
@@ -109,6 +109,27 @@
     </div>
   </header>
 
+  <!-- Projector Navigation Tabs -->
+  <div style="display: flex; justify-content: center; margin-bottom: 1.75rem;">
+    <div class="desk-nav-pills" id="projNavPills">
+      <button class="desk-pill active" onclick="switchProjectorMode('overall', this)">
+        <i data-lucide="trophy"></i> Overall Championship
+      </button>
+      <button class="desk-pill" onclick="switchProjectorMode('evt-group-dance', this)">
+        <i data-lucide="sparkles"></i> Group Dance
+      </button>
+      <button class="desk-pill" onclick="switchProjectorMode('evt-group-song', this)">
+        <i data-lucide="music"></i> Group Song
+      </button>
+      <button class="desk-pill" onclick="switchProjectorMode('evt-declamation', this)">
+        <i data-lucide="mic"></i> Declamation
+      </button>
+      <button class="desk-pill" onclick="switchProjectorMode('evt-science-exhibition', this)">
+        <i data-lucide="atom"></i> Science Exhibition
+      </button>
+    </div>
+  </div>
+
   <!-- Top 3 Podium Cards -->
   <section class="podium-grid" id="podiumSection">
     <!-- Rank 2 -->
@@ -116,7 +137,7 @@
       <span class="badge" style="background: rgba(226, 232, 240, 0.2); color: #fff;">🥈 RANK #2</span>
       <div class="podium-tag" id="podium2Tag">--</div>
       <div class="podium-score" style="color: #e2e8f0;" id="podium2Score">--</div>
-      <span style="font-size: 0.8rem; color: var(--text-dim);">Average Score / 100</span>
+      <span style="font-size: 0.8rem; color: var(--text-dim);" id="podium2Label">Score</span>
     </div>
 
     <!-- Rank 1 (Gold) -->
@@ -125,9 +146,9 @@
         👑 TOURNAMENT LEADER
       </div>
       <span class="badge" style="background: rgba(251, 191, 36, 0.3); color: #fbbf24; margin-top: 0.5rem;">🥇 RANK #1 GOLD</span>
-      <div class="podium-tag" style="font-size: 2.8rem; text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);" id="podium1Tag">--</div>
-      <div class="podium-score" style="color: #fbbf24; font-size: 3.2rem;" id="podium1Score">--</div>
-      <span style="font-size: 0.85rem; color: #fde68a; font-weight: 700;">Average Score / 100</span>
+      <div class="podium-tag" style="font-size: 2.4rem; text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);" id="podium1Tag">--</div>
+      <div class="podium-score" style="color: #fbbf24; font-size: 3rem;" id="podium1Score">--</div>
+      <span style="font-size: 0.85rem; color: #fde68a; font-weight: 700;" id="podium1Label">Score</span>
     </div>
 
     <!-- Rank 3 -->
@@ -135,115 +156,240 @@
       <span class="badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">🥉 RANK #3</span>
       <div class="podium-tag" id="podium3Tag">--</div>
       <div class="podium-score" style="color: #f97316;" id="podium3Score">--</div>
-      <span style="font-size: 0.8rem; color: var(--text-dim);">Average Score / 100</span>
+      <span style="font-size: 0.8rem; color: var(--text-dim);" id="podium3Label">Score</span>
     </div>
   </section>
 
   <!-- Full Leaderboard Table -->
   <main class="matrix-table-container">
     <table class="matrix-table">
-      <thead>
-        <tr>
-          <th style="font-size: 0.95rem;">Rank</th>
-          <th style="font-size: 0.95rem;">Team Tag</th>
-          <th style="font-size: 0.95rem;">Overall Average</th>
-          <th style="font-size: 0.95rem;">Judges Evaluated</th>
-          <th style="font-size: 0.95rem;">Status</th>
-        </tr>
+      <thead id="projectorTableHead">
+        <!-- Rendered in JS -->
       </thead>
       <tbody id="projectorTableBody">
-        <!-- Populated in JS -->
+        <!-- Rendered in JS -->
       </tbody>
     </table>
   </main>
 
   <script>
     let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
-    let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'admin'].includes(pathSegment)) ? pathSegment : 'evt-agrash';
+    let currentMode = (pathSegment && ['evt-group-dance', 'evt-group-song', 'evt-declamation', 'evt-science-exhibition'].includes(pathSegment)) ? pathSegment : 'overall';
+
+    // Highlight initial tab
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('#projNavPills .desk-pill').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('onclick').includes(currentMode));
+      });
+    });
+
+    function switchProjectorMode(mode, btn) {
+      currentMode = mode;
+      document.querySelectorAll('#projNavPills .desk-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      loadProjectorData();
+    }
 
     async function loadProjectorData() {
       try {
-        const [evtRes, scRes] = await Promise.all([
-          fetch(`/api/events/${eventId}`),
-          fetch(`/api/events/${eventId}/scores`)
-        ]);
-
-        const evtData = await evtRes.json();
-        const scData = await scRes.json();
-
-        if (evtData.success) {
-          const event = evtData.event;
-          const scores = scData.scores || [];
-          const judges = event.judges || [];
-
-          document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
-
-          // Combine active + completed tags
-          let allTags = event.sequence.map(s => s.tag_no);
-          (event.completed_tags || []).forEach(c => {
-            if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
-          });
-
-          // Calculate averages
-          const rankedList = allTags.map(tag => {
-            const tagScores = scores.filter(s => s.tag_no === tag);
-            const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
-            const count = tagScores.length;
-            const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
-            const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
-            const isLive = evtData.current_tag === tag;
-
-            return { tag, avg, count, totalJudges: judges.length, isCompleted, isLive };
-          });
-
-          // Sort by highest average
-          rankedList.sort((a, b) => b.avg - a.avg);
-
-          // Update Top 3 Podium
-          if (rankedList.length > 0 && rankedList[0].avg > 0) {
-            document.getElementById('podium1Tag').textContent = rankedList[0].tag;
-            document.getElementById('podium1Score').textContent = rankedList[0].avg;
-          }
-          if (rankedList.length > 1 && rankedList[1].avg > 0) {
-            document.getElementById('podium2Tag').textContent = rankedList[1].tag;
-            document.getElementById('podium2Score').textContent = rankedList[1].avg;
-          }
-          if (rankedList.length > 2 && rankedList[2].avg > 0) {
-            document.getElementById('podium3Tag').textContent = rankedList[2].tag;
-            document.getElementById('podium3Score').textContent = rankedList[2].avg;
-          }
-
-          // Render Table
-          const tbody = document.getElementById('projectorTableBody');
-          tbody.innerHTML = rankedList.map((item, idx) => `
-            <tr style="${item.isLive ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
-              <td>
-                <span class="badge ${idx === 0 ? 'podium-rank-1' : (idx === 1 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
-                  #${idx + 1}
-                </span>
-              </td>
-              <td>
-                <strong style="font-family: var(--font-heading); font-size: 1.35rem; color: #fff;">${item.tag}</strong>
-                ${item.isLive ? ' <span class="badge badge-live" style="font-size:0.7rem; padding:0.15rem 0.5rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
-              </td>
-              <td>
-                <strong style="font-family: var(--font-heading); font-size: 1.5rem; color: ${item.avg > 0 ? '#00e5ff' : 'var(--text-dim)'};">
-                  ${item.avg > 0 ? item.avg : '--'}
-                </strong>
-              </td>
-              <td>
-                <span style="font-size: 1rem; color: var(--text-muted);">${item.count} / ${item.totalJudges}</span>
-              </td>
-              <td>
-                ${item.isLive ? '<span class="badge badge-live">LIVE ON STAGE</span>' : (item.isCompleted ? '<span class="badge badge-done">COMPLETED</span>' : '<span class="badge badge-next">IN QUEUE</span>')}
-              </td>
-            </tr>
-          `).join('');
-
-          if (window.lucide) lucide.createIcons();
+        if (currentMode === 'overall') {
+          await loadOverallChampionship();
+        } else {
+          await loadCategoryEvent(currentMode);
         }
+        if (window.lucide) lucide.createIcons();
       } catch (e) {
         console.error('Projector load error:', e);
+      }
+    }
+
+    async function loadOverallChampionship() {
+      const stageBox = document.getElementById('projectorStageBox');
+      if (stageBox) stageBox.style.display = 'none';
+
+      document.getElementById('podium1Label').textContent = 'Combined Score / 400';
+      document.getElementById('podium2Label').textContent = 'Combined Score / 400';
+      document.getElementById('podium3Label').textContent = 'Combined Score / 400';
+
+      const res = await fetch('/api/championship');
+      const data = await res.json();
+      if (!data.success) return;
+
+      const list = data.championship || [];
+      const top3 = list.slice(0, 3);
+
+      document.getElementById('podium1Tag').textContent = top3[0] ? top3[0].school : '--';
+      document.getElementById('podium1Score').textContent = top3[0] && top3[0].total_score > 0 ? top3[0].total_score : '--';
+
+      document.getElementById('podium2Tag').textContent = top3[1] ? top3[1].school : '--';
+      document.getElementById('podium2Score').textContent = top3[1] && top3[1].total_score > 0 ? top3[1].total_score : '--';
+
+      document.getElementById('podium3Tag').textContent = top3[2] ? top3[2].school : '--';
+      document.getElementById('podium3Score').textContent = top3[2] && top3[2].total_score > 0 ? top3[2].total_score : '--';
+
+      // Table Header
+      const thead = document.getElementById('projectorTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th style="font-size: 0.95rem; text-align: center;">Rank</th>
+          <th style="font-size: 0.95rem;">School Name</th>
+          <th style="font-size: 0.95rem; text-align: center;">Dance</th>
+          <th style="font-size: 0.95rem; text-align: center;">Song</th>
+          <th style="font-size: 0.95rem; text-align: center;">Declamation</th>
+          <th style="font-size: 0.95rem; text-align: center;">Science</th>
+          <th style="font-size: 0.95rem; text-align: center; color: #fbbf24;">Combined Total</th>
+          <th style="font-size: 0.95rem; text-align: center;">Standing</th>
+        </tr>
+      `;
+
+      // Table Body
+      const tbody = document.getElementById('projectorTableBody');
+      tbody.innerHTML = list.map((item, idx) => {
+        const isTop10 = idx < 10;
+        let standing = 'Participant';
+        if (idx === 0 && item.total_score > 0) standing = '🏆 1st Champion';
+        else if (idx === 1 && item.total_score > 0) standing = '🥈 1st Runner Up';
+        else if (idx === 2 && item.total_score > 0) standing = '🥉 2nd Runner Up';
+        else if (isTop10 && item.total_score > 0) standing = `⭐ Top 10 (#${idx + 1})`;
+
+        return `
+          <tr style="${idx === 0 ? 'background: rgba(251, 191, 36, 0.1);' : (idx < 3 ? 'background: rgba(56, 189, 248, 0.05);' : '')}">
+            <td style="text-align: center;">
+              <span class="badge ${idx === 0 ? 'podium-rank-1' : (idx === 1 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.3rem 0.75rem;">
+                #${idx + 1}
+              </span>
+            </td>
+            <td>
+              <strong style="font-family: var(--font-heading); font-size: 1.25rem; color: #fff;">${item.school}</strong>
+              ${item.room !== '-' ? `<span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 0.4rem;">[${item.room}]</span>` : ''}
+            </td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.dance}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.song}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.declamation}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.science}</td>
+            <td style="text-align: center;">
+              <strong style="font-family: var(--font-mono); font-size: 1.35rem; color: ${item.total_score > 0 ? '#fbbf24' : 'var(--text-dim)'};">
+                ${item.total_score > 0 ? item.total_score : '--'}
+              </strong>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${isTop10 && item.total_score > 0 ? 'badge-done' : 'badge-next'}" style="font-size: 0.8rem;">
+                ${standing}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadCategoryEvent(eventId) {
+      const stageBox = document.getElementById('projectorStageBox');
+      if (stageBox) stageBox.style.display = 'block';
+
+      document.getElementById('podium1Label').textContent = 'Average Score / 100';
+      document.getElementById('podium2Label').textContent = 'Average Score / 100';
+      document.getElementById('podium3Label').textContent = 'Average Score / 100';
+
+      const [evtRes, scRes] = await Promise.all([
+        fetch(`/api/events/${eventId}`),
+        fetch(`/api/events/${eventId}/scores`)
+      ]);
+
+      const evtData = await evtRes.json();
+      const scData = await scRes.json();
+
+      if (evtData.success) {
+        const event = evtData.event;
+        const scores = scData.scores || [];
+        const judges = event.judges || [];
+
+        document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
+
+        let allTags = event.sequence.map(s => s.tag_no);
+        (event.completed_tags || []).forEach(c => {
+          if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
+        });
+
+        const rankedList = allTags.map(tag => {
+          const tagScores = scores.filter(s => s.tag_no === tag);
+          const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
+          const count = tagScores.length;
+          const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
+          const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
+          const isLive = evtData.current_tag === tag;
+
+          // Find school name if present
+          const seqItem = event.sequence.find(s => s.tag_no === tag) || (event.completed_tags || []).find(c => c.tag_no === tag);
+          const notes = seqItem ? seqItem.notes : '';
+
+          return { tag, avg, count, totalJudges: judges.length, isCompleted, isLive, notes };
+        });
+
+        rankedList.sort((a, b) => b.avg - a.avg);
+
+        if (rankedList.length > 0 && rankedList[0].avg > 0) {
+          document.getElementById('podium1Tag').textContent = rankedList[0].tag;
+          document.getElementById('podium1Score').textContent = rankedList[0].avg;
+        } else {
+          document.getElementById('podium1Tag').textContent = '--';
+          document.getElementById('podium1Score').textContent = '--';
+        }
+
+        if (rankedList.length > 1 && rankedList[1].avg > 0) {
+          document.getElementById('podium2Tag').textContent = rankedList[1].tag;
+          document.getElementById('podium2Score').textContent = rankedList[1].avg;
+        } else {
+          document.getElementById('podium2Tag').textContent = '--';
+          document.getElementById('podium2Score').textContent = '--';
+        }
+
+        if (rankedList.length > 2 && rankedList[2].avg > 0) {
+          document.getElementById('podium3Tag').textContent = rankedList[2].tag;
+          document.getElementById('podium3Score').textContent = rankedList[2].avg;
+        } else {
+          document.getElementById('podium3Tag').textContent = '--';
+          document.getElementById('podium3Score').textContent = '--';
+        }
+
+        // Table Header
+        const thead = document.getElementById('projectorTableHead');
+        thead.innerHTML = `
+          <tr>
+            <th style="font-size: 0.95rem; text-align: center;">Rank</th>
+            <th style="font-size: 0.95rem;">Team Tag & School</th>
+            <th style="font-size: 0.95rem; text-align: center;">Average Score</th>
+            <th style="font-size: 0.95rem; text-align: center;">Judges Evaluated</th>
+            <th style="font-size: 0.95rem; text-align: center;">Status</th>
+          </tr>
+        `;
+
+        // Table Body
+        const tbody = document.getElementById('projectorTableBody');
+        tbody.innerHTML = rankedList.map((item, idx) => `
+          <tr style="${item.isLive ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
+            <td style="text-align: center;">
+              <span class="badge ${idx === 0 ? 'podium-rank-1' : (idx === 1 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
+                #${idx + 1}
+              </span>
+            </td>
+            <td>
+              <strong style="font-family: var(--font-heading); font-size: 1.35rem; color: #fff;">${item.tag}</strong>
+              ${item.notes ? `<span style="font-size: 0.85rem; color: var(--text-dim); margin-left: 0.5rem;">${item.notes}</span>` : ''}
+              ${item.isLive ? ' <span class="badge badge-live" style="font-size:0.7rem; padding:0.15rem 0.5rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
+            </td>
+            <td style="text-align: center;">
+              <strong style="font-family: var(--font-heading); font-size: 1.5rem; color: ${item.avg > 0 ? '#00e5ff' : 'var(--text-dim)'};">
+                ${item.avg > 0 ? item.avg : '--'}
+              </strong>
+            </td>
+            <td style="text-align: center;">
+              <span style="font-size: 1rem; color: var(--text-muted);">${item.count} / ${item.totalJudges}</span>
+            </td>
+            <td style="text-align: center;">
+              ${item.isLive ? '<span class="badge badge-live">LIVE ON STAGE</span>' : (item.isCompleted ? '<span class="badge badge-done">COMPLETED</span>' : '<span class="badge badge-next">IN QUEUE</span>')}
+            </td>
+          </tr>
+        `).join('');
       }
     }
 
@@ -258,7 +404,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
       loadProjectorData();
-      setInterval(loadProjectorData, 3000);
+      setInterval(loadProjectorData, 4000);
     });
   </script>
 </body>

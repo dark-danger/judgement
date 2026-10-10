@@ -60,6 +60,8 @@ def sequence_page(event_id=None):
 
 @app.route("/projector")
 @app.route("/projector/<event_id>")
+@app.route("/leaderboard")
+@app.route("/leaderboard/<event_id>")
 def projector_page(event_id=None):
     return send_from_directory(app.static_folder, "projector.html")
 
@@ -363,10 +365,23 @@ def remove_judge_route(event_id, judge_id=None):
 def get_championship_leaderboard():
     try:
         data = sheets_service.calculate_championship_data()
+        event_winners = sheets_service.calculate_event_winners()
         return jsonify({
             "success": True,
             "championship": data,
-            "top10": data[:10] if data else []
+            "top10": data[:10] if data else [],
+            "event_winners": event_winners
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/winners", methods=["GET"])
+def get_event_winners():
+    try:
+        event_winners = sheets_service.calculate_event_winners()
+        return jsonify({
+            "success": True,
+            "event_winners": event_winners
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
