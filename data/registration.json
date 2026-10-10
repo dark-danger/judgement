@@ -5,8 +5,8 @@
     "school_name": "Delhi Public School DPS Kathua",
     "desk_no": 1,
     "room_no": "F-501",
-    "is_arrived": true,
-    "arrived_at": "11:13 PM",
+    "is_arrived": false,
+    "arrived_at": null,
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -15,8 +15,7 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-21",
-        "status": "PRESENT",
-        "marked_at": "11:29 PM"
+        "status": "PENDING"
       },
       {
         "category": "Declamation",
@@ -38,8 +37,8 @@
     "school_name": "SMR International School Safidon",
     "desk_no": 1,
     "room_no": "F-502",
-    "is_arrived": true,
-    "arrived_at": "11:13 PM",
+    "is_arrived": false,
+    "arrived_at": null,
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -48,15 +47,13 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-22",
-        "status": "PRESENT",
-        "marked_at": "11:21 PM"
+        "status": "PENDING"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-22",
-        "status": "PRESENT",
-        "marked_at": "11:13 PM"
+        "status": "PENDING"
       }
     ]
   },
@@ -1674,82 +1671,6 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-78",
-        "status": "PENDING"
-      }
-    ]
-  },
-  {
-    "id": "sch-59",
-    "seq_no": 59,
-    "school_name": "Test School 1",
-    "desk_no": 4,
-    "room_no": "G-101",
-    "is_arrived": false,
-    "arrived_at": null,
-    "contact_person": "",
-    "contact_phone": "",
-    "notes": "",
-    "events": [
-      {
-        "category": "Group Dance",
-        "event_id": "evt-group-dance",
-        "tag_no": "D-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Group Song",
-        "event_id": "evt-group-song",
-        "tag_no": "S-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Declamation",
-        "event_id": "evt-declamation",
-        "tag_no": "DC-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Science Exhibition",
-        "event_id": "evt-science-exhibition",
-        "tag_no": "SC-99",
-        "status": "PENDING"
-      }
-    ]
-  },
-  {
-    "id": "sch-60",
-    "seq_no": 60,
-    "school_name": "Test International Model School Karnal",
-    "desk_no": 5,
-    "room_no": "G-101",
-    "is_arrived": false,
-    "arrived_at": null,
-    "contact_person": "",
-    "contact_phone": "",
-    "notes": "",
-    "events": [
-      {
-        "category": "Group Dance",
-        "event_id": "evt-group-dance",
-        "tag_no": "D-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Group Song",
-        "event_id": "evt-group-song",
-        "tag_no": "S-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Declamation",
-        "event_id": "evt-declamation",
-        "tag_no": "DC-99",
-        "status": "PENDING"
-      },
-      {
-        "category": "Science Exhibition",
-        "event_id": "evt-science-exhibition",
-        "tag_no": "SC-99",
         "status": "PENDING"
       }
     ]
