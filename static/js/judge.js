@@ -12,6 +12,9 @@ let hasSubmittedForEvaluatingTag = false; // Whether judge has submitted score f
 let lastSubmittedTag = null;
 let isDoorsClosed = false;
 
+// Notification state
+let notifiedTagForFastScoring = null;
+
 // Server state:
 let serverCurrentTag = null;
 let serverNextTag = null;
@@ -115,17 +118,39 @@ async function loadEventData() {
         // SCENARIO A: Judge has NOT submitted yet for evaluatingTagNo and doors are open
         // CRITICAL: Keep judge locked on evaluatingTagNo even if sequence moves ahead on stage!
         if (!hasSubmittedForEvaluatingTag && !isDoorsClosed && evaluatingTagNo && evaluatingTagNo !== 'NO TAG') {
-          // Keep evaluatingTagNo active
+          const isBackendAdvanced = (serverCurrentTag !== evaluatingTagNo && serverCurrentTag !== 'NO TAG');
+
+          // Pending notice badge in current team card
           const pendingBadge = document.getElementById('currentTagPendingNotice');
           if (pendingBadge) {
-            pendingBadge.style.display = (serverCurrentTag !== evaluatingTagNo) ? 'block' : 'none';
+            pendingBadge.style.display = isBackendAdvanced ? 'block' : 'none';
+          }
+
+          // Urgent fast scoring banner & notification
+          const urgentBanner = document.getElementById('urgentFastScoringBanner');
+          const urgentTagTarget = document.getElementById('urgentTagTarget');
+          const urgentNextTarget = document.getElementById('urgentNextTarget');
+          if (urgentBanner) {
+            if (isBackendAdvanced) {
+              urgentBanner.style.display = 'flex';
+              if (urgentTagTarget) urgentTagTarget.textContent = evaluatingTagNo;
+              if (urgentNextTarget) urgentNextTarget.textContent = serverCurrentTag;
+
+              // High-priority toast notification: "Please score the team fast because next team is coming"
+              if (notifiedTagForFastScoring !== evaluatingTagNo) {
+                notifiedTagForFastScoring = evaluatingTagNo;
+                showToast(`⚡ Please score team ${evaluatingTagNo} fast because next team (${serverCurrentTag}) is coming on stage!`, 'warning');
+              }
+            } else {
+              urgentBanner.style.display = 'none';
+            }
           }
 
           // Update Next Coming Team Box in Hero
           const nextTagDisp = document.getElementById('nextTagDisplay');
           const nextTagLabel = document.getElementById('nextTagSchool');
           if (nextTagDisp) {
-            const displayNext = (serverCurrentTag !== evaluatingTagNo) ? serverCurrentTag : serverNextTag;
+            const displayNext = isBackendAdvanced ? serverCurrentTag : serverNextTag;
             if (nextTagDisp.textContent !== displayNext) {
               nextTagDisp.textContent = displayNext;
               nextTagDisp.classList.remove('tag-updated-anim');
@@ -134,20 +159,24 @@ async function loadEventData() {
             }
           }
           if (nextTagLabel) {
-            nextTagLabel.textContent = (serverCurrentTag !== evaluatingTagNo) 
-              ? 'Live On Stage Now' 
+            nextTagLabel.textContent = isBackendAdvanced 
+              ? 'Now Live on Stage (Waiting for your submit)' 
               : (serverNextTag !== 'End of Queue' ? 'Next Up in Queue' : 'Queue Finished');
           }
         }
         // SCENARIO B: Judge HAS submitted evaluatingTagNo OR Doors are Closed waiting for next team
         else {
+          const urgentBanner = document.getElementById('urgentFastScoringBanner');
+          if (urgentBanner) urgentBanner.style.display = 'none';
+
+          const pendingBadge = document.getElementById('currentTagPendingNotice');
+          if (pendingBadge) pendingBadge.style.display = 'none';
+
           // If server's on-stage team is different from evaluatingTagNo (and valid), advance to the new team!
           if (serverCurrentTag !== evaluatingTagNo && serverCurrentTag !== 'NO TAG') {
             evaluatingTagNo = serverCurrentTag;
             hasSubmittedForEvaluatingTag = false;
-
-            const pendingBadge = document.getElementById('currentTagPendingNotice');
-            if (pendingBadge) pendingBadge.style.display = 'none';
+            notifiedTagForFastScoring = null;
 
             openStageDoors();
             renderCriteriaSection();
@@ -258,6 +287,7 @@ function openStageDoors() {
 
 function reopenCurrentScoring() {
   hasSubmittedForEvaluatingTag = false;
+  notifiedTagForFastScoring = null;
   if (lastSubmittedTag) {
     evaluatingTagNo = lastSubmittedTag;
   }
@@ -323,6 +353,10 @@ async function submitEvaluation() {
 
       hasSubmittedForEvaluatingTag = true;
       lastSubmittedTag = targetTag;
+      notifiedTagForFastScoring = null;
+
+      const urgentBanner = document.getElementById('urgentFastScoringBanner');
+      if (urgentBanner) urgentBanner.style.display = 'none';
 
       document.getElementById('doorSubmittedTotal').textContent = data.score.total;
       document.getElementById('doorSubmittedTag').textContent = targetTag;
@@ -345,6 +379,7 @@ async function submitEvaluation() {
         setTimeout(() => {
           evaluatingTagNo = serverCurrentTag;
           hasSubmittedForEvaluatingTag = false;
+          notifiedTagForFastScoring = null;
           openStageDoors();
           renderCriteriaSection();
           loadExistingScoresForTag(evaluatingTagNo);
@@ -733,15 +768,17 @@ async function loadExistingScoresForTag(tagNo) {
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
+  toast.className = `toast toast-${type} ${type}`;
   toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
   container.appendChild(toast);
+
+  const duration = (type === 'warning' || type === 'error') ? 6000 : 3500;
 
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(10px)';
     setTimeout(() => toast.remove(), 300);
-  }, 3500);
+  }, duration);
 }
 
 function escapeHtml(text) {

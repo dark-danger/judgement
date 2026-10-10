@@ -133,6 +133,20 @@
         </div>
       </section>
 
+      <!-- Urgent Fast Scoring Alert Banner when backend advances while judge is evaluating -->
+      <div id="urgentFastScoringBanner" class="urgent-fast-banner" style="display: none;">
+        <div class="urgent-banner-content">
+          <div class="urgent-icon-pulse"><i data-lucide="alert-triangle"></i></div>
+          <div>
+            <strong style="color: #fbbf24; font-size: 0.95rem; display: block;">⚡ Please score team <span id="urgentTagTarget">--</span> fast!</strong>
+            <span style="color: #cbd5e1; font-size: 0.82rem;">Next team (<strong id="urgentNextTarget" style="color: #38bdf8;">--</strong>) is now arriving on stage. Please finalize and submit marks.</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('btnSubmitScore').scrollIntoView({ behavior: 'smooth', block: 'center' });" style="white-space: nowrap; background: #f59e0b; color: #000; font-weight: 800; border-color: #fbbf24;">
+          Submit Marks Now ↓
+        </button>
+      </div>
+
       <!-- 5 Criteria Scoring Section -->
       <main class="criteria-section" id="criteriaSection">
         <!-- Generated dynamically in JS -->
