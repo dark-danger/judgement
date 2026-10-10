@@ -231,6 +231,7 @@ async function loadAllEvents() {
   }
 }
 
+window.selectEvent = onSelectEvent;
 function onSelectEvent(evtId) {
   activeEventId = evtId;
   loadAdminData();
@@ -345,6 +346,91 @@ async function quickDeleteJudge(judgeId, judgeName) {
   } catch (e) {
     showToast('Error removing judge', 'error');
   }
+}
+
+
+function renderPerJudgeLinks() {
+  const container = document.getElementById('perJudgeLinksGrid');
+  const countSpan = document.getElementById('assignedJudgesCount');
+  const eventNameSpan = document.getElementById('btnCopyAllEventName');
+  
+  if (!currentEventData) {
+    if (container) container.innerHTML = '<div style="grid-column: 1 / -1; padding: 1rem; color: var(--text-dim); text-align: center;">Select or create an event to view personalized judge links.</div>';
+    if (countSpan) countSpan.textContent = '0';
+    return;
+  }
+
+  const judges = currentEventData.judges || [];
+  if (countSpan) countSpan.textContent = judges.length;
+  if (eventNameSpan) eventNameSpan.textContent = currentEventData.name || 'Event';
+
+  if (!container) return;
+
+  if (judges.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; background: rgba(0,0,0,0.3); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 1.5rem; text-align: center;">
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.75rem;">
+          No judges currently aligned for "${escapeHtml(currentEventData.name)}".
+        </p>
+        <button type="button" class="btn btn-cyan btn-sm" onclick="openAddJudgeModal('${currentEventData.id}')">
+          <i data-lucide="user-plus"></i> Align First Judge
+        </button>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  let base = window.location.origin;
+  if (linkHostMode === 'network' && networkInfo && networkInfo.network_base_url) {
+    base = networkInfo.network_base_url;
+  } else if (linkHostMode === 'localhost' && networkInfo && networkInfo.localhost_base_url) {
+    base = networkInfo.localhost_base_url;
+  }
+
+  container.innerHTML = judges.map((j, idx) => {
+    const judgeUrl = `${base}/judge/${currentEventData.id}?judge=${j.id}`;
+    const waText = encodeURIComponent(`Agrash Scoring Portal Link for ${j.name} (${currentEventData.name}):
+${judgeUrl}`);
+    const inputId = `pJudgeLink_${currentEventData.id}_${j.id}`;
+
+    return `
+      <div style="background: rgba(12, 17, 29, 0.75); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.2s ease;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">#${idx + 1}</span>
+            <strong style="color: #fff; font-size: 0.92rem;">${escapeHtml(j.name)}</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <button type="button" onclick="quickRenameJudge('${j.id}', '${escapeHtml(j.name)}')" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem; color: #94a3b8;" title="Rename Judge">
+              <i data-lucide="edit-2" style="width: 13px; height: 13px;"></i>
+            </button>
+            <button type="button" onclick="quickDeleteJudge('${j.id}', '${escapeHtml(j.name)}')" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem; color: #fb7185;" title="Remove Judge">
+              <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.35rem;">
+          <input type="text" id="${inputId}" readonly value="${judgeUrl}" style="flex-grow: 1; font-family: var(--font-mono); font-size: 0.74rem; background: rgba(7, 10, 17, 0.8); border: 1px solid rgba(56, 189, 248, 0.25); padding: 0.35rem 0.5rem; border-radius: 5px; color: #38bdf8;">
+          <button type="button" class="btn btn-cyan btn-sm" onclick="copyLink('${inputId}')" title="Copy Link" style="padding: 0.35rem 0.55rem;">
+            <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openQrModal('${escapeHtml(j.name)} • ${escapeHtml(currentEventData.name)}', '${judgeUrl}')" title="QR Code" style="padding: 0.35rem 0.55rem;">
+            <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i>
+          </button>
+          <a href="https://api.whatsapp.com/send?text=${waText}" target="_blank" class="btn btn-emerald btn-sm" title="Share WhatsApp" style="padding: 0.35rem 0.55rem;">
+            <i data-lucide="share-2" style="width: 13px; height: 13px;"></i>
+          </a>
+          <a href="${judgeUrl}" target="_blank" class="btn btn-ghost btn-sm" title="Open Judge Portal" style="padding: 0.35rem 0.55rem;">
+            <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
+          </a>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
 }
 
 function updateShareableLinks() {
@@ -826,38 +912,73 @@ function copyLink(inputId) {
 // -------------------------------------------------------------
 // EDIT EVENT & JUDGES HANDLERS
 // -------------------------------------------------------------
-function openEditEventModal() {
+async function openEditEventModal() {
   if (!currentEventData) {
-    showToast('Please select an active event first', 'error');
+    if (!activeEventId && allEvents.length > 0) {
+      activeEventId = allEvents[0].id;
+    }
+    if (activeEventId) {
+      try {
+        const res = await fetch(`/api/events/${activeEventId}`);
+        const data = await res.json();
+        if (data.success) {
+          currentEventData = data.event;
+        }
+      } catch (e) {}
+    }
+  }
+
+  if (!currentEventData) {
+    try {
+      const res = await fetch('/api/events');
+      const data = await res.json();
+      if (data.success && data.events && data.events.length > 0) {
+        allEvents = data.events;
+        activeEventId = allEvents[0].id;
+        currentEventData = allEvents[0];
+      }
+    } catch (e) {}
+  }
+
+  if (!currentEventData) {
+    showToast('Please create or select an event first', 'error');
+    openCreateEventModal();
     return;
   }
 
-  document.getElementById('editEventNameInput').value = currentEventData.name || '';
-  document.getElementById('editEventDescInput').value = currentEventData.description || '';
+  const nameInput = document.getElementById('editEventNameInput');
+  const descInput = document.getElementById('editEventDescInput');
+  if (nameInput) nameInput.value = currentEventData.name || '';
+  if (descInput) descInput.value = currentEventData.description || '';
 
   // Render Judges
   const judgesContainer = document.getElementById('editJudgesContainer');
-  judgesContainer.innerHTML = '';
-  const judges = currentEventData.judges || [];
-  if (judges.length === 0) {
-    for (let i = 1; i <= 5; i++) {
-      addJudgeToEditModal(`Judge ${i}`, `j${i}`);
+  if (judgesContainer) {
+    judgesContainer.innerHTML = '';
+    const judges = currentEventData.judges || [];
+    if (judges.length === 0) {
+      for (let i = 1; i <= 5; i++) {
+        addJudgeToEditModal(`Judge ${i}`, `j${i}`);
+      }
+    } else {
+      judges.forEach((j, idx) => {
+        addJudgeToEditModal(j.name || `Judge ${idx + 1}`, j.id || `j${idx + 1}`);
+      });
     }
-  } else {
-    judges.forEach((j, idx) => {
-      addJudgeToEditModal(j.name || `Judge ${idx + 1}`, j.id || `j${idx + 1}`);
-    });
   }
 
   // Render Criteria
   const criteriaContainer = document.getElementById('editCriteriaContainer');
-  criteriaContainer.innerHTML = '';
-  const criteria = currentEventData.criteria || [];
-  criteria.forEach((c, idx) => {
-    addCriteriaToEditModal(c.name || `Criterion ${idx + 1}`, c.max_marks || 20, c.id || `c${idx + 1}`);
-  });
+  if (criteriaContainer) {
+    criteriaContainer.innerHTML = '';
+    const criteria = currentEventData.criteria || [];
+    criteria.forEach((c, idx) => {
+      addCriteriaToEditModal(c.name || `Criterion ${idx + 1}`, c.max_marks || 20, c.id || `c${idx + 1}`);
+    });
+  }
 
-  document.getElementById('editEventModal').classList.add('active');
+  const modal = document.getElementById('editEventModal');
+  if (modal) modal.classList.add('active');
   if (window.lucide) lucide.createIcons();
 }
 
@@ -1189,12 +1310,28 @@ function escapeHtml(text) {
 // JUDGE ALIGNMENT & DIRECTORY MODAL HANDLERS
 // -------------------------------------------------------------
 
-function openAddJudgeModal(preselectedEventId = null) {
+async function openAddJudgeModal(preselectedEventId = null) {
   const modal = document.getElementById('addJudgeModal');
   const select = document.getElementById('addJudgeEventSelect');
   const nameInput = document.getElementById('addJudgeNameInput');
 
   if (!modal || !select) return;
+
+  if (allEvents.length === 0) {
+    try {
+      const res = await fetch('/api/events');
+      const data = await res.json();
+      if (data.success && data.events) {
+        allEvents = data.events;
+      }
+    } catch (e) {}
+  }
+
+  if (allEvents.length === 0) {
+    showToast('No events found. Please create an event first!', 'error');
+    openCreateEventModal();
+    return;
+  }
 
   select.innerHTML = allEvents.map(e => `
     <option value="${e.id}" ${e.id === (preselectedEventId || activeEventId) ? 'selected' : ''}>
