@@ -366,25 +366,24 @@ class SheetsService:
                 "Rank",
                 "School Name",
                 "Room / Flat",
-                f"Group Dance (/{dance_m})",
-                f"Group Song (/{song_m})",
-                f"Declamation (/{dec_m})",
-                f"Science Exhibition (/{sci_m})",
-                f"Combined Total (/{comb_m})",
-                "Combined Average",
-                "Events Scored",
-                "Standing / Award",
+                f"Group Dance Total (/{dance_m})",
+                f"Group Song Total (/{song_m})",
+                f"Declamation Total (/{dec_m})",
+                f"Science Exhibition Total (/{sci_m})",
+                f"Grand Total (4-Event Sum /{comb_m})",
+                "Events Evaluated",
+                "Overall Standing & Award",
                 "Last Updated"
             ]
 
             final_rows = [headers]
             for idx, r in enumerate(championship_list, start=1):
                 if idx == 1 and r["total_score"] > 0:
-                    standing = "🏆 1st Place - Champion (Gold)"
+                    standing = "🏆 1st Place - Champion (Gold Trophy)"
                 elif idx == 2 and r["total_score"] > 0:
-                    standing = "🥈 2nd Place - 1st Runner Up (Silver)"
+                    standing = "🥈 2nd Place - 1st Runner Up (Silver Trophy)"
                 elif idx == 3 and r["total_score"] > 0:
-                    standing = "🥉 3rd Place - 2nd Runner Up (Bronze)"
+                    standing = "🥉 3rd Place - 2nd Runner Up (Bronze Trophy)"
                 elif idx <= 10 and r["total_score"] > 0:
                     standing = f"⭐ Top 10 Finalist Trophy (#{idx})"
                 elif r["total_score"] > 0:
@@ -402,7 +401,6 @@ class SheetsService:
                     r["declamation"],
                     r["science"],
                     r["total_score"] if r["total_score"] > 0 else "-",
-                    r["overall_avg"] if r["overall_avg"] > 0 else "-",
                     f"{r['events_done']}/4",
                     standing,
                     get_ist_time_str()

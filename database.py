@@ -537,22 +537,58 @@ class DB:
             except Exception as e:
                 print(f"⚠️ [Supabase] get_scores error: {e}")
 
-        scores = load_json(SCORES_FILE, [])
-        if not scores:
+    def _sync_cloud_scores(self, local_scores=None):
+        """Fetches cloud-backed scores from Google Apps Script and merges with local container scores"""
+        scores = local_scores if local_scores is not None else load_json(SCORES_FILE, [])
+        try:
+            from seed_events import GSHEET_WEBHOOK_URL
+            webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.get(f"{webhook}?action=get_scores", timeout=4)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    cloud_scores = data.get("scores", [])
+                    if cloud_scores:
+                        merged_map = {}
+                        for s in scores:
+                            ev = str(s.get("event_id", "")).strip().lower()
+                            t = str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "")
+                            j = str(s.get("judge_id", "")).strip().lower()
+                            merged_map[f"{ev}_{t}_{j}"] = s
+                        for s in cloud_scores:
+                            ev = str(s.get("event_id", "")).strip().lower()
+                            t = str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "")
+                            j = str(s.get("judge_id", "")).strip().lower()
+                            k = f"{ev}_{t}_{j}"
+                            if k not in merged_map:
+                                merged_map[k] = s
+                            else:
+                                s_ts = s.get("updated_at", "")
+                                ex_ts = merged_map[k].get("updated_at", "")
+                                if s_ts >= ex_ts:
+                                    merged_map[k] = s
+                        scores = list(merged_map.values())
+                        save_json(SCORES_FILE, scores)
+        except Exception:
+            pass
+        return scores
+
+    def get_scores(self, event_id=None, tag_no=None):
+        if self.is_supabase_connected and self.supabase:
             try:
-                from seed_events import GSHEET_WEBHOOK_URL
-                webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
-                if webhook and webhook.startswith("http"):
-                    import requests
-                    resp = requests.get(f"{webhook}?action=get_scores", timeout=4)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        cloud_scores = data.get("scores", [])
-                        if cloud_scores:
-                            scores = cloud_scores
-                            save_json(SCORES_FILE, scores)
-            except Exception:
-                pass
+                query = self.supabase.table("scores").select("*")
+                if event_id:
+                    query = query.eq("event_id", event_id)
+                if tag_no:
+                    query = query.eq("tag_no", tag_no)
+                res = query.execute()
+                if res.data is not None:
+                    return res.data
+            except Exception as e:
+                print(f"⚠️ [Supabase] get_scores error: {e}")
+
+        scores = self._sync_cloud_scores()
 
         if event_id:
             scores = [s for s in scores if s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))]
@@ -562,7 +598,8 @@ class DB:
         return scores
 
     def submit_score(self, event_id, tag_no, judge_id, judge_name, criteria_scores, remarks=""):
-        scores = load_json(SCORES_FILE, [])
+        # 1. First merge all existing judges scores from cloud so no other judge's score is lost
+        scores = self._sync_cloud_scores()
         total = sum(float(v) for v in criteria_scores.values() if v is not None and str(v).replace('.', '', 1).isdigit())
 
         existing_idx = None
@@ -593,23 +630,13 @@ class DB:
 
         save_json(SCORES_FILE, scores)
 
-        # Cloud backup to Google Apps Script Properties
+        # 2. Cloud backup to Google Apps Script Properties synchronously
         try:
             from seed_events import GSHEET_WEBHOOK_URL
             webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
             if webhook and webhook.startswith("http"):
-                import threading
-                def _cloud_bk():
-                    try:
-                        import requests
-                        requests.post(webhook, json={"action": "save_score", "score": score_entry}, timeout=8)
-                    except Exception:
-                        pass
-                is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
-                if is_serverless:
-                    _cloud_bk()
-                else:
-                    threading.Thread(target=_cloud_bk, daemon=True).start()
+                import requests
+                requests.post(webhook, json={"action": "save_score", "score": score_entry}, timeout=8)
         except Exception:
             pass
 

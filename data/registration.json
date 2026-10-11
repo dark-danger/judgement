@@ -5,7 +5,7 @@
     "school_name": "Delhi Public School DPS Kathua",
     "desk_no": 1,
     "room_no": "F-501",
-    "is_arrived": false,
+    "is_arrived": true,
     "arrived_at": "10:38 PM",
     "contact_person": "",
     "contact_phone": "",
@@ -15,8 +15,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-21",
-        "status": "PENDING",
-        "marked_at": "12:09 AM"
+        "status": "PRESENT",
+        "marked_at": "12:53 AM"
       },
       {
         "category": "Declamation",
