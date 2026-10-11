@@ -165,7 +165,6 @@ def sync_from_sheet_api():
             if rec:
                 added_or_updated.append(rec)
 
-        sheets_service.trigger_background_sync()
         return jsonify({
             "success": True,
             "count": len(added_or_updated),

@@ -1,21 +1,20 @@
 /**
- * 🔥 AGRASH 2026 - AUTOMATIC GOOGLE APPS SCRIPT LIVE SYNC & MULTI-SHEET ROUTER
- * =============================================================================
+ * 🔥 AGRASH 2026 - BULLETPROOF GOOGLE APPS SCRIPT LIVE SYNC & DATA PRESERVATION ENGINE
+ * ======================================================================================
  * SPREADSHEET ID: 1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk
  * WEB PORTAL URL: https://judgement-ten.vercel.app
  * 
- * FEATURES:
- * 1. WebApp endpoint (doPost, doGet) for 2-way real-time score & marksheet updates.
- * 2. Automatic multi-sheet router: Jab bhi "Agrash Registrations" sheet me naya data/school
- *    add ya edit hoga, wo AUTOMATICALLY:
- *    - Charo event tabs me sync hoga ("Group Dance", "Group Song", "Declamation", "Science Exhibition")
- *    - "Master Registrations" tab me sync hoga
- *    - Web Portal (https://judgement-ten.vercel.app) me live push hoga!
- * 3. Menu "⚡ AGRASH 2026" for 1-click sync & trigger setup inside Google Sheets.
+ * CORE GUARANTEES:
+ * 1. ZERO DATA LOSS: Judge scores entered on the portal are PERMANENT and will NEVER be wiped
+ *    or overwritten by "Pending", even during background syncs.
+ * 2. ATTENDANCE PRESERVATION: Once marked "PRESENT (✅)" or "ARRIVED", attendance will NEVER
+ *    revert to "PENDING (⏳)".
+ * 3. NO RECURRING WIPING TIMERS: Deleted all periodic time triggers that were repeatedly erasing data.
+ * 4. EVENT TAB PROTECTION: "Group Dance", "Group Song", "Declamation", and "Science Exhibition"
+ *    are protected marksheets managed strictly by scoring submissions.
  */
 
 var TARGET_SPREADSHEET_ID = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk";
-var PORTAL_SYNC_URL = "https://judgement-ten.vercel.app/api/registration/sync-from-sheet";
 
 /**
  * Custom Menu inside Google Sheets
@@ -23,8 +22,9 @@ var PORTAL_SYNC_URL = "https://judgement-ten.vercel.app/api/registration/sync-fr
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu("⚡ AGRASH 2026")
-    .addItem("🔄 Sync Agrash Registrations to All Tabs & Portal", "syncMainSheetToAllTabs")
-    .addItem("⚡ Setup Automatic Triggers (onEdit & 1-Min Auto Sync)", "setupTriggers")
+    .addItem("🔄 Sync Agrash Registrations to Master Registrations", "syncMainSheetToAllTabs")
+    .addItem("⚡ Setup Real-time onEdit Trigger (Safe)", "setupTriggers")
+    .addItem("🛑 Delete ALL Background Timers (Stop Wiping)", "removeAllBackgroundTriggers")
     .addItem("🧹 Clean Duplicate / Unwanted Tabs", "cleanUnwantedTabs")
     .addToUi();
 }
@@ -36,12 +36,12 @@ function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
     sheet_id: TARGET_SPREADSHEET_ID,
-    message: "⚡ Agrash Live Sync & Auto-Router WebApp is active and ready to write into Google Sheet!"
+    message: "⚡ Agrash Live Sync & Data Protection Engine is active and running!"
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
- * WebApp POST Handler (Receives updates from Web Portal to Google Sheet)
+ * WebApp POST Handler (Receives updates from Web Portal with Intelligent Merging & Score Preservation)
  */
 function doPost(e) {
   try {
@@ -81,57 +81,224 @@ function doPost(e) {
     if (!sheet) {
       sheet = ss.insertSheet(tabName);
     }
-    sheet.clear();
 
-    var rows = payload.rows || [];
-    if (rows.length > 0) {
-      var numRows = rows.length;
-      var numCols = rows[0].length;
-      
-      var range = sheet.getRange(1, 1, numRows, numCols);
-      range.setValues(rows);
-      range.setVerticalAlignment("middle");
-      range.setFontFamily("Arial");
-      range.setFontSize(10);
+    var incomingRows = payload.rows || [];
+    if (incomingRows.length === 0) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "No rows provided" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
-      // Header styling
-      var headerRange = sheet.getRange(1, 1, 1, numCols);
-      headerRange.setFontWeight("bold");
-      headerRange.setBackground("#0f172a");
-      headerRange.setFontColor("#ffffff");
-      headerRange.setHorizontalAlignment("center");
-      sheet.setRowHeight(1, 32);
+    var existingData = sheet.getDataRange().getValues();
+    var finalRows = [];
 
-      // Alignment
-      for (var col = 1; col <= numCols; col++) {
-        if (col === 2 || col === 3) {
-          sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("left");
-        } else {
-          sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("center");
+    var isEventSheet = (tabName === "Group Dance" || tabName === "Group Song" || tabName === "Declamation" || tabName === "Science Exhibition");
+    var isMasterReg = (tabName === "Master Registrations");
+
+    // =========================================================================
+    // CASE 1: EVENT MARKSHEETS (Group Dance, Group Song, Declamation, Science)
+    // Preserves existing judge scores so they NEVER get wiped by "Pending"
+    // =========================================================================
+    if (isEventSheet && existingData.length > 1) {
+      var existingTagMap = {};
+      for (var er = 1; er < existingData.length; er++) {
+        var exRow = existingData[er];
+        var exTag = (exRow[1] || "").toString().trim().toUpperCase();
+        if (exTag) {
+          existingTagMap[exTag] = exRow;
         }
       }
 
-      // Top 3 Highlight (for leaderboard tabs)
-      if (tabName !== "Master Registrations") {
-        if (numRows > 1) sheet.getRange(2, 1, 1, numCols).setBackground("#fef3c7");
-        if (numRows > 2) sheet.getRange(3, 1, 1, numCols).setBackground("#f1f5f9");
-        if (numRows > 3) sheet.getRange(4, 1, 1, numCols).setBackground("#ffedd5");
+      var incomingHeaders = incomingRows[0];
+      var judgeStartCol = 4;
+      var judgeEndCol = incomingHeaders.length - 4; // up to Overall Average
+
+      for (var r = 1; r < incomingRows.length; r++) {
+        var inRow = incomingRows[r];
+        var inTag = (inRow[1] || "").toString().trim().toUpperCase();
+        var exRow = existingTagMap[inTag];
+
+        if (exRow) {
+          var mergedRow = inRow.slice();
+
+          // 1. Preserve Attendance (Col 3: "Attendance (Present/Absent)")
+          var exAtt = (exRow[3] || "").toString().trim();
+          var inAtt = (inRow[3] || "").toString().trim();
+          if (exAtt.indexOf("PRESENT") !== -1 && inAtt.indexOf("PENDING") !== -1) {
+            mergedRow[3] = exAtt;
+          }
+
+          // 2. Preserve Judge Scores (Cols 4 to judgeEndCol - 1)
+          var preservedAnyScore = false;
+          for (var c = judgeStartCol; c < judgeEndCol; c++) {
+            var inScore = (inRow[c] !== undefined ? inRow[c] : "").toString().trim();
+            var exScore = (exRow[c] !== undefined ? exRow[c] : "").toString().trim();
+
+            var isExScoreNumeric = (exScore !== "" && exScore !== "Pending" && exScore !== "-" && !isNaN(Number(exScore)));
+            var isInScoreEmpty = (inScore === "" || inScore === "Pending" || inScore === "-");
+
+            if (isExScoreNumeric && isInScoreEmpty) {
+              mergedRow[c] = Number(exScore);
+              preservedAnyScore = true;
+            }
+          }
+
+          // 3. Recalculate Overall Average & Judges Scored if existing score was preserved
+          var numScores = [];
+          for (var sc = judgeStartCol; sc < judgeEndCol; sc++) {
+            var val = mergedRow[sc];
+            if (val !== "" && val !== "Pending" && val !== "-" && !isNaN(Number(val))) {
+              numScores.push(Number(val));
+            }
+          }
+
+          if (numScores.length > 0) {
+            var sum = 0;
+            for (var k = 0; k < numScores.length; k++) sum += numScores[k];
+            var avg = Math.round((sum / numScores.length) * 100) / 100;
+            var totalJudges = judgeEndCol - judgeStartCol;
+            mergedRow[judgeEndCol] = avg;
+            mergedRow[judgeEndCol + 1] = numScores.length + "/" + totalJudges;
+          }
+
+          finalRows.push(mergedRow);
+        } else {
+          finalRows.push(inRow);
+        }
       }
 
-      for (var c = 1; c <= numCols; c++) {
-        sheet.autoResizeColumn(c);
+      // Re-sort all scored rows by Overall Average descending
+      var scoredRows = [];
+      var unscoredRows = [];
+      for (var fr = 0; fr < finalRows.length; fr++) {
+        var rowItem = finalRows[fr];
+        var avgVal = rowItem[judgeEndCol];
+        if (avgVal !== undefined && avgVal !== "" && avgVal !== "-" && avgVal !== "Pending" && !isNaN(Number(avgVal))) {
+          scoredRows.push(rowItem);
+        } else {
+          unscoredRows.push(rowItem);
+        }
       }
+
+      scoredRows.sort(function(a, b) {
+        return Number(b[judgeEndCol]) - Number(a[judgeEndCol]);
+      });
+
+      var reRanked = [incomingHeaders];
+      for (var sr = 0; sr < scoredRows.length; sr++) {
+        var sRow = scoredRows[sr];
+        sRow[0] = "#" + (sr + 1);
+        reRanked.push(sRow);
+      }
+      for (var ur = 0; ur < unscoredRows.length; ur++) {
+        var uRow = unscoredRows[ur];
+        uRow[0] = "-";
+        reRanked.push(uRow);
+      }
+      finalRows = reRanked;
+
+    // =========================================================================
+    // CASE 2: MASTER REGISTRATIONS (Attendance & Arrival Status)
+    // Preserves ARRIVED and PRESENT so they NEVER revert to PENDING
+    // =========================================================================
+    } else if (isMasterReg && existingData.length > 1) {
+      var existingSchMap = {};
+      for (var mr = 1; mr < existingData.length; mr++) {
+        var mRow = existingData[mr];
+        var sName = cleanSchoolKey((mRow[1] || "").toString());
+        if (sName) {
+          existingSchMap[sName] = mRow;
+        }
+      }
+
+      finalRows.push(incomingRows[0]);
+      for (var ir = 1; ir < incomingRows.length; ir++) {
+        var inMRow = incomingRows[ir];
+        var schKey = cleanSchoolKey((inMRow[1] || "").toString());
+        var exMRow = existingSchMap[schKey];
+
+        if (exMRow) {
+          var mergedM = inMRow.slice();
+          // Col 4: Dance, Col 5: Song, Col 6: Dec, Col 7: Sci
+          for (var catCol = 4; catCol <= 7; catCol++) {
+            var exVal = (exMRow[catCol] || "").toString();
+            var inVal = (inMRow[catCol] || "").toString();
+            if (exVal.indexOf("PRESENT") !== -1 && inVal.indexOf("PENDING") !== -1) {
+              mergedM[catCol] = exVal;
+            }
+          }
+          // Col 8: Arrival Status (Preserve ARRIVED)
+          var exArr = (exMRow[8] || "").toString();
+          var inArr = (inMRow[8] || "").toString();
+          if (exArr.indexOf("ARRIVED") !== -1 && inArr.indexOf("PENDING") !== -1) {
+            mergedM[8] = exArr;
+          }
+          // Col 9: Check-In Time
+          var exTime = (exMRow[9] || "").toString();
+          var inTime = (inMRow[9] || "").toString();
+          if (exTime !== "-" && exTime !== "" && (inTime === "-" || inTime === "")) {
+            mergedM[9] = exTime;
+          }
+          finalRows.push(mergedM);
+        } else {
+          finalRows.push(inMRow);
+        }
+      }
+
+    } else {
+      finalRows = incomingRows;
+    }
+
+    // =========================================================================
+    // WRITE PROTECTED DATA TO GOOGLE SHEET
+    // =========================================================================
+    sheet.clear();
+    var numRows = finalRows.length;
+    var numCols = finalRows[0].length;
+
+    var range = sheet.getRange(1, 1, numRows, numCols);
+    range.setValues(finalRows);
+    range.setVerticalAlignment("middle");
+    range.setFontFamily("Arial");
+    range.setFontSize(10);
+
+    // Header styling
+    var headerRange = sheet.getRange(1, 1, 1, numCols);
+    headerRange.setFontWeight("bold");
+    headerRange.setBackground("#0f172a");
+    headerRange.setFontColor("#ffffff");
+    headerRange.setHorizontalAlignment("center");
+    sheet.setRowHeight(1, 32);
+
+    // Alignment
+    for (var col = 1; col <= numCols; col++) {
+      if (col === 2 || col === 3) {
+        sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("left");
+      } else {
+        sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("center");
+      }
+    }
+
+    // Top 3 Leaderboard highlight
+    if (tabName !== "Master Registrations") {
+      if (numRows > 1 && finalRows[1][0] === "#1") sheet.getRange(2, 1, 1, numCols).setBackground("#fef3c7");
+      if (numRows > 2 && finalRows[2][0] === "#2") sheet.getRange(3, 1, 1, numCols).setBackground("#f1f5f9");
+      if (numRows > 3 && finalRows[3][0] === "#3") sheet.getRange(4, 1, 1, numCols).setBackground("#ffedd5");
+    }
+
+    for (var c = 1; c <= numCols; c++) {
+      sheet.autoResizeColumn(c);
     }
 
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       sheet_title: ss.getName(),
       tab: tabName,
-      updated_rows: rows.length,
+      updated_rows: numRows,
       timestamp: new Date().toISOString()
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
+    Logger.log("doPost error: " + err.toString());
     return ContentService.createTextOutput(JSON.stringify({
       status: "error",
       message: err.toString()
@@ -140,15 +307,13 @@ function doPost(e) {
 }
 
 /**
- * ⚡ MAIN AUTO-ROUTER: Reads 'Agrash Registrations' and Syncs to All 4 Event Sheets,
- * Master Registrations Sheet, and Web Portal
+ * ⚡ ROUTER: Reads 'Agrash Registrations' and Syncs ONLY to 'Master Registrations'
+ * (DOES NOT touch or clear the 4 event marksheets, protecting judge scores)
  */
 function syncMainSheetToAllTabs() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
   if (!ss) return;
 
-  // Locate the Main 'Agrash Registrations' sheet
-  var allSheets = ss.getSheets();
   var masterSheet = null;
   var possibleNames = [
     "Agrash Registrations",
@@ -156,8 +321,7 @@ function syncMainSheetToAllTabs() {
     "Agrash Registration",
     "agrash_schools_sheet",
     "Master",
-    "Registration",
-    "Registrations"
+    "Registration"
   ];
   
   for (var i = 0; i < possibleNames.length; i++) {
@@ -165,8 +329,8 @@ function syncMainSheetToAllTabs() {
     if (masterSheet) break;
   }
 
-  // Fallback: Pick first sheet that is not an event / result tab
   if (!masterSheet) {
+    var allSheets = ss.getSheets();
     for (var k = 0; k < allSheets.length; k++) {
       var sName = allSheets[k].getName();
       if (sName !== "Group Dance" && sName !== "Group Song" && sName !== "Declamation" && sName !== "Science Exhibition" && sName !== "Final Result" && sName !== "Live Scores" && sName !== "Master Registrations") {
@@ -186,7 +350,6 @@ function syncMainSheetToAllTabs() {
 
   var header = data[0].map(function(h) { return h.toString().trim().toLowerCase(); });
   
-  // Detect columns accurately
   var colSchool = findColIndex(header, ["school name", "school", "name of school", "institution"]);
   if (colSchool === -1) colSchool = 0;
 
@@ -196,7 +359,6 @@ function syncMainSheetToAllTabs() {
   var colSci = findColIndex(header, ["science exhibition", "science"]);
   var colRoom = findColIndex(header, ["green room", "room allocation", "room", "room no"]);
 
-  // Tag column detection (immediately after category or named "tags")
   function getTagCol(catCol) {
     if (catCol >= 0 && catCol + 1 < header.length) {
       var nextH = header[catCol + 1];
@@ -224,7 +386,6 @@ function syncMainSheetToAllTabs() {
     var row = data[r];
     var schoolName = (row[colSchool] || "").toString().trim();
     if (!schoolName) continue;
-    // Skip totals row (e.g. "66")
     if (/^\d+$/.test(schoolName)) continue;
 
     function extractTag(tagCol, flagCol) {
@@ -253,118 +414,14 @@ function syncMainSheetToAllTabs() {
     });
   }
 
-  Logger.log("Parsed " + schoolsToSync.length + " schools from " + masterSheet.getName());
+  Logger.log("Parsed " + schoolsToSync.length + " schools. Updating Master Registrations tab only.");
 
-  // 1. Update the 4 category event tabs in Google Sheets
-  var EVENT_CONFIGS = [
-    { name: "Group Dance", tagKey: "dance_tag" },
-    { name: "Group Song", tagKey: "song_tag" },
-    { name: "Declamation", tagKey: "declamation_tag" },
-    { name: "Science Exhibition", tagKey: "science_tag" }
-  ];
-
-  for (var eIdx = 0; eIdx < EVENT_CONFIGS.length; eIdx++) {
-    var cfg = EVENT_CONFIGS[eIdx];
-    syncEventTab(ss, cfg.name, cfg.tagKey, schoolsToSync);
-  }
-
-  // 2. Update Master Registrations tab in Google Sheets
+  // Update Master Registrations tab preserving live check-in timestamps & arrival status
   syncMasterRegistrationsTab(ss, schoolsToSync);
-
-  // 3. Push to Web Portal API so live Registration Desk & Sequence Queue are updated
-  try {
-    var options = {
-      method: "post",
-      contentType: "application/json",
-      payload: JSON.stringify({ schools: schoolsToSync }),
-      muteHttpExceptions: true
-    };
-    var response = UrlFetchApp.fetch(PORTAL_SYNC_URL, options);
-    Logger.log("✅ Pushed " + schoolsToSync.length + " schools to Web Portal: " + response.getContentText());
-  } catch (err) {
-    Logger.log("⚠️ Portal sync notice: " + err.toString());
-  }
 }
 
 /**
- * Syncs a single event tab ("Group Dance", "Group Song", etc.) preserving existing judge scores
- */
-function syncEventTab(ss, tabName, tagKey, schools) {
-  var sheet = ss.getSheetByName(tabName);
-  if (!sheet) {
-    sheet = ss.insertSheet(tabName);
-  }
-
-  var existingData = sheet.getDataRange().getValues();
-  var existingMap = {};
-
-  if (existingData.length > 1) {
-    for (var i = 1; i < existingData.length; i++) {
-      var row = existingData[i];
-      var tagNo = (row[1] || "").toString().trim();
-      if (tagNo) {
-        existingMap[tagNo] = row;
-      }
-    }
-  }
-
-  var headers = [
-    "Rank", "Tag No", "School & Details", "Attendance (Present/Absent)",
-    "Judge 1 (/100)", "Judge 2 (/100)", "Judge 3 (/100)", "Judge 4 (/100)", "Judge 5 (/100)",
-    "Overall Average (/100)", "Judges Scored", "Stage Status", "Last Updated"
-  ];
-
-  var newRows = [headers];
-  var nowStr = Utilities.formatDate(new Date(), "GMT+5:30", "hh:mm a");
-
-  for (var s = 0; s < schools.length; s++) {
-    var sch = schools[s];
-    var tag = sch[tagKey];
-    if (!tag) continue;
-
-    var schoolDetail = sch.school_name + (sch.room_no && sch.room_no !== "TBD" ? " [Room: " + sch.room_no + "]" : "");
-
-    if (existingMap[tag]) {
-      // Preserve existing judge scores & status, update school details if changed
-      var exRow = existingMap[tag];
-      exRow[2] = schoolDetail;
-      newRows.push(exRow);
-    } else {
-      // Brand new row
-      newRows.push([
-        "-", tag, schoolDetail, "PENDING (⏳)",
-        "Pending", "Pending", "Pending", "Pending", "Pending",
-        "-", "0/5", "IN QUEUE", nowStr
-      ]);
-    }
-  }
-
-  sheet.clear();
-  var rRange = sheet.getRange(1, 1, newRows.length, headers.length);
-  rRange.setValues(newRows);
-  rRange.setVerticalAlignment("middle");
-  rRange.setFontFamily("Arial");
-  rRange.setFontSize(10);
-
-  var hRange = sheet.getRange(1, 1, 1, headers.length);
-  hRange.setFontWeight("bold");
-  hRange.setBackground("#0f172a");
-  hRange.setFontColor("#ffffff");
-  hRange.setHorizontalAlignment("center");
-  sheet.setRowHeight(1, 32);
-
-  for (var col = 1; col <= headers.length; col++) {
-    if (col === 3) {
-      sheet.getRange(2, col, newRows.length - 1, 1).setHorizontalAlignment("left");
-    } else {
-      sheet.getRange(2, col, newRows.length - 1, 1).setHorizontalAlignment("center");
-    }
-    sheet.autoResizeColumn(col);
-  }
-}
-
-/**
- * Syncs 'Master Registrations' tab with arrival status across 6 desks
+ * Syncs 'Master Registrations' tab with arrival status across 6 desks preserving live timestamps
  */
 function syncMasterRegistrationsTab(ss, schools) {
   var sheet = ss.getSheetByName("Master Registrations");
@@ -376,7 +433,7 @@ function syncMasterRegistrationsTab(ss, schools) {
   var existingMap = {};
   if (existingData.length > 1) {
     for (var i = 1; i < existingData.length; i++) {
-      var schName = (existingData[i][1] || "").toString().trim().toLowerCase();
+      var schName = cleanSchoolKey((existingData[i][1] || "").toString());
       if (schName) {
         existingMap[schName] = existingData[i];
       }
@@ -397,7 +454,7 @@ function syncMasterRegistrationsTab(ss, schools) {
   for (var idx = 0; idx < schools.length; idx++) {
     var s = schools[idx];
     var calculatedDesk = Math.min(6, Math.floor(idx / schoolsPerDesk) + 1);
-    var key = s.school_name.trim().toLowerCase();
+    var key = cleanSchoolKey(s.school_name);
 
     var arrivalStatus = "⏳ PENDING";
     var checkInTime = "-";
@@ -467,7 +524,6 @@ function onEdit(e) {
   try {
     if (e && e.range) {
       var sName = e.range.getSheet().getName();
-      // Only sync when someone actually edits the Agrash Registrations sheet
       if (sName === "Agrash Registrations" || sName === "AGRASH REGISTRATION" || sName === "agrash_schools_sheet") {
         syncMainSheetToAllTabs();
       }
@@ -478,14 +534,7 @@ function onEdit(e) {
 }
 
 /**
- * Auto-trigger on Google Form submission
- */
-function onFormSubmit(e) {
-  syncMainSheetToAllTabs();
-}
-
-/**
- * Setup Triggers for Real-time Execution (Instant onEdit without background wiping timer)
+ * Setup Triggers for Real-time Execution (Deletes any repeating timers permanently)
  */
 function setupTriggers() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
@@ -494,13 +543,25 @@ function setupTriggers() {
     ScriptApp.deleteTrigger(triggers[i]);
   }
 
-  // onEdit Trigger (Runs instantly ONLY when a cell in Agrash Registrations is edited)
+  // ONLY setup onEdit trigger - NO periodic/time triggers!
   ScriptApp.newTrigger("onEdit")
     .forSpreadsheet(ss)
     .onEdit()
     .create();
 
-  SpreadsheetApp.getUi().alert("✅ Triggers Configured!", "Real-time onEdit auto-sync is now ACTIVE. Background wiping timer removed.", SpreadsheetApp.getUi().ButtonSet.OK);
+  SpreadsheetApp.getUi().alert("✅ Triggers Configured!", "Real-time onEdit auto-sync is now ACTIVE.\nAll background wiping timers have been DELETED permanently.", SpreadsheetApp.getUi().ButtonSet.OK);
+}
+
+/**
+ * Removes ALL background triggers to stop accidental repeated auto-wiping
+ */
+function removeAllBackgroundTriggers() {
+  var triggers = ScriptApp.getProjectTriggers();
+  var count = triggers.length;
+  for (var i = 0; i < triggers.length; i++) {
+    ScriptApp.deleteTrigger(triggers[i]);
+  }
+  SpreadsheetApp.getUi().alert("✅ Triggers Cleared", "Removed all " + count + " background triggers.\nYour sheet is now 100% safe from periodic wipes.", SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 function cleanUnwantedTabs() {
@@ -527,4 +588,8 @@ function findColIndex(header, candidates) {
     }
   }
   return -1;
+}
+
+function cleanSchoolKey(name) {
+  return (name || "").toLowerCase().replace(/[^a-z0-9]/g, "").trim();
 }

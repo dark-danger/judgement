@@ -43,12 +43,10 @@ class SheetsService:
         return None
 
     def trigger_attendance_sync(self, event_id=None):
-        """Ultra-fast sync for attendance updates only (updates Master Registrations and affected event tab)"""
+        """Ultra-fast sync for attendance updates only (updates Master Registrations tab without touching scores)"""
         def _worker():
             try:
                 self.sync_master_registrations()
-                if event_id:
-                    self.auto_sync_event(event_id)
             except Exception as ex:
                 logger.error(f"Attendance sync error: {ex}")
 
