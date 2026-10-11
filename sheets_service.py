@@ -37,17 +37,27 @@ class SheetsService:
             logger.error(f"Error authorizing gspread: {e}")
         return None
 
-    def trigger_background_sync(self, event_id=None):
-        """Spawns non-blocking background thread to update connected Google Sheet and Final Result tab"""
+    def trigger_background_sync(self, event_id=None, sync_registration=False):
+        """Spawns non-blocking background thread (or synchronous if serverless) to update connected Google Sheet and Final Result tab"""
         def _sync_worker():
-            if event_id:
-                self.auto_sync_event(event_id)
-            else:
-                self.sync_all_events()
-            self.sync_final_championship()
+            try:
+                if event_id:
+                    self.auto_sync_event(event_id)
+                else:
+                    self.sync_all_events()
+                self.sync_final_championship()
+                if sync_registration:
+                    self.sync_master_registrations()
+            except Exception as ex:
+                logger.error(f"Sync worker error: {ex}")
 
-        thread = threading.Thread(target=_sync_worker, daemon=True)
-        thread.start()
+        # Vercel / AWS Lambda freeze daemon background threads before they finish HTTP calls.
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        if is_serverless:
+            _sync_worker()
+        else:
+            thread = threading.Thread(target=_sync_worker, daemon=True)
+            thread.start()
 
     def calculate_championship_data(self):
         """Calculates 4-event combined score leaderboard across all 58 schools"""
@@ -310,6 +320,91 @@ class SheetsService:
             return False, "No webhook configured"
         except Exception as e:
             logger.error(f"Error syncing final championship: {e}")
+            return False, str(e)
+
+    def sync_master_registrations(self, webhook_url=None):
+        """Pushes the master school registrations & attendance matrix to Google Sheet 'Master Registrations' tab"""
+        try:
+            from database import db
+            from registration_service import registration_service
+
+            schools = registration_service.get_all()
+            if not schools:
+                return False, "No registration data available"
+
+            events = db.get_events()
+            webhook = webhook_url
+            if not webhook and events:
+                webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
+
+            headers = [
+                "S.No",
+                "School Name",
+                "Assigned Desk",
+                "Room / Flat",
+                "Group Dance",
+                "Group Song",
+                "Declamation",
+                "Science Exhibition",
+                "Arrival Status",
+                "Check-In Time",
+                "Last Updated"
+            ]
+
+            rows = [headers]
+            for idx, s in enumerate(schools, start=1):
+                ev_map = {ev.get("category", ""): ev for ev in s.get("events", [])}
+
+                def fmt_ev(cat):
+                    ev = ev_map.get(cat)
+                    if not ev or not ev.get("tag_no"):
+                        return "-"
+                    st = ev.get("status", "PENDING")
+                    icon = "✅ PRESENT" if st == "PRESENT" else ("❌ ABSENT" if st == "ABSENT" else "⏳ PENDING")
+                    return f"{ev['tag_no']} ({icon})"
+
+                d_str = fmt_ev("Group Dance")
+                s_str = fmt_ev("Group Song")
+                dc_str = fmt_ev("Declamation")
+                se_str = fmt_ev("Science Exhibition")
+
+                arrived_status = "🟢 ARRIVED" if s.get("is_arrived") else "⏳ PENDING"
+                check_in = s.get("arrived_at") or "-"
+
+                rows.append([
+                    f"#{idx}",
+                    s.get("school_name", ""),
+                    f"Desk {s.get('desk_no', 1)}",
+                    s.get("room_no", "TBD"),
+                    d_str,
+                    s_str,
+                    dc_str,
+                    se_str,
+                    arrived_status,
+                    check_in,
+                    datetime.now().strftime("%I:%M %p")
+                ])
+
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.post(
+                    webhook,
+                    json={
+                        "event_name": "Agrash Master Registrations",
+                        "tab_name": "Master Registrations",
+                        "rows": rows,
+                        "timestamp": datetime.now().isoformat()
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=25,
+                    allow_redirects=True
+                )
+                logger.info(f"⚡ [Master Registrations Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, "Master Registrations tab synced successfully"
+
+            return False, "No webhook configured"
+        except Exception as e:
+            logger.error(f"Error syncing master registrations: {e}")
             return False, str(e)
 
     def auto_sync_event(self, event_id):

@@ -151,7 +151,7 @@ class RegistrationService:
             try:
                 from sheets_service import sheets_service
                 if mark_all:
-                    sheets_service.trigger_background_sync(None)
+                    sheets_service.trigger_background_sync(None, sync_registration=True)
                 else:
                     cat_event_map = {
                         "group dance": "evt-group-dance",
@@ -160,7 +160,7 @@ class RegistrationService:
                         "science exhibition": "evt-science-exhibition"
                     }
                     ev_id = cat_event_map.get(category.lower() if category else "", None)
-                    sheets_service.trigger_background_sync(ev_id)
+                    sheets_service.trigger_background_sync(ev_id, sync_registration=True)
             except Exception as e:
                 logger.error(f"Error triggering sheet sync on attendance: {e}")
 
