@@ -380,7 +380,8 @@ async function submitEvaluation() {
         });
       }
 
-      showToast(`🎯 Score of ${data.score.total}/100 locked for ${targetTag}!`, 'success');
+      const totalPossible = (currentEvent?.criteria || []).reduce((sum, c) => sum + (c.max_marks || 10), 0) || 50;
+      showToast(`🎯 Score of ${data.score.total}/${totalPossible} locked for ${targetTag}!`, 'success');
 
       hasSubmittedForEvaluatingTag = true;
       lastSubmittedTag = targetTag;
@@ -390,6 +391,8 @@ async function submitEvaluation() {
       if (urgentBanner) urgentBanner.style.display = 'none';
 
       document.getElementById('doorSubmittedTotal').textContent = data.score.total;
+      const doorMaxEl = document.getElementById('doorMaxTotal');
+      if (doorMaxEl) doorMaxEl.textContent = totalPossible;
       document.getElementById('doorSubmittedTag').textContent = targetTag;
       document.getElementById('doorSubmittedStatusBadge').style.display = 'inline-flex';
       document.getElementById('btnDoorReopen').style.display = 'inline-flex';
@@ -649,16 +652,33 @@ function updateJudgeUI() {
   }
 }
 
-// Render 5 Criteria Scoring Cards
+// Render Criteria Scoring Cards
 function renderCriteriaSection() {
   const container = document.getElementById('criteriaSection');
   if (!currentEvent || !currentEvent.criteria) return;
 
+  const totalPossible = (currentEvent.criteria || []).reduce((sum, c) => sum + (c.max_marks || 10), 0) || 50;
+  const outOfEl = document.getElementById('totalScoreOutOf') || document.querySelector('.score-submit-bar .out-of');
+  if (outOfEl) outOfEl.textContent = `/ ${totalPossible}`;
+  const doorMaxEl = document.getElementById('doorMaxTotal');
+  if (doorMaxEl) doorMaxEl.textContent = `${totalPossible}`;
+
   currentScores = {};
 
   container.innerHTML = currentEvent.criteria.map((crit, idx) => {
-    const defaultScore = 15;
+    const maxMarks = crit.max_marks || 10;
+    const defaultScore = Math.min(8, maxMarks);
     currentScores[crit.id] = defaultScore;
+
+    let quickVals = [];
+    if (maxMarks === 10) {
+      quickVals = [0, 2, 4, 6, 7, 8, 9, 10];
+    } else if (maxMarks <= 10) {
+      quickVals = Array.from({ length: maxMarks + 1 }, (_, i) => i);
+    } else {
+      quickVals = [0, 5, 10, 12, 15, 18, 20].filter(v => v <= maxMarks);
+      if (!quickVals.includes(maxMarks)) quickVals.push(maxMarks);
+    }
 
     return `
       <div class="criteria-card animate-in" id="card-${crit.id}" style="animation-delay: ${idx * 0.08}s;">
@@ -668,7 +688,7 @@ function renderCriteriaSection() {
             <div>
               <h3>${escapeHtml(crit.name)}</h3>
               ${crit.description ? `<p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; line-height: 1.35;">${escapeHtml(crit.description)}</p>` : ''}
-              <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 600; display: inline-block; margin-top: 0.3rem;">Max Marks: ${crit.max_marks || 20}</span>
+              <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 600; display: inline-block; margin-top: 0.3rem;">Max Marks: ${maxMarks}</span>
             </div>
           </div>
           <div class="criteria-score-display">
@@ -677,11 +697,11 @@ function renderCriteriaSection() {
               class="score-input-number" 
               id="num-${crit.id}" 
               min="0" 
-              max="${crit.max_marks || 20}" 
+              max="${maxMarks}" 
               value="${defaultScore}"
-              oninput="onNumberChange('${crit.id}', this.value)"
+              oninput="onNumberChange('${crit.id}', this.value, ${maxMarks})"
             >
-            <span class="score-max-tag">/ ${crit.max_marks || 20}</span>
+            <span class="score-max-tag">/ ${maxMarks}</span>
           </div>
         </div>
 
@@ -691,14 +711,14 @@ function renderCriteriaSection() {
             class="score-slider" 
             id="slider-${crit.id}" 
             min="0" 
-            max="${crit.max_marks || 20}" 
+            max="${maxMarks}" 
             step="1" 
             value="${defaultScore}"
             oninput="onSliderChange('${crit.id}', this.value)"
           >
           <div class="quick-score-buttons">
             <span style="font-size: 0.75rem; color: var(--text-dim); margin-right: 0.25rem;">Quick Select:</span>
-            ${[0, 5, 10, 12, 15, 18, 20].map(val => `
+            ${quickVals.map(val => `
               <button type="button" class="btn-quick ${val === defaultScore ? 'active' : ''}" onclick="setQuickScore('${crit.id}', ${val})">
                 ${val}
               </button>
@@ -720,10 +740,10 @@ function onSliderChange(critId, val) {
   recalculateTotal();
 }
 
-function onNumberChange(critId, val) {
+function onNumberChange(critId, val, maxMarks = 10) {
   let num = parseFloat(val);
   if (isNaN(num)) num = 0;
-  if (num > 20) num = 20;
+  if (num > maxMarks) num = maxMarks;
   if (num < 0) num = 0;
 
   const slider = document.getElementById(`slider-${critId}`);
@@ -789,7 +809,8 @@ async function loadExistingScoresForTag(tagNo) {
         updateQuickBtnHighlight(critId, val);
       }
       recalculateTotal();
-      document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/100)</span>`;
+      const totalPossible = (currentEvent?.criteria || []).reduce((sum, c) => sum + (c.max_marks || 10), 0) || 50;
+      document.getElementById('scoreStatusMessage').innerHTML = `<span style="color: #34d399;">✓ Submitted (${myScore.total}/${totalPossible})</span>`;
     } else {
       document.getElementById('scoreStatusMessage').innerHTML = `All criteria ready for evaluation`;
     }
@@ -881,10 +902,11 @@ function showRulesModal() {
 
   // Criteria Summary
   if (currentEvent.criteria && currentEvent.criteria.length > 0) {
+    const totalCriteriaMarks = currentEvent.criteria.reduce((s, c) => s + (c.max_marks || 10), 0);
     html += `
       <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.85rem;">
         <h4 style="color: #34d399; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-          <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Judging Criteria Breakdown (Total: 100 Marks)
+          <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> Judging Criteria Breakdown (Total: ${totalCriteriaMarks} Marks)
         </h4>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           ${currentEvent.criteria.map((c, i) => `
@@ -893,7 +915,7 @@ function showRulesModal() {
                 <strong style="color: #f1f5f9;">${i + 1}. ${escapeHtml(c.name)}</strong>
                 ${c.description ? `<div style="color: #94a3b8; font-size: 0.78rem; margin-top: 0.15rem;">${escapeHtml(c.description)}</div>` : ''}
               </div>
-              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; white-space: nowrap;">${c.max_marks || 20} Marks</span>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; white-space: nowrap;">${c.max_marks || 10} Marks</span>
             </div>
           `).join('')}
         </div>

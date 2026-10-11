@@ -300,6 +300,11 @@
 
       if (evtData.success) {
         const event = evtData.event;
+        const maxScore = (event.criteria || []).reduce((acc, c) => acc + (c.max_marks || 10), 0) || 50;
+        document.getElementById('podium1Label').textContent = `Average Score / ${maxScore}`;
+        document.getElementById('podium2Label').textContent = `Average Score / ${maxScore}`;
+        document.getElementById('podium3Label').textContent = `Average Score / ${maxScore}`;
+
         const scores = scData.scores || [];
         const judges = event.judges || [];
 
@@ -357,7 +362,7 @@
           <tr>
             <th style="font-size: 0.95rem; text-align: center;">Rank</th>
             <th style="font-size: 0.95rem;">Team Tag & School</th>
-            <th style="font-size: 0.95rem; text-align: center;">Average Score</th>
+            <th style="font-size: 0.95rem; text-align: center;">Average Score (/${maxScore})</th>
             <th style="font-size: 0.95rem; text-align: center;">Judges Evaluated</th>
             <th style="font-size: 0.95rem; text-align: center;">Status</th>
           </tr>

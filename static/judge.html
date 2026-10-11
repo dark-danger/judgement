@@ -68,7 +68,7 @@
           </div>
 
           <div id="doorSubmittedStatusBadge" class="submitted-summary-badge" style="display: none;">
-            <span>🎉 Score of <strong id="doorSubmittedTotal">0</strong>/100 Locked for <strong id="doorSubmittedTag">--</strong></span>
+            <span>🎉 Score of <strong id="doorSubmittedTotal">0</strong>/<span id="doorMaxTotal">50</span> Locked for <strong id="doorSubmittedTag">--</strong></span>
           </div>
 
           <h1 class="door-next-tag-title" id="doorNextTagTitle">
@@ -160,7 +160,7 @@
         <div class="total-score-block">
           <span class="label" style="color: var(--text-muted); font-weight: 700;">TOTAL SCORE:</span>
           <span class="val" id="totalScoreVal">0</span>
-          <span class="out-of" style="font-size: 1.2rem; color: var(--text-dim); font-weight: 800;">/ 100</span>
+          <span class="out-of" id="totalScoreOutOf" style="font-size: 1.2rem; color: var(--text-dim); font-weight: 800;">/ 50</span>
         </div>
         <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
           <span id="scoreStatusMessage" style="font-size: 0.85rem; color: var(--text-muted);">

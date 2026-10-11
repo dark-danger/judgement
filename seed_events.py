@@ -1,7 +1,15 @@
 import json
 import os
+import sys
 from datetime import datetime
 from create_excel import schools_data
+
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -9,11 +17,11 @@ os.makedirs(DATA_DIR, exist_ok=True)
 EVENTS_FILE = os.path.join(DATA_DIR, "events.json")
 
 DEFAULT_CRITERIA = [
-    {"id": "c1", "name": "Innovation & Concept", "max_marks": 20},
-    {"id": "c2", "name": "Technical Execution", "max_marks": 20},
-    {"id": "c3", "name": "Design & Functionality", "max_marks": 20},
-    {"id": "c4", "name": "Presentation & Q/A", "max_marks": 20},
-    {"id": "c5", "name": "Feasibility & Impact", "max_marks": 20}
+    {"id": "c1", "name": "Innovation & Concept", "max_marks": 10},
+    {"id": "c2", "name": "Technical Execution", "max_marks": 10},
+    {"id": "c3", "name": "Design & Functionality", "max_marks": 10},
+    {"id": "c4", "name": "Presentation & Q/A", "max_marks": 10},
+    {"id": "c5", "name": "Feasibility & Impact", "max_marks": 10}
 ]
 
 GSHEET_URL = "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing"
@@ -80,33 +88,33 @@ def build_category_events():
             "criteria": [
                 {
                     "id": "c1",
-                    "name": "Choreography, Formations & Creativity",
-                    "max_marks": 20,
-                    "description": "Originality of routine, complex step patterns, spatial coverage, and smooth group transitions."
+                    "name": "Dance Steps & Coordination",
+                    "max_marks": 10,
+                    "description": "Accuracy of steps, rhythm and synchronization"
                 },
                 {
                     "id": "c2",
-                    "name": "Rhythm, Timing & Group Synchronization",
-                    "max_marks": 20,
-                    "description": "Precision of footwork, rhythm matching musical beats/tempo, and unison across all dancers."
+                    "name": "Expressions",
+                    "max_marks": 10,
+                    "description": "Facial expressions and emotional connection"
                 },
                 {
                     "id": "c3",
-                    "name": "Expressions (Bhava/Abhinaya), Costume & Props",
-                    "max_marks": 20,
-                    "description": "Facial expressions, emotive acting, authentic costume aesthetics, and effective use of allowable props."
+                    "name": "Creativity",
+                    "max_marks": 10,
+                    "description": "Originality and presentation of the performance"
                 },
                 {
                     "id": "c4",
-                    "name": "Energy, Technique & Stage Presence",
-                    "max_marks": 20,
-                    "description": "Stamina, body posture, agility, flexibility, confidence, and commanding stage dynamics."
+                    "name": "Stage Presence & Confidence",
+                    "max_marks": 10,
+                    "description": "Confidence, energy and audience engagement"
                 },
                 {
                     "id": "c5",
-                    "name": "Thematic Execution, Time Adherence & Pure Dance Compliance",
-                    "max_marks": 20,
-                    "description": "Relevance to chosen theme, compliance with the 4-6 min duration, and pure dance format (no drama/skits)."
+                    "name": "Overall Performance",
+                    "max_marks": 10,
+                    "description": "Overall impact and quality of the performance"
                 }
             ],
             "sequence": dance_seq,
@@ -148,33 +156,33 @@ def build_category_events():
             "criteria": [
                 {
                     "id": "c1",
-                    "name": "Sur, Vocal Pitch & Melodic Accuracy",
-                    "max_marks": 20,
-                    "description": "Pitch precision, tonal quality, vocal purity, pitch control, and melodic consistency."
+                    "name": "Vocal Quality & Control",
+                    "max_marks": 10,
+                    "description": "Pitch accuracy, tone, clarity, breath control and vocal stability."
                 },
                 {
                     "id": "c2",
-                    "name": "Taal, Rhythm & Instrumental Synchronization",
-                    "max_marks": 20,
-                    "description": "Beat consistency (Taal), tempo stability, and harmony between instruments and vocalists."
+                    "name": "Rhythm & Timing",
+                    "max_marks": 10,
+                    "description": "Keeping the beat, tempo and timing with the music."
                 },
                 {
                     "id": "c3",
-                    "name": "Choral Harmony, Blend & Synchronization",
-                    "max_marks": 20,
-                    "description": "Vocal balance between lead and chorus, multi-part harmony, unison delivery, and coordination."
+                    "name": "Expression & Emotion",
+                    "max_marks": 10,
+                    "description": "Emotional connection, phrasing and conveying the song's mood."
                 },
                 {
                     "id": "c4",
-                    "name": "Pronunciation, Diction & Theme Expression",
-                    "max_marks": 20,
-                    "description": "Clarity of lyrical enunciation, emotional depth (Bhava), and theme fidelity."
+                    "name": "Stage Presence & Confidence",
+                    "max_marks": 10,
+                    "description": "Confidence, posture, composure and audience engagement."
                 },
                 {
                     "id": "c5",
-                    "name": "Stage Presence, Overall Melodic Impact & Time Adherence",
-                    "max_marks": 20,
-                    "description": "Artistic presentation, choir discipline, audience impact, and strict adherence to 4-6 min duration."
+                    "name": "Musicality & Originality",
+                    "max_marks": 10,
+                    "description": "Interpretation, creativity, style and overall musical impact."
                 }
             ],
             "sequence": song_seq,
@@ -218,33 +226,39 @@ def build_category_events():
             "criteria": [
                 {
                     "id": "c1",
-                    "name": "Content, Originality & Subject Depth",
-                    "max_marks": 20,
-                    "description": "Depth of thoughts, insight into Bhagavad Gita teachings, logical structure, and originality."
+                    "name": "Content & Message",
+                    "max_marks": 10,
+                    "description": "Meaningful, appropriate speech; clear central theme; strong opening and closing; suitability to age group."
                 },
                 {
                     "id": "c2",
-                    "name": "Pronunciation & Diction",
-                    "max_marks": 20,
-                    "description": "Clarity of articulation, correct enunciation in Hindi/English, and linguistic purity."
+                    "name": "Delivery & Voice",
+                    "max_marks": 10,
+                    "description": "Clear pronunciation; modulation of pitch and volume; pace; pauses for effect; confident tone."
                 },
                 {
                     "id": "c3",
-                    "name": "Accent, Voice Modulation & Tone",
-                    "max_marks": 20,
-                    "description": "Pitch variation, tonal inflection, tempo control, expressiveness, and vocal power."
+                    "name": "Expression & Emotion",
+                    "max_marks": 10,
+                    "description": "Emotion matching the content; facial expressions; passion and conviction; ability to move the audience."
                 },
                 {
                     "id": "c4",
-                    "name": "Gestures, Body Language & Eye Contact",
-                    "max_marks": 20,
-                    "description": "Authoritative stage posture, natural and expressive gestures, eye contact, and poise."
+                    "name": "Body Language & Stage Presence",
+                    "max_marks": 10,
+                    "description": "Posture; eye contact; purposeful gestures; confidence; stage movement; avoiding nervous habits."
                 },
                 {
                     "id": "c5",
-                    "name": "Overall Presentation, Impact & Time Adherence",
-                    "max_marks": 20,
-                    "description": "Persuasive oratorical appeal, audience engagement, confidence, and adherence to 3 min limit."
+                    "name": "Memorization & Fluency",
+                    "max_marks": 10,
+                    "description": "Delivery without prompting; no hesitation or fumbling; smooth recovery from slips."
+                },
+                {
+                    "id": "c6",
+                    "name": "Overall Impact",
+                    "max_marks": 10,
+                    "description": "Audience engagement; originality in interpretation; memorable performance."
                 }
             ],
             "sequence": dec_seq,
@@ -288,33 +302,33 @@ def build_category_events():
             "criteria": [
                 {
                     "id": "c1",
-                    "name": "Conceptual Clarity & Scientific Principle",
-                    "max_marks": 20,
-                    "description": "Soundness of scientific principles, technical depth, accuracy, and scientific rigor."
+                    "name": "Scientific Knowledge and Accuracy",
+                    "max_marks": 10,
+                    "description": "Understanding of scientific concepts and accuracy of facts."
                 },
                 {
                     "id": "c2",
-                    "name": "Working Model Execution & Innovation",
-                    "max_marks": 20,
-                    "description": "Working functionality of model, operational reliability, ingenuity, and problem-solving design."
+                    "name": "Creativity and Innovation",
+                    "max_marks": 10,
+                    "description": "Originality of the idea and creative use of materials."
                 },
                 {
                     "id": "c3",
-                    "name": "Explanation, Clarity & Student Presentation",
-                    "max_marks": 20,
-                    "description": "Communication clarity, structured demonstration, articulation, and balanced team participation."
+                    "name": "Working Model and Practical Application",
+                    "max_marks": 10,
+                    "description": "Functionality, demonstration, and real-life applicability of the project."
                 },
                 {
                     "id": "c4",
-                    "name": "Relevance to Theme & SDG Alignment",
-                    "max_marks": 20,
-                    "description": "Direct alignment with SDGs (Green Energy, Disaster-Resilience, Healthcare, Agri-tech, Pollution)."
+                    "name": "Presentation and Communication",
+                    "max_marks": 10,
+                    "description": "Clarity, confidence, and effective explanation of the project."
                 },
                 {
                     "id": "c5",
-                    "name": "Practical Utility, Societal Impact & Q/A Handling",
-                    "max_marks": 20,
-                    "description": "Real-world scalability, economic viability, societal benefit, and confident Q&A responses."
+                    "name": "Question - Answer Session",
+                    "max_marks": 10,
+                    "description": "Ability to answer questions and explain the scientific principles involved."
                 }
             ],
             "sequence": sci_seq,

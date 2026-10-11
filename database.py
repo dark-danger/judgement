@@ -44,11 +44,11 @@ SUPABASE_CONFIG_FILE = os.path.join(DATA_DIR, "supabase_config.json")
 _IN_MEMORY_CACHE = {}
 
 DEFAULT_CRITERIA = [
-    {"id": "c1", "name": "Innovation & Concept", "max_marks": 20},
-    {"id": "c2", "name": "Technical Execution", "max_marks": 20},
-    {"id": "c3", "name": "Design & Functionality", "max_marks": 20},
-    {"id": "c4", "name": "Presentation & Q/A", "max_marks": 20},
-    {"id": "c5", "name": "Feasibility & Impact", "max_marks": 20}
+    {"id": "c1", "name": "Innovation & Concept", "max_marks": 10},
+    {"id": "c2", "name": "Technical Execution", "max_marks": 10},
+    {"id": "c3", "name": "Design & Functionality", "max_marks": 10},
+    {"id": "c4", "name": "Presentation & Q/A", "max_marks": 10},
+    {"id": "c5", "name": "Feasibility & Impact", "max_marks": 10}
 ]
 
 def load_json(filepath, default):

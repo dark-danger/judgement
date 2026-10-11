@@ -523,8 +523,9 @@ function renderMatrixTable() {
   judges.forEach(j => {
     headHtml += `<th>${escapeHtml(j.name)}</th>`;
   });
+  const eventMax = (currentEventData?.criteria || []).reduce((acc, c) => acc + (c.max_marks || 10), 0) || 50;
   headHtml += `
-      <th>Overall Avg (/100)</th>
+      <th>Overall Avg (/${eventMax})</th>
       <th>Judges Done</th>
       <th>Status</th>
     </tr>
@@ -719,11 +720,12 @@ function openOverrideModal(scoreId, tagNo, judgeId) {
     `;
   });
 
+  const eventMax = (currentEventData?.criteria || []).reduce((acc, c) => acc + (c.max_marks || 10), 0) || 50;
   body.innerHTML = `
     <input type="hidden" id="overrideScoreId" value="${scoreId}">
     <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
       <h4 style="font-family: var(--font-heading); font-size: 1.2rem; color: #fff;">${escapeHtml(tagNo)} • ${escapeHtml(score.judge_name)}</h4>
-      <span style="font-size: 0.82rem; color: var(--text-dim);">Current Total: ${score.total}/100</span>
+      <span style="font-size: 0.82rem; color: var(--text-dim);">Current Total: ${score.total}/${eventMax}</span>
     </div>
     ${criteriaHtml}
     <div class="form-group" style="margin-top: 1rem;">
@@ -760,7 +762,8 @@ async function submitOverrideScore(e) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Score updated to ${data.score.total}/100!`, 'success');
+      const eventMax = (currentEventData?.criteria || []).reduce((acc, c) => acc + (c.max_marks || 10), 0) || 50;
+      showToast(`Score updated to ${data.score.total}/${eventMax}!`, 'success');
       closeOverrideModal();
       loadAdminData();
     } else {
@@ -1027,7 +1030,7 @@ function removeJudgeFromEditModal(btn) {
   }
 }
 
-function addCriteriaToEditModal(name = '', maxMarks = 20, id = '') {
+function addCriteriaToEditModal(name = '', maxMarks = 10, id = '') {
   const container = document.getElementById('editCriteriaContainer');
   const count = container.children.length + 1;
   const critId = id || `c${Date.now().toString().slice(-4)}`;
@@ -1308,6 +1311,15 @@ function renderOverallChampionshipView(container) {
     tableRowsHtml = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">No matching schools found</td></tr>';
   }
 
+  const getEventMax = (eid, fallback) => {
+    const ev = (allEvents || []).find(e => e.id === eid);
+    return ev?.criteria?.reduce((s, c) => s + (c.max_marks || 10), 0) || fallback;
+  };
+  const danceMax = getEventMax('evt-group-dance', 50);
+  const songMax = getEventMax('evt-group-song', 50);
+  const decMax = getEventMax('evt-declamation', 60);
+  const sciMax = getEventMax('evt-science-exhibition', 50);
+
   container.innerHTML = `
     ${podiumHtml}
     <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass); overflow-x: auto;">
@@ -1316,10 +1328,10 @@ function renderOverallChampionshipView(container) {
           <tr style="background: #0f172a; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-glass);">
             <th style="padding: 0.75rem 0.6rem; text-align: center;">Rank</th>
             <th style="padding: 0.75rem 0.75rem;">School Name</th>
-            <th style="padding: 0.75rem 0.5rem; text-align: center;">Dance (/100)</th>
-            <th style="padding: 0.75rem 0.5rem; text-align: center;">Song (/100)</th>
-            <th style="padding: 0.75rem 0.5rem; text-align: center;">Declamation (/100)</th>
-            <th style="padding: 0.75rem 0.5rem; text-align: center;">Science (/100)</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Dance (/${danceMax})</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Song (/${songMax})</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Declamation (/${decMax})</th>
+            <th style="padding: 0.75rem 0.5rem; text-align: center;">Science (/${sciMax})</th>
             <th style="padding: 0.75rem 0.6rem; text-align: center; color: #fbbf24;">Combined Total</th>
             <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
           </tr>
@@ -1429,6 +1441,9 @@ function renderCategoryWinnersView(container, eventId) {
     return;
   }
 
+  const catEv = (allEvents || []).find(e => e.id === eventId);
+  const eventMax = (catEv?.criteria || []).reduce((s, c) => s + (c.max_marks || 10), 0) || 50;
+
   let list = cat.rankings || [];
   if (champSearchQuery) {
     list = list.filter(item => 
@@ -1464,7 +1479,7 @@ function renderCategoryWinnersView(container, eventId) {
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.4rem;">
           <span>Average Score:</span>
           <strong style="color: ${conf.text}; font-size: 1.1rem; font-family: var(--font-mono);">
-            ${item && item.average_score > 0 ? item.average_score + ' / 100' : '--'}
+            ${item && item.average_score > 0 ? item.average_score + ' / ' + eventMax : '--'}
           </strong>
         </div>
       </div>
@@ -1534,7 +1549,7 @@ function renderCategoryWinnersView(container, eventId) {
             <th style="padding: 0.75rem 0.6rem; text-align: center;">Tag No</th>
             <th style="padding: 0.75rem 0.75rem;">School Name</th>
             <th style="padding: 0.75rem 0.5rem; text-align: center;">Room</th>
-            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #00e5ff;">Average (/100)</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #00e5ff;">Average (/${eventMax})</th>
             <th style="padding: 0.75rem 0.5rem; text-align: center;">Judges Scored</th>
             <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
           </tr>
