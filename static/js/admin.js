@@ -1242,7 +1242,16 @@ function renderOverallChampionshipView(container) {
     { title: '🥉 2nd Runner Up (Bronze)', bg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(0,0,0,0.7))', border: '#f97316', text: '#fdba74' }
   ];
 
-  let podiumHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">';
+  const getEventMax = (eid, fallback) => {
+    const ev = (allEvents || []).find(e => e.id === eid);
+    return ev?.criteria?.reduce((s, c) => s + (c.max_marks || 10), 0) || fallback;
+  };
+  const danceMax = getEventMax('evt-group-dance', 50);
+  const songMax = getEventMax('evt-group-song', 50);
+  const decMax = getEventMax('evt-declamation', 60);
+  const sciMax = getEventMax('evt-science-exhibition', 50);
+  const combinedMax = danceMax + songMax + decMax + sciMax;
+
   top3.forEach((item, idx) => {
     const conf = podiumColors[idx];
     podiumHtml += `
@@ -1256,7 +1265,7 @@ function renderOverallChampionshipView(container) {
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.4rem;">
           <span>Combined 4-Event Score:</span>
-          <strong style="color: ${conf.text}; font-size: 1.05rem; font-family: var(--font-mono);">${item.total_score > 0 ? item.total_score + ' / 400' : 'Pending'}</strong>
+          <strong style="color: ${conf.text}; font-size: 1.05rem; font-family: var(--font-mono);">${item.total_score > 0 ? item.total_score + ' / ' + combinedMax : 'Pending'}</strong>
         </div>
       </div>
     `;
@@ -1311,15 +1320,6 @@ function renderOverallChampionshipView(container) {
     tableRowsHtml = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">No matching schools found</td></tr>';
   }
 
-  const getEventMax = (eid, fallback) => {
-    const ev = (allEvents || []).find(e => e.id === eid);
-    return ev?.criteria?.reduce((s, c) => s + (c.max_marks || 10), 0) || fallback;
-  };
-  const danceMax = getEventMax('evt-group-dance', 50);
-  const songMax = getEventMax('evt-group-song', 50);
-  const decMax = getEventMax('evt-declamation', 60);
-  const sciMax = getEventMax('evt-science-exhibition', 50);
-
   container.innerHTML = `
     ${podiumHtml}
     <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass); overflow-x: auto;">
@@ -1332,7 +1332,7 @@ function renderOverallChampionshipView(container) {
             <th style="padding: 0.75rem 0.5rem; text-align: center;">Song (/${songMax})</th>
             <th style="padding: 0.75rem 0.5rem; text-align: center;">Declamation (/${decMax})</th>
             <th style="padding: 0.75rem 0.5rem; text-align: center;">Science (/${sciMax})</th>
-            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #fbbf24;">Combined Total</th>
+            <th style="padding: 0.75rem 0.6rem; text-align: center; color: #fbbf24;">Combined Total (/${combinedMax})</th>
             <th style="padding: 0.75rem 0.6rem; text-align: center;">Award Standing</th>
           </tr>
         </thead>

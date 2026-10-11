@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agrash - Auditorium Live Scoreboard & Leaderboard</title>
+  <title>Agrash 2026 - Auditorium Live Scoreboard & Dual Leaderboard</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,19 +24,117 @@
       justify-content: space-between;
       border-bottom: 2px solid rgba(255, 42, 75, 0.4);
       padding-bottom: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .mode-switcher-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+    .main-mode-pills {
+      display: inline-flex;
+      background: rgba(12, 17, 29, 0.95);
+      padding: 0.35rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+      gap: 0.35rem;
+    }
+    .main-mode-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.4rem;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .main-mode-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+    }
+    .main-mode-btn.active {
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.45);
+    }
+    .main-mode-btn.active.trophy-mode {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #000;
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.45);
+    }
+    .sub-cat-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .sub-cat-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sub-cat-btn:hover {
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .sub-cat-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+    .rubrics-banner {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .rubric-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
     .podium-grid {
       display: grid;
       grid-template-columns: 1fr 1.2fr 1fr;
       gap: 1.5rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
       align-items: end;
     }
     .podium-card {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
-      padding: 1.75rem;
+      padding: 1.5rem;
       text-align: center;
       box-shadow: var(--shadow-card);
       position: relative;
@@ -44,12 +142,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .podium-rank-1 {
       border: 2px solid #fbbf24;
       box-shadow: 0 0 35px rgba(251, 191, 36, 0.35);
-      transform: translateY(-15px);
+      transform: translateY(-12px);
       background: linear-gradient(180deg, rgba(251, 191, 36, 0.15), rgba(11, 16, 28, 0.95));
     }
     .podium-rank-2 {
@@ -62,13 +160,14 @@
     }
     .podium-tag {
       font-family: var(--font-heading);
-      font-size: 2.2rem;
+      font-size: 1.9rem;
       font-weight: 900;
       color: #fff;
+      line-height: 1.2;
     }
     .podium-score {
       font-family: var(--font-heading);
-      font-size: 2.6rem;
+      font-size: 2.5rem;
       font-weight: 900;
     }
   </style>
@@ -80,26 +179,26 @@
   <!-- Projector Header -->
   <header class="projector-header">
     <div style="display: flex; align-items: center; gap: 1.25rem;">
-      <div class="brand-icon" style="width: 54px; height: 54px;">
-        <i data-lucide="trophy" style="width: 30px; height: 30px;"></i>
+      <div class="brand-icon" style="width: 52px; height: 52px;">
+        <i data-lucide="trophy" style="width: 28px; height: 28px;"></i>
       </div>
       <div>
-        <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em;">
-          AGRASH <span style="background: linear-gradient(135deg, #f43f5e 20%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LIVE LEADERBOARD</span>
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.2rem;">
+          AGRASH 2026 <span id="headerTitleHighlight" style="background: linear-gradient(135deg, #fbbf24 20%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">OVERALL TROPHY CHAMPIONSHIP</span>
         </h1>
-        <span style="font-size: 0.85rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">
-          Auditorium Stage Display • 12 October 2026 • Real-time Sync
+        <span id="headerSubtitle" style="font-size: 0.82rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">
+          Auditorium Main Stage Display • Combined 4-Event Championship (Max: 210 Marks)
         </span>
       </div>
     </div>
 
-    <!-- Live Active on Stage Box & Controls -->
+    <!-- Live Stage Box & Controls -->
     <div style="display: flex; align-items: center; gap: 1rem;">
-      <div id="projectorStageBox" style="background: rgba(12, 17, 29, 0.85); border: 1.5px solid #f43f5e; padding: 0.6rem 1.5rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 0 20px rgba(244, 63, 94, 0.3); backdrop-filter: blur(16px);">
-        <span style="font-size: 0.72rem; font-weight: 800; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.06em;">
+      <div id="projectorStageBox" style="display: none; background: rgba(12, 17, 29, 0.85); border: 1.5px solid #f43f5e; padding: 0.5rem 1.25rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 0 20px rgba(244, 63, 94, 0.3); backdrop-filter: blur(16px);">
+        <span style="font-size: 0.7rem; font-weight: 800; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.06em;">
           <span class="dot-pulse"></span> NOW ON STAGE
         </span>
-        <div id="projectorCurrentTag" style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900; color: #fff;">
+        <div id="projectorCurrentTag" style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 900; color: #fff;">
           --
         </div>
       </div>
@@ -109,58 +208,70 @@
     </div>
   </header>
 
-  <!-- Projector Navigation Tabs -->
-  <div style="display: flex; justify-content: center; margin-bottom: 1.75rem;">
-    <div class="desk-nav-pills" id="projNavPills">
-      <button class="desk-pill active" onclick="switchProjectorMode('overall', this)">
-        <i data-lucide="trophy"></i> Overall Championship
+  <!-- Dual Mode Switcher -->
+  <div class="mode-switcher-container">
+    <div class="main-mode-pills">
+      <button class="main-mode-btn active trophy-mode" id="btnModeOverall" onclick="setMainMode('overall')">
+        <i data-lucide="trophy"></i> 🏆 Overall Trophy Championship (Combined 4 Events)
       </button>
-      <button class="desk-pill" onclick="switchProjectorMode('evt-group-dance', this)">
-        <i data-lucide="sparkles"></i> Group Dance
+      <button class="main-mode-btn" id="btnModeCategory" onclick="setMainMode('category')">
+        <i data-lucide="award"></i> 🎭 Individual Category Leaderboards
       </button>
-      <button class="desk-pill" onclick="switchProjectorMode('evt-group-song', this)">
-        <i data-lucide="music"></i> Group Song
+    </div>
+
+    <!-- Sub-Categories Bar (Visible when Individual mode is selected) -->
+    <div class="sub-cat-pills" id="subCatPills" style="display: none;">
+      <button class="sub-cat-btn active" data-event="evt-group-dance" onclick="switchCategoryEvent('evt-group-dance', this)">
+        <i data-lucide="sparkles"></i> 💃 Group Dance (/50)
       </button>
-      <button class="desk-pill" onclick="switchProjectorMode('evt-declamation', this)">
-        <i data-lucide="mic"></i> Declamation
+      <button class="sub-cat-btn" data-event="evt-group-song" onclick="switchCategoryEvent('evt-group-song', this)">
+        <i data-lucide="music"></i> 🎵 Group Song (/50)
       </button>
-      <button class="desk-pill" onclick="switchProjectorMode('evt-science-exhibition', this)">
-        <i data-lucide="atom"></i> Science Exhibition
+      <button class="sub-cat-btn" data-event="evt-declamation" onclick="switchCategoryEvent('evt-declamation', this)">
+        <i data-lucide="mic"></i> 🎤 Declamation (/60)
+      </button>
+      <button class="sub-cat-btn" data-event="evt-science-exhibition" onclick="switchCategoryEvent('evt-science-exhibition', this)">
+        <i data-lucide="atom"></i> 🔬 Science Exhibition (/50)
       </button>
     </div>
   </div>
 
+  <!-- Dynamic Rubrics & Criteria Banner -->
+  <div class="rubrics-banner" id="rubricsBanner">
+    <!-- Populated by JS -->
+  </div>
+
   <!-- Top 3 Podium Cards -->
   <section class="podium-grid" id="podiumSection">
-    <!-- Rank 2 -->
+    <!-- Rank 2 (Silver) -->
     <div class="podium-card podium-rank-2" id="podium2">
-      <span class="badge" style="background: rgba(226, 232, 240, 0.2); color: #fff;">🥈 RANK #2</span>
+      <span class="badge" style="background: rgba(226, 232, 240, 0.2); color: #fff; font-size: 0.8rem;" id="podium2Badge">🥈 1ST RUNNER UP</span>
       <div class="podium-tag" id="podium2Tag">--</div>
       <div class="podium-score" style="color: #e2e8f0;" id="podium2Score">--</div>
       <span style="font-size: 0.8rem; color: var(--text-dim);" id="podium2Label">Score</span>
     </div>
 
-    <!-- Rank 1 (Gold) -->
+    <!-- Rank 1 (Gold Winner) -->
     <div class="podium-card podium-rank-1" id="podium1">
-      <div style="position: absolute; top: -10px; background: #fbbf24; color: #000; font-weight: 900; font-size: 0.75rem; padding: 0.2rem 0.8rem; border-radius: var(--radius-full);">
-        👑 TOURNAMENT LEADER
+      <div style="position: absolute; top: -10px; background: #fbbf24; color: #000; font-weight: 900; font-size: 0.75rem; padding: 0.2rem 0.8rem; border-radius: var(--radius-full);" id="podium1TopBadge">
+        👑 OVERALL CHAMPION TROPHY
       </div>
-      <span class="badge" style="background: rgba(251, 191, 36, 0.3); color: #fbbf24; margin-top: 0.5rem;">🥇 RANK #1 GOLD</span>
-      <div class="podium-tag" style="font-size: 2.4rem; text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);" id="podium1Tag">--</div>
-      <div class="podium-score" style="color: #fbbf24; font-size: 3rem;" id="podium1Score">--</div>
+      <span class="badge" style="background: rgba(251, 191, 36, 0.3); color: #fbbf24; margin-top: 0.5rem; font-size: 0.85rem;" id="podium1Badge">🥇 RANK #1 GOLD</span>
+      <div class="podium-tag" style="font-size: 2.2rem; text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);" id="podium1Tag">--</div>
+      <div class="podium-score" style="color: #fbbf24; font-size: 2.9rem;" id="podium1Score">--</div>
       <span style="font-size: 0.85rem; color: #fde68a; font-weight: 700;" id="podium1Label">Score</span>
     </div>
 
-    <!-- Rank 3 -->
+    <!-- Rank 3 (Bronze) -->
     <div class="podium-card podium-rank-3" id="podium3">
-      <span class="badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">🥉 RANK #3</span>
+      <span class="badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316; font-size: 0.8rem;" id="podium3Badge">🥉 2ND RUNNER UP</span>
       <div class="podium-tag" id="podium3Tag">--</div>
       <div class="podium-score" style="color: #f97316;" id="podium3Score">--</div>
       <span style="font-size: 0.8rem; color: var(--text-dim);" id="podium3Label">Score</span>
     </div>
   </section>
 
-  <!-- Full Leaderboard Table -->
+  <!-- Full Leaderboard Table Container -->
   <main class="matrix-table-container">
     <table class="matrix-table">
       <thead id="projectorTableHead">
@@ -173,43 +284,138 @@
   </main>
 
   <script>
-    let pathSegment = window.location.pathname.split('/').filter(Boolean).pop();
-    let currentMode = (pathSegment && ['evt-group-dance', 'evt-group-song', 'evt-declamation', 'evt-science-exhibition'].includes(pathSegment)) ? pathSegment : 'overall';
+    let activeMainMode = 'overall'; // 'overall' or 'category'
+    let activeCategoryId = 'evt-group-dance';
 
-    // Highlight initial tab
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('#projNavPills .desk-pill').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('onclick').includes(currentMode));
-      });
-    });
+    // Official Category Rubrics Configuration
+    const EVENT_RUBRICS = {
+      'evt-group-dance': {
+        name: 'Group Dance',
+        max: 50,
+        icon: 'sparkles',
+        criteria: [
+          { name: 'Dance Steps & Coordination', max: 10 },
+          { name: 'Expressions', max: 10 },
+          { name: 'Creativity', max: 10 },
+          { name: 'Stage Presence & Confidence', max: 10 },
+          { name: 'Overall Performance', max: 10 }
+        ]
+      },
+      'evt-group-song': {
+        name: 'Group Song',
+        max: 50,
+        icon: 'music',
+        criteria: [
+          { name: 'Vocal Quality & Control', max: 10 },
+          { name: 'Rhythm & Timing', max: 10 },
+          { name: 'Expression & Emotion', max: 10 },
+          { name: 'Stage Presence & Confidence', max: 10 },
+          { name: 'Musicality & Originality', max: 10 }
+        ]
+      },
+      'evt-declamation': {
+        name: 'Declamation',
+        max: 60,
+        icon: 'mic',
+        criteria: [
+          { name: 'Content & Message', max: 10 },
+          { name: 'Delivery & Voice', max: 10 },
+          { name: 'Expression & Emotion', max: 10 },
+          { name: 'Body Language & Stage Presence', max: 10 },
+          { name: 'Memorization & Fluency', max: 10 },
+          { name: 'Overall Impact', max: 10 }
+        ]
+      },
+      'evt-science-exhibition': {
+        name: 'Science Exhibition',
+        max: 50,
+        icon: 'atom',
+        criteria: [
+          { name: 'Scientific Knowledge & Accuracy', max: 10 },
+          { name: 'Creativity & Innovation', max: 10 },
+          { name: 'Working Model & Application', max: 10 },
+          { name: 'Presentation & Communication', max: 10 },
+          { name: 'Q/A Session', max: 10 }
+        ]
+      }
+    };
 
-    function switchProjectorMode(mode, btn) {
-      currentMode = mode;
-      document.querySelectorAll('#projNavPills .desk-pill').forEach(b => b.classList.remove('active'));
+    function setMainMode(mode) {
+      activeMainMode = mode;
+      const btnOverall = document.getElementById('btnModeOverall');
+      const btnCat = document.getElementById('btnModeCategory');
+      const subPills = document.getElementById('subCatPills');
+
+      if (mode === 'overall') {
+        btnOverall.classList.add('active', 'trophy-mode');
+        btnCat.classList.remove('active');
+        subPills.style.display = 'none';
+      } else {
+        btnOverall.classList.remove('active', 'trophy-mode');
+        btnCat.classList.add('active');
+        subPills.style.display = 'flex';
+      }
+
+      loadProjectorData();
+    }
+
+    function switchCategoryEvent(eventId, btn) {
+      activeCategoryId = eventId;
+      document.querySelectorAll('#subCatPills .sub-cat-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
       loadProjectorData();
     }
 
     async function loadProjectorData() {
       try {
-        if (currentMode === 'overall') {
-          await loadOverallChampionship();
+        if (activeMainMode === 'overall') {
+          await renderOverallTrophyLeaderboard();
         } else {
-          await loadCategoryEvent(currentMode);
+          await renderIndividualEventLeaderboard(activeCategoryId);
         }
         if (window.lucide) lucide.createIcons();
-      } catch (e) {
-        console.error('Projector load error:', e);
+      } catch (err) {
+        console.error('Leaderboard fetch error:', err);
       }
     }
 
-    async function loadOverallChampionship() {
+    // =========================================================================
+    // 1. OVERALL TROPHY CHAMPIONSHIP LEADERBOARD (COMBINED 4 EVENTS)
+    // =========================================================================
+    async function renderOverallTrophyLeaderboard() {
       const stageBox = document.getElementById('projectorStageBox');
       if (stageBox) stageBox.style.display = 'none';
 
-      document.getElementById('podium1Label').textContent = 'Combined Score / 400';
-      document.getElementById('podium2Label').textContent = 'Combined Score / 400';
-      document.getElementById('podium3Label').textContent = 'Combined Score / 400';
+      document.getElementById('headerTitleHighlight').innerHTML = 'OVERALL TROPHY CHAMPIONSHIP';
+      document.getElementById('headerTitleHighlight').style.background = 'linear-gradient(135deg, #fbbf24 20%, #f59e0b 100%)';
+      document.getElementById('headerSubtitle').textContent = 'Auditorium Main Stage Display • Combined 4-Category Master Leaderboard (Dance: 50, Song: 50, Dec: 60, Sci: 50 = 210 Marks)';
+
+      // Rubrics Banner for Overall
+      const banner = document.getElementById('rubricsBanner');
+      banner.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="trophy" style="color: #fbbf24; width: 18px; height: 18px;"></i>
+          <span style="font-weight: 700; color: #fbbf24; font-size: 0.85rem;">Combined 4-Category Trophy Calculation:</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <span class="rubric-chip">💃 Dance (/50)</span>
+          <span class="rubric-chip">🎵 Song (/50)</span>
+          <span class="rubric-chip">🎤 Declamation (/60)</span>
+          <span class="rubric-chip">🔬 Science (/50)</span>
+          <span class="rubric-chip" style="background: rgba(251, 191, 36, 0.15); border-color: #fbbf24; color: #fbbf24; font-weight: 800;">🏆 Combined Max: 210 Marks</span>
+        </div>
+      `;
+
+      // Update Podium Labels
+      document.getElementById('podium1TopBadge').textContent = '👑 OVERALL CHAMPION TROPHY';
+      document.getElementById('podium1Badge').textContent = '🥇 RANK #1 GOLD CHAMPION';
+      document.getElementById('podium1Label').textContent = 'Combined Score / 210';
+
+      document.getElementById('podium2Badge').textContent = '🥈 1ST RUNNER UP (SILVER)';
+      document.getElementById('podium2Label').textContent = 'Combined Score / 210';
+
+      document.getElementById('podium3Badge').textContent = '🥉 2ND RUNNER UP (BRONZE)';
+      document.getElementById('podium3Label').textContent = 'Combined Score / 210';
 
       const res = await fetch('/api/championship');
       const data = await res.json();
@@ -231,14 +437,15 @@
       const thead = document.getElementById('projectorTableHead');
       thead.innerHTML = `
         <tr>
-          <th style="font-size: 0.95rem; text-align: center;">Rank</th>
-          <th style="font-size: 0.95rem;">School Name</th>
-          <th style="font-size: 0.95rem; text-align: center;">Dance</th>
-          <th style="font-size: 0.95rem; text-align: center;">Song</th>
-          <th style="font-size: 0.95rem; text-align: center;">Declamation</th>
-          <th style="font-size: 0.95rem; text-align: center;">Science</th>
-          <th style="font-size: 0.95rem; text-align: center; color: #fbbf24;">Combined Total</th>
-          <th style="font-size: 0.95rem; text-align: center;">Standing</th>
+          <th style="font-size: 0.95rem; text-align: center; width: 70px;">Rank</th>
+          <th style="font-size: 0.95rem;">School Name & Details</th>
+          <th style="font-size: 0.95rem; text-align: center;">Dance (/50)</th>
+          <th style="font-size: 0.95rem; text-align: center;">Song (/50)</th>
+          <th style="font-size: 0.95rem; text-align: center;">Declamation (/60)</th>
+          <th style="font-size: 0.95rem; text-align: center;">Science (/50)</th>
+          <th style="font-size: 0.95rem; text-align: center; color: #fbbf24;">Combined Total (/210)</th>
+          <th style="font-size: 0.95rem; text-align: center;">Avg Score</th>
+          <th style="font-size: 0.95rem; text-align: center;">Trophy Award Standing</th>
         </tr>
       `;
 
@@ -247,10 +454,10 @@
       tbody.innerHTML = list.map((item, idx) => {
         const isTop10 = idx < 10;
         let standing = 'Participant';
-        if (idx === 0 && item.total_score > 0) standing = '🏆 1st Champion';
-        else if (idx === 1 && item.total_score > 0) standing = '🥈 1st Runner Up';
-        else if (idx === 2 && item.total_score > 0) standing = '🥉 2nd Runner Up';
-        else if (isTop10 && item.total_score > 0) standing = `⭐ Top 10 (#${idx + 1})`;
+        if (idx === 0 && item.total_score > 0) standing = '🏆 Champion Trophy Winner';
+        else if (idx === 1 && item.total_score > 0) standing = '🥈 1st Runner Up Trophy';
+        else if (idx === 2 && item.total_score > 0) standing = '🥉 2nd Runner Up Trophy';
+        else if (isTop10 && item.total_score > 0) standing = `⭐ Top 10 Merit (#${idx + 1})`;
 
         return `
           <tr style="${idx === 0 ? 'background: rgba(251, 191, 36, 0.1);' : (idx < 3 ? 'background: rgba(56, 189, 248, 0.05);' : '')}">
@@ -260,20 +467,23 @@
               </span>
             </td>
             <td>
-              <strong style="font-family: var(--font-heading); font-size: 1.25rem; color: #fff;">${item.school}</strong>
+              <strong style="font-family: var(--font-heading); font-size: 1.2rem; color: #fff;">${item.school}</strong>
               ${item.room !== '-' ? `<span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 0.4rem;">[${item.room}]</span>` : ''}
             </td>
-            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.dance}</td>
-            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.song}</td>
-            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.declamation}</td>
-            <td style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">${item.science}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.88rem;">${item.dance}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.88rem;">${item.song}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.88rem;">${item.declamation}</td>
+            <td style="text-align: center; color: var(--text-muted); font-size: 0.88rem;">${item.science}</td>
             <td style="text-align: center;">
               <strong style="font-family: var(--font-mono); font-size: 1.35rem; color: ${item.total_score > 0 ? '#fbbf24' : 'var(--text-dim)'};">
                 ${item.total_score > 0 ? item.total_score : '--'}
               </strong>
             </td>
+            <td style="text-align: center; font-family: var(--font-mono); color: #38bdf8; font-weight: 700;">
+              ${item.overall_avg > 0 ? item.overall_avg : '--'}
+            </td>
             <td style="text-align: center;">
-              <span class="badge ${isTop10 && item.total_score > 0 ? 'badge-done' : 'badge-next'}" style="font-size: 0.8rem;">
+              <span class="badge ${idx < 3 && item.total_score > 0 ? 'badge-live' : (isTop10 && item.total_score > 0 ? 'badge-done' : 'badge-next')}" style="font-size: 0.8rem;">
                 ${standing}
               </span>
             </td>
@@ -282,13 +492,42 @@
       }).join('');
     }
 
-    async function loadCategoryEvent(eventId) {
+    // =========================================================================
+    // 2. INDIVIDUAL CATEGORY EVENT LEADERBOARD (DYNAMIC JUDGES & RUBRICS)
+    // =========================================================================
+    async function renderIndividualEventLeaderboard(eventId) {
       const stageBox = document.getElementById('projectorStageBox');
       if (stageBox) stageBox.style.display = 'block';
 
-      document.getElementById('podium1Label').textContent = 'Average Score / 100';
-      document.getElementById('podium2Label').textContent = 'Average Score / 100';
-      document.getElementById('podium3Label').textContent = 'Average Score / 100';
+      const rubricConfig = EVENT_RUBRICS[eventId] || { name: 'Event', max: 50, criteria: [] };
+
+      document.getElementById('headerTitleHighlight').innerHTML = `${rubricConfig.name.toUpperCase()} LEADERBOARD`;
+      document.getElementById('headerTitleHighlight').style.background = 'linear-gradient(135deg, #f43f5e 20%, #38bdf8 100%)';
+      document.getElementById('headerSubtitle').textContent = `Auditorium Stage Display • ${rubricConfig.name} Category Marks (Max: ${rubricConfig.max} Marks)`;
+
+      // Rubrics Banner
+      const banner = document.getElementById('rubricsBanner');
+      banner.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="${rubricConfig.icon || 'award'}" style="color: #38bdf8; width: 18px; height: 18px;"></i>
+          <span style="font-weight: 700; color: #38bdf8; font-size: 0.85rem;">Official ${rubricConfig.name} Rubrics (/10 each):</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+          ${rubricConfig.criteria.map(c => `<span class="rubric-chip">${c.name} (${c.max})</span>`).join('')}
+          <span class="rubric-chip" style="background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #38bdf8; font-weight: 800;">Total: ${rubricConfig.max} Marks</span>
+        </div>
+      `;
+
+      // Update Podium Labels
+      document.getElementById('podium1TopBadge').textContent = `👑 1ST PLACE GOLD - ${rubricConfig.name.toUpperCase()}`;
+      document.getElementById('podium1Badge').textContent = '🥇 RANK #1 GOLD';
+      document.getElementById('podium1Label').textContent = `Average Score / ${rubricConfig.max}`;
+
+      document.getElementById('podium2Badge').textContent = '🥈 2ND PLACE SILVER';
+      document.getElementById('podium2Label').textContent = `Average Score / ${rubricConfig.max}`;
+
+      document.getElementById('podium3Badge').textContent = '🥉 3RD PLACE BRONZE';
+      document.getElementById('podium3Label').textContent = `Average Score / ${rubricConfig.max}`;
 
       const [evtRes, scRes] = await Promise.all([
         fetch(`/api/events/${eventId}`),
@@ -298,104 +537,112 @@
       const evtData = await evtRes.json();
       const scData = await scRes.json();
 
-      if (evtData.success) {
-        const event = evtData.event;
-        const maxScore = (event.criteria || []).reduce((acc, c) => acc + (c.max_marks || 10), 0) || 50;
-        document.getElementById('podium1Label').textContent = `Average Score / ${maxScore}`;
-        document.getElementById('podium2Label').textContent = `Average Score / ${maxScore}`;
-        document.getElementById('podium3Label').textContent = `Average Score / ${maxScore}`;
+      if (!evtData.success) return;
 
-        const scores = scData.scores || [];
-        const judges = event.judges || [];
+      const event = evtData.event;
+      const scores = scData.scores || [];
+      const judges = event.judges || [];
+      const maxScore = rubricConfig.max;
 
-        document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
+      document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
 
-        let allTags = event.sequence.map(s => s.tag_no);
-        (event.completed_tags || []).forEach(c => {
-          if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
+      let allTags = event.sequence.map(s => s.tag_no);
+      (event.completed_tags || []).forEach(c => {
+        if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
+      });
+
+      const rankedList = allTags.map(tag => {
+        const tagScores = scores.filter(s => s.tag_no === tag);
+        const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
+        const count = tagScores.length;
+        const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
+        const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
+        const isLive = evtData.current_tag === tag;
+
+        const seqItem = event.sequence.find(s => s.tag_no === tag) || (event.completed_tags || []).find(c => c.tag_no === tag);
+        const notes = seqItem ? seqItem.notes : '';
+
+        // Dynamic score per judge
+        const judgeValues = judges.map(j => {
+          const js = tagScores.find(s => s.judge_id === j.id);
+          return js ? js.total : null;
         });
 
-        const rankedList = allTags.map(tag => {
-          const tagScores = scores.filter(s => s.tag_no === tag);
-          const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
-          const count = tagScores.length;
-          const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
-          const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
-          const isLive = evtData.current_tag === tag;
+        return { tag, avg, count, totalJudges: judges.length, isCompleted, isLive, notes, judgeValues };
+      });
 
-          // Find school name if present
-          const seqItem = event.sequence.find(s => s.tag_no === tag) || (event.completed_tags || []).find(c => c.tag_no === tag);
-          const notes = seqItem ? seqItem.notes : '';
+      rankedList.sort((a, b) => b.avg - a.avg);
 
-          return { tag, avg, count, totalJudges: judges.length, isCompleted, isLive, notes };
-        });
-
-        rankedList.sort((a, b) => b.avg - a.avg);
-
-        if (rankedList.length > 0 && rankedList[0].avg > 0) {
-          document.getElementById('podium1Tag').textContent = rankedList[0].tag;
-          document.getElementById('podium1Score').textContent = rankedList[0].avg;
-        } else {
-          document.getElementById('podium1Tag').textContent = '--';
-          document.getElementById('podium1Score').textContent = '--';
-        }
-
-        if (rankedList.length > 1 && rankedList[1].avg > 0) {
-          document.getElementById('podium2Tag').textContent = rankedList[1].tag;
-          document.getElementById('podium2Score').textContent = rankedList[1].avg;
-        } else {
-          document.getElementById('podium2Tag').textContent = '--';
-          document.getElementById('podium2Score').textContent = '--';
-        }
-
-        if (rankedList.length > 2 && rankedList[2].avg > 0) {
-          document.getElementById('podium3Tag').textContent = rankedList[2].tag;
-          document.getElementById('podium3Score').textContent = rankedList[2].avg;
-        } else {
-          document.getElementById('podium3Tag').textContent = '--';
-          document.getElementById('podium3Score').textContent = '--';
-        }
-
-        // Table Header
-        const thead = document.getElementById('projectorTableHead');
-        thead.innerHTML = `
-          <tr>
-            <th style="font-size: 0.95rem; text-align: center;">Rank</th>
-            <th style="font-size: 0.95rem;">Team Tag & School</th>
-            <th style="font-size: 0.95rem; text-align: center;">Average Score (/${maxScore})</th>
-            <th style="font-size: 0.95rem; text-align: center;">Judges Evaluated</th>
-            <th style="font-size: 0.95rem; text-align: center;">Status</th>
-          </tr>
-        `;
-
-        // Table Body
-        const tbody = document.getElementById('projectorTableBody');
-        tbody.innerHTML = rankedList.map((item, idx) => `
-          <tr style="${item.isLive ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
-            <td style="text-align: center;">
-              <span class="badge ${idx === 0 ? 'podium-rank-1' : (idx === 1 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
-                #${idx + 1}
-              </span>
-            </td>
-            <td>
-              <strong style="font-family: var(--font-heading); font-size: 1.35rem; color: #fff;">${item.tag}</strong>
-              ${item.notes ? `<span style="font-size: 0.85rem; color: var(--text-dim); margin-left: 0.5rem;">${item.notes}</span>` : ''}
-              ${item.isLive ? ' <span class="badge badge-live" style="font-size:0.7rem; padding:0.15rem 0.5rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
-            </td>
-            <td style="text-align: center;">
-              <strong style="font-family: var(--font-heading); font-size: 1.5rem; color: ${item.avg > 0 ? '#00e5ff' : 'var(--text-dim)'};">
-                ${item.avg > 0 ? item.avg : '--'}
-              </strong>
-            </td>
-            <td style="text-align: center;">
-              <span style="font-size: 1rem; color: var(--text-muted);">${item.count} / ${item.totalJudges}</span>
-            </td>
-            <td style="text-align: center;">
-              ${item.isLive ? '<span class="badge badge-live">LIVE ON STAGE</span>' : (item.isCompleted ? '<span class="badge badge-done">COMPLETED</span>' : '<span class="badge badge-next">IN QUEUE</span>')}
-            </td>
-          </tr>
-        `).join('');
+      // Top 3 Podium
+      if (rankedList.length > 0 && rankedList[0].avg > 0) {
+        document.getElementById('podium1Tag').textContent = rankedList[0].tag + (rankedList[0].notes ? ` (${rankedList[0].notes.split('[')[0].trim()})` : '');
+        document.getElementById('podium1Score').textContent = rankedList[0].avg;
+      } else {
+        document.getElementById('podium1Tag').textContent = '--';
+        document.getElementById('podium1Score').textContent = '--';
       }
+
+      if (rankedList.length > 1 && rankedList[1].avg > 0) {
+        document.getElementById('podium2Tag').textContent = rankedList[1].tag + (rankedList[1].notes ? ` (${rankedList[1].notes.split('[')[0].trim()})` : '');
+        document.getElementById('podium2Score').textContent = rankedList[1].avg;
+      } else {
+        document.getElementById('podium2Tag').textContent = '--';
+        document.getElementById('podium2Score').textContent = '--';
+      }
+
+      if (rankedList.length > 2 && rankedList[2].avg > 0) {
+        document.getElementById('podium3Tag').textContent = rankedList[2].tag + (rankedList[2].notes ? ` (${rankedList[2].notes.split('[')[0].trim()})` : '');
+        document.getElementById('podium3Score').textContent = rankedList[2].avg;
+      } else {
+        document.getElementById('podium3Tag').textContent = '--';
+        document.getElementById('podium3Score').textContent = '--';
+      }
+
+      // Dynamic Table Header (Generating columns for whatever judges exist!)
+      const thead = document.getElementById('projectorTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th style="font-size: 0.95rem; text-align: center; width: 70px;">Rank</th>
+          <th style="font-size: 0.95rem;">Team Tag & School</th>
+          ${judges.map(j => `<th style="font-size: 0.95rem; text-align: center;">${j.name} (/${maxScore})</th>`).join('')}
+          <th style="font-size: 0.95rem; text-align: center; color: #fbbf24;">Average Score (/${maxScore})</th>
+          <th style="font-size: 0.95rem; text-align: center;">Judges Evaluated</th>
+          <th style="font-size: 0.95rem; text-align: center;">Status</th>
+        </tr>
+      `;
+
+      // Table Body
+      const tbody = document.getElementById('projectorTableBody');
+      tbody.innerHTML = rankedList.map((item, idx) => `
+        <tr style="${item.isLive ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
+          <td style="text-align: center;">
+            <span class="badge ${idx === 0 && item.avg > 0 ? 'podium-rank-1' : (idx === 1 && item.avg > 0 ? 'podium-rank-2' : 'badge-done')}" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
+              #${idx + 1}
+            </span>
+          </td>
+          <td>
+            <strong style="font-family: var(--font-heading); font-size: 1.35rem; color: #fff;">${item.tag}</strong>
+            ${item.notes ? `<span style="font-size: 0.88rem; color: #cbd5e1; margin-left: 0.6rem;">${item.notes}</span>` : ''}
+            ${item.isLive ? ' <span class="badge badge-live" style="font-size:0.7rem; padding:0.15rem 0.5rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
+          </td>
+          ${item.judgeValues.map(val => `
+            <td style="text-align: center; font-family: var(--font-mono); font-size: 1rem; color: ${val !== null ? '#fff' : 'var(--text-dim)'};">
+              ${val !== null ? val : '-'}
+            </td>
+          `).join('')}
+          <td style="text-align: center;">
+            <strong style="font-family: var(--font-heading); font-size: 1.5rem; color: ${item.avg > 0 ? '#fbbf24' : 'var(--text-dim)'};">
+              ${item.avg > 0 ? item.avg : '--'}
+            </strong>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-size: 1rem; color: var(--text-muted);">${item.count} / ${item.totalJudges}</span>
+          </td>
+          <td style="text-align: center;">
+            ${item.isLive ? '<span class="badge badge-live">LIVE ON STAGE</span>' : (item.isCompleted ? '<span class="badge badge-done">COMPLETED</span>' : '<span class="badge badge-next">IN QUEUE</span>')}
+          </td>
+        </tr>
+      `).join('');
     }
 
     function toggleFullscreen() {
@@ -407,6 +654,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Check URL parameters for direct category navigation
+      const pathSeg = window.location.pathname.split('/').filter(Boolean).pop();
+      if (pathSeg && ['evt-group-dance', 'evt-group-song', 'evt-declamation', 'evt-science-exhibition'].includes(pathSeg)) {
+        activeMainMode = 'category';
+        activeCategoryId = pathSeg;
+        setMainMode('category');
+        document.querySelectorAll('#subCatPills .sub-cat-btn').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-event') === pathSeg);
+        });
+      }
+
       if (window.lucide) lucide.createIcons();
       loadProjectorData();
       setInterval(loadProjectorData, 4000);

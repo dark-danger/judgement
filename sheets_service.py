@@ -80,12 +80,24 @@ class SheetsService:
             thread.start()
 
     def calculate_championship_data(self):
-        """Calculates 4-event combined score leaderboard across all 58 schools"""
+        """Calculates 4-event combined score leaderboard across all schools with new rubrics (Dance:50, Song:50, Dec:60, Sci:50 = 210)"""
         try:
-            from create_excel import schools_data
             from database import db
+            from registration_service import registration_service
 
             all_scores = db.get_scores()
+            events = db.get_events()
+            events_dict = {ev["id"]: ev for ev in events}
+
+            def get_event_max(ev_id, default=50):
+                ev = events_dict.get(ev_id, {})
+                return sum(c.get("max_marks", 10) for c in ev.get("criteria", [])) or default
+
+            dance_max = get_event_max("evt-group-dance", 50)
+            song_max = get_event_max("evt-group-song", 50)
+            dec_max = get_event_max("evt-declamation", 60)
+            sci_max = get_event_max("evt-science-exhibition", 50)
+            combined_max = dance_max + song_max + dec_max + sci_max
 
             def get_tag_avg(event_id, tag_no):
                 if not tag_no:
@@ -97,41 +109,91 @@ class SheetsService:
                 avg = round(sum(totals) / len(totals), 2)
                 return avg, f"{tag_no} ({avg})"
 
+            schools_list = registration_service.get_all()
             results = []
-            for row in schools_data:
-                school = row[0]
-                room = row[9] or "-"
 
-                dance_tag = row[2] if row[1] == "YES" else ""
-                song_tag = row[4] if row[3] == "YES" else ""
-                dec_tag = row[6] if row[5] == "YES" else ""
-                sci_tag = row[8] if row[7] == "YES" else ""
+            if schools_list:
+                for s in schools_list:
+                    school = s.get("school_name", "")
+                    room = s.get("room_no") or "-"
+                    ev_map = {ev.get("category"): ev.get("tag_no") for ev in s.get("events", [])}
 
-                d_avg, d_str = get_tag_avg("evt-group-dance", dance_tag)
-                s_avg, s_str = get_tag_avg("evt-group-song", song_tag)
-                dc_avg, dc_str = get_tag_avg("evt-declamation", dec_tag)
-                se_avg, se_str = get_tag_avg("evt-science-exhibition", sci_tag)
+                    dance_tag = ev_map.get("Group Dance", "")
+                    song_tag = ev_map.get("Group Song", "")
+                    dec_tag = ev_map.get("Declamation", "")
+                    sci_tag = ev_map.get("Science Exhibition", "")
 
-                scored_vals = [v for v in [d_avg, s_avg, dc_avg, se_avg] if v is not None and v > 0]
-                total_score = round(sum(scored_vals), 2)
-                events_done = len(scored_vals)
-                overall_avg = round(total_score / events_done, 2) if events_done > 0 else 0
+                    d_avg, d_str = get_tag_avg("evt-group-dance", dance_tag)
+                    s_avg, s_str = get_tag_avg("evt-group-song", song_tag)
+                    dc_avg, dc_str = get_tag_avg("evt-declamation", dec_tag)
+                    se_avg, se_str = get_tag_avg("evt-science-exhibition", sci_tag)
 
-                results.append({
-                    "school": school,
-                    "room": room,
-                    "dance": d_str,
-                    "dance_score": d_avg or 0,
-                    "song": s_str,
-                    "song_score": s_avg or 0,
-                    "declamation": dc_str,
-                    "declamation_score": dc_avg or 0,
-                    "science": se_str,
-                    "science_score": se_avg or 0,
-                    "total_score": total_score,
-                    "overall_avg": overall_avg,
-                    "events_done": events_done
-                })
+                    scored_vals = [v for v in [d_avg, s_avg, dc_avg, se_avg] if v is not None and v > 0]
+                    total_score = round(sum(scored_vals), 2)
+                    events_done = len(scored_vals)
+                    overall_avg = round(total_score / events_done, 2) if events_done > 0 else 0
+
+                    results.append({
+                        "school": school,
+                        "room": room,
+                        "dance": d_str,
+                        "dance_score": d_avg or 0,
+                        "dance_max": dance_max,
+                        "song": s_str,
+                        "song_score": s_avg or 0,
+                        "song_max": song_max,
+                        "declamation": dc_str,
+                        "declamation_score": dc_avg or 0,
+                        "declamation_max": dec_max,
+                        "science": se_str,
+                        "science_score": se_avg or 0,
+                        "science_max": sci_max,
+                        "total_score": total_score,
+                        "combined_max": combined_max,
+                        "overall_avg": overall_avg,
+                        "events_done": events_done
+                    })
+            else:
+                from create_excel import schools_data
+                for row in schools_data:
+                    school = row[0]
+                    room = row[9] or "-"
+
+                    dance_tag = row[2] if row[1] == "YES" else ""
+                    song_tag = row[4] if row[3] == "YES" else ""
+                    dec_tag = row[6] if row[5] == "YES" else ""
+                    sci_tag = row[8] if row[7] == "YES" else ""
+
+                    d_avg, d_str = get_tag_avg("evt-group-dance", dance_tag)
+                    s_avg, s_str = get_tag_avg("evt-group-song", song_tag)
+                    dc_avg, dc_str = get_tag_avg("evt-declamation", dec_tag)
+                    se_avg, se_str = get_tag_avg("evt-science-exhibition", sci_tag)
+
+                    scored_vals = [v for v in [d_avg, s_avg, dc_avg, se_avg] if v is not None and v > 0]
+                    total_score = round(sum(scored_vals), 2)
+                    events_done = len(scored_vals)
+                    overall_avg = round(total_score / events_done, 2) if events_done > 0 else 0
+
+                    results.append({
+                        "school": school,
+                        "room": room,
+                        "dance": d_str,
+                        "dance_score": d_avg or 0,
+                        "dance_max": dance_max,
+                        "song": s_str,
+                        "song_score": s_avg or 0,
+                        "song_max": song_max,
+                        "declamation": dc_str,
+                        "declamation_score": dc_avg or 0,
+                        "declamation_max": dec_max,
+                        "science": se_str,
+                        "science_score": se_avg or 0,
+                        "science_max": sci_max,
+                        "total_score": total_score,
+                        "combined_max": combined_max,
+                        "overall_avg": overall_avg,
+                        "events_done": events_done
+                    })
 
             results.sort(key=lambda x: (x["total_score"], x["overall_avg"]), reverse=True)
             return results
@@ -273,16 +335,27 @@ class SheetsService:
             if not webhook and events:
                 webhook = events[0].get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
 
+            events_dict = {ev["id"]: ev for ev in events}
+            def get_ev_max(ev_id, default=50):
+                ev = events_dict.get(ev_id, {})
+                return sum(c.get("max_marks", 10) for c in ev.get("criteria", [])) or default
+
+            dance_m = get_ev_max("evt-group-dance", 50)
+            song_m = get_ev_max("evt-group-song", 50)
+            dec_m = get_ev_max("evt-declamation", 60)
+            sci_m = get_ev_max("evt-science-exhibition", 50)
+            comb_m = dance_m + song_m + dec_m + sci_m
+
             headers = [
                 "Rank",
                 "School Name",
                 "Room / Flat",
-                "Group Dance (/100)",
-                "Group Song (/100)",
-                "Declamation (/100)",
-                "Science Exhibition (/100)",
-                "Combined Total (/400)",
-                "Combined Average (/100)",
+                f"Group Dance (/{dance_m})",
+                f"Group Song (/{song_m})",
+                f"Declamation (/{dec_m})",
+                f"Science Exhibition (/{sci_m})",
+                f"Combined Total (/{comb_m})",
+                "Combined Average",
                 "Events Scored",
                 "Standing / Award",
                 "Last Updated"

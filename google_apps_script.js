@@ -112,6 +112,18 @@ function doPost(e) {
       var judgeStartCol = 4;
       var judgeEndCol = incomingHeaders.length - 4; // up to Overall Average
 
+      // Map existing judges by name (e.g. "Judge 1 (/50)" -> "judge 1") so deleted/added judges align correctly
+      function getCleanJudgeName(headerStr) {
+        return (headerStr || "").toString().split("(")[0].trim().toLowerCase();
+      }
+
+      var exJudgeColMap = {};
+      var existingHeaders = existingData[0] || [];
+      for (var eh = 4; eh < existingHeaders.length - 4; eh++) {
+        var jKey = getCleanJudgeName(existingHeaders[eh]);
+        if (jKey) exJudgeColMap[jKey] = eh;
+      }
+
       for (var r = 1; r < incomingRows.length; r++) {
         var inRow = incomingRows[r];
         var inTag = (inRow[1] || "").toString().trim().toUpperCase();
@@ -127,11 +139,13 @@ function doPost(e) {
             mergedRow[3] = exAtt;
           }
 
-          // 2. Preserve Judge Scores (Cols 4 to judgeEndCol - 1)
+          // 2. Preserve Judge Scores dynamically matching each judge by name
           var preservedAnyScore = false;
           for (var c = judgeStartCol; c < judgeEndCol; c++) {
             var inScore = (inRow[c] !== undefined ? inRow[c] : "").toString().trim();
-            var exScore = (exRow[c] !== undefined ? exRow[c] : "").toString().trim();
+            var jName = getCleanJudgeName(incomingHeaders[c]);
+            var matchingExCol = exJudgeColMap[jName];
+            var exScore = (matchingExCol !== undefined && exRow[matchingExCol] !== undefined) ? exRow[matchingExCol].toString().trim() : "";
 
             var isExScoreNumeric = (exScore !== "" && exScore !== "Pending" && exScore !== "-" && !isNaN(Number(exScore)));
             var isInScoreEmpty = (inScore === "" || inScore === "Pending" || inScore === "-");
