@@ -135,6 +135,29 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // 3. Tab Deletion Support
+    if (payload.action === "delete_tabs" || payload.delete_tabs) {
+      var toDelete = payload.delete_tabs || [
+        "Group Dance", "Declamation", "Science Exhibition", "Group Song",
+        "Master Registrations", "Final Result", "Live Scores",
+        "registration_dance", "registration_song", "registration_declamation", "registration_science",
+        "Sheet1", "Sheet2"
+      ];
+      var deleted = [];
+      for (var dIdx = 0; dIdx < toDelete.length; dIdx++) {
+        var shDel = ss.getSheetByName(toDelete[dIdx]);
+        if (shDel && ss.getSheets().length > 1) {
+          ss.deleteSheet(shDel);
+          deleted.push(toDelete[dIdx]);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        deleted_tabs: deleted,
+        remaining_tabs: ss.getSheets().map(function(s) { return s.getName(); })
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var tabName = payload.tab_name || "Live Scores";
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) {
@@ -681,16 +704,23 @@ function removeAllBackgroundTriggers() {
 
 function cleanUnwantedTabs() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
-  var toDelete = ["registration_dance", "registration_song", "registration_declamation", "registration_science", "Sheet1", "Sheet2"];
+  var toDelete = [
+    "Group Dance", "Declamation", "Science Exhibition", "Group Song",
+    "Master Registrations", "Final Result", "Live Scores",
+    "registration_dance", "registration_song", "registration_declamation", "registration_science",
+    "Sheet1", "Sheet2"
+  ];
   var count = 0;
+  var deleted = [];
   for (var i = 0; i < toDelete.length; i++) {
     var sh = ss.getSheetByName(toDelete[i]);
     if (sh && ss.getSheets().length > 1) {
       ss.deleteSheet(sh);
+      deleted.push(toDelete[i]);
       count++;
     }
   }
-  SpreadsheetApp.getUi().alert("Tabs Cleaned", "Removed " + count + " unused tabs.", SpreadsheetApp.getUi().ButtonSet.OK);
+  SpreadsheetApp.getUi().alert("✅ Old Tabs Removed", "Successfully deleted " + count + " old duplicate tabs:\n" + (deleted.length > 0 ? deleted.join(", ") : "None found!"), SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 function findColIndex(header, candidates) {
