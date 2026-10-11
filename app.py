@@ -325,7 +325,6 @@ def update_event(event_id):
             update_dict["google_sheet_webhook_url"] = data["google_sheet_webhook_url"]
 
         updated = db.update_event(event_id, update_dict)
-        sheets_service.trigger_background_sync(event_id)
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -338,7 +337,6 @@ def add_judge_route(event_id):
         updated = db.add_judge(event_id, judge_name)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
-        sheets_service.trigger_background_sync(event_id)
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -355,7 +353,6 @@ def remove_judge_route(event_id, judge_id=None):
         updated = db.remove_judge(event_id, judge_id)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
-        sheets_service.trigger_background_sync(event_id)
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

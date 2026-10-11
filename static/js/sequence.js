@@ -44,6 +44,11 @@ async function loadSequenceData() {
     if (data.success && data.event) {
       currentEvent = data.event;
       eventId = currentEvent.id;
+
+      // Filter out any completed tags from the active queue
+      const compTags = data.completed_tags || [];
+      const compSet = new Set(compTags.map(c => c.tag_no));
+      currentEvent.sequence = (currentEvent.sequence || []).filter(s => !compSet.has(s.tag_no));
       
       const navTitle = document.getElementById('eventTitleNav');
       if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Sequence</span>`;
@@ -52,13 +57,15 @@ async function loadSequenceData() {
       if (badge) badge.textContent = `${currentEvent.sequence.length} Teams in Queue`;
       
       const sideCurrent = document.getElementById('sidebarCurrentTag');
-      if (sideCurrent) sideCurrent.textContent = data.current_tag || 'Queue Finished';
+      const activeStageTag = currentEvent.sequence.length > 0 ? currentEvent.sequence[0].tag_no : 'Queue Finished';
+      if (sideCurrent) sideCurrent.textContent = activeStageTag;
       
       const sideNext = document.getElementById('sidebarNextTag');
-      if (sideNext) sideNext.textContent = data.next_tag || 'None';
+      const nextQueueTag = currentEvent.sequence.length > 1 ? currentEvent.sequence[1].tag_no : 'None';
+      if (sideNext) sideNext.textContent = nextQueueTag;
 
       renderSequenceList(currentEvent.sequence);
-      renderCompletedList(data.completed_tags || []);
+      renderCompletedList(compTags);
     }
   } catch (err) {
     console.error('Error loading sequence:', err);

@@ -190,18 +190,23 @@ class DB:
 
     def get_event(self, event_id):
         events = self.get_events()
-        # Direct match
+        matched = None
         for e in events:
             if e["id"] == event_id:
-                return e
-        # Special keywords fallback or first event
-        if event_id in ["judge", "judges", "sequence", "projector", "admin", "default", None, ""]:
-            if events:
-                return events[0]
-        # Single event fallback
-        if events:
-            return events[0]
-        return None
+                matched = e
+                break
+        if not matched and event_id in ["judge", "judges", "sequence", "projector", "admin", "default", None, ""]:
+            matched = events[0] if events else None
+        elif not matched and events:
+            matched = events[0]
+
+        if matched:
+            comp_tags = matched.get("completed_tags", [])
+            comp_set = {c.get("tag_no") for c in comp_tags if isinstance(c, dict) and c.get("tag_no")}
+            if comp_set and matched.get("sequence"):
+                matched["sequence"] = [item for item in matched["sequence"] if item.get("tag_no") not in comp_set]
+
+        return matched
 
     def create_event(self, name, description, judge_names, tag_numbers, criteria=None, google_sheet_url=""):
         events = load_json(EVENTS_FILE, [])
@@ -348,30 +353,34 @@ class DB:
         return None
 
     def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None):
-        """Marks tag as completed, removes it from sequence, and top of queue (index 0) becomes new stage team"""
+        """Marks tag as completed, removes it permanently from sequence, and next team becomes stage team"""
         event = self.get_event(event_id)
         if not event:
             return None, "Event not found"
         
         seq = list(event.get("sequence", []))
-        if not seq:
-            return None, "No active tags in sequence queue"
-
         completed_list = list(event.get("completed_tags", []))
 
-        idx_to_remove = 0
-        if tag_no:
-            for i, item in enumerate(seq):
-                if item.get("tag_no") == tag_no:
-                    idx_to_remove = i
-                    break
-        elif tag_index is not None and 0 <= tag_index < len(seq):
-            idx_to_remove = tag_index
+        target_tag = tag_no
+        if not target_tag and tag_index is not None and 0 <= tag_index < len(seq):
+            target_tag = seq[tag_index].get("tag_no")
+        elif not target_tag and seq:
+            target_tag = seq[0].get("tag_no")
 
-        if 0 <= idx_to_remove < len(seq):
-            removed_item = seq.pop(idx_to_remove)
-            removed_item["completed_at"] = datetime.now().strftime("%I:%M %p")
-            completed_list.append(removed_item)
+        if target_tag:
+            matched_item = next((item for item in seq if item.get("tag_no") == target_tag), None)
+            notes = matched_item.get("notes", "") if matched_item else ""
+
+            # Remove ALL instances of target_tag from sequence
+            seq = [item for item in seq if item.get("tag_no") != target_tag]
+
+            # Add to completed list
+            if not any(c.get("tag_no") == target_tag for c in completed_list):
+                completed_list.append({
+                    "tag_no": target_tag,
+                    "notes": notes,
+                    "completed_at": datetime.now().strftime("%I:%M %p")
+                })
             
             event["sequence"] = seq
             event["completed_tags"] = completed_list
@@ -380,7 +389,7 @@ class DB:
 
             updated = self.update_event(event["id"], event)
             new_stage_tag = seq[0]["tag_no"] if seq else "None (Queue Finished)"
-            return updated, f"Tag '{removed_item['tag_no']}' completed. Next on stage: '{new_stage_tag}'"
+            return updated, f"Tag '{target_tag}' completed. Next on stage: '{new_stage_tag}'"
         
         return None, "Could not find tag to complete"
 
@@ -393,13 +402,13 @@ class DB:
         completed_list = list(event.get("completed_tags", []))
         matched = None
         for i, c in enumerate(completed_list):
-            if c["tag_no"] == tag_no:
+            if c.get("tag_no") == tag_no:
                 matched = completed_list.pop(i)
                 break
         
         if matched:
             seq = list(event.get("sequence", []))
-            seq.append({"tag_no": matched["tag_no"], "notes": ""})
+            seq.append({"tag_no": matched["tag_no"], "notes": matched.get("notes", "")})
             event["sequence"] = seq
             event["completed_tags"] = completed_list
             return self.update_event(event["id"], event)

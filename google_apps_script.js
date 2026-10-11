@@ -33,6 +33,18 @@ function onOpen() {
  * WebApp GET Handler (Health Check)
  */
 function doGet(e) {
+  var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "";
+  if (action === "get_state" || action === "get_scores") {
+    var props = PropertiesService.getScriptProperties();
+    var scoresJson = props.getProperty("agrash_scores") || "[]";
+    var compJson = props.getProperty("agrash_completed_tags") || "{}";
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      scores: JSON.parse(scoresJson),
+      completed_tags: JSON.parse(compJson)
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
     sheet_id: TARGET_SPREADSHEET_ID,
@@ -51,6 +63,36 @@ function doPost(e) {
     }
 
     var payload = JSON.parse(e.postData.contents);
+
+    // 1. Cloud Score Backup
+    if (payload.action === "save_score" && payload.score) {
+      var props = PropertiesService.getScriptProperties();
+      var existingScores = JSON.parse(props.getProperty("agrash_scores") || "[]");
+      var sc = payload.score;
+      var found = false;
+      for (var sIdx = 0; sIdx < existingScores.length; sIdx++) {
+        if (existingScores[sIdx].event_id === sc.event_id && existingScores[sIdx].tag_no === sc.tag_no && existingScores[sIdx].judge_id === sc.judge_id) {
+          existingScores[sIdx] = sc;
+          found = true;
+          break;
+        }
+      }
+      if (!found) existingScores.push(sc);
+      props.setProperty("agrash_scores", JSON.stringify(existingScores));
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", count: existingScores.length })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 2. Cloud Completed Tag Backup
+    if (payload.action === "complete_tag" && payload.tag_no) {
+      var props = PropertiesService.getScriptProperties();
+      var compMap = JSON.parse(props.getProperty("agrash_completed_tags") || "{}");
+      var evKey = payload.event_id || "all";
+      if (!compMap[evKey]) compMap[evKey] = [];
+      if (compMap[evKey].indexOf(payload.tag_no) === -1) compMap[evKey].push(payload.tag_no);
+      props.setProperty("agrash_completed_tags", JSON.stringify(compMap));
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", completed: compMap[evKey] })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var sheetId = payload.sheet_id || TARGET_SPREADSHEET_ID;
     var ss = SpreadsheetApp.openById(sheetId);
     if (!ss) {

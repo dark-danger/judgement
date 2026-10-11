@@ -152,23 +152,6 @@ class RegistrationService:
 
         if updated_school:
             self._save(data)
-            # Fast Attendance Sheet Sync
-            try:
-                from sheets_service import sheets_service
-                if mark_all:
-                    sheets_service.trigger_attendance_sync(None)
-                else:
-                    cat_event_map = {
-                        "group dance": "evt-group-dance",
-                        "group song": "evt-group-song",
-                        "declamation": "evt-declamation",
-                        "science exhibition": "evt-science-exhibition"
-                    }
-                    ev_id = cat_event_map.get(category.lower() if category else "", None)
-                    sheets_service.trigger_attendance_sync(ev_id)
-            except Exception as e:
-                logger.error(f"Error triggering sheet sync on attendance: {e}")
-
         return updated_school
 
     def get_stats(self):

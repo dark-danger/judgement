@@ -544,9 +544,12 @@
       const judges = event.judges || [];
       const maxScore = rubricConfig.max;
 
-      document.getElementById('projectorCurrentTag').textContent = evtData.current_tag || 'Finished';
+      const completedSet = new Set((event.completed_tags || []).map(c => c.tag_no));
+      const activeQueue = (event.sequence || []).filter(s => !completedSet.has(s.tag_no));
+      const currentLiveTag = activeQueue.length > 0 ? activeQueue[0].tag_no : 'Queue Finished';
+      document.getElementById('projectorCurrentTag').textContent = currentLiveTag;
 
-      let allTags = event.sequence.map(s => s.tag_no);
+      let allTags = activeQueue.map(s => s.tag_no);
       (event.completed_tags || []).forEach(c => {
         if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
       });
@@ -556,8 +559,8 @@
         const sum = tagScores.reduce((acc, s) => acc + s.total, 0);
         const count = tagScores.length;
         const avg = count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
-        const isCompleted = (event.completed_tags || []).some(c => c.tag_no === tag);
-        const isLive = evtData.current_tag === tag;
+        const isCompleted = completedSet.has(tag);
+        const isLive = (currentLiveTag === tag && !isCompleted);
 
         const seqItem = event.sequence.find(s => s.tag_no === tag) || (event.completed_tags || []).find(c => c.tag_no === tag);
         const notes = seqItem ? seqItem.notes : '';
