@@ -284,13 +284,30 @@ function onSearchInput(query) {
   }, 250);
 }
 
+async function pullFromAgrashSheet() {
+  try {
+    showToast('Fetching school data from "Agrash Registrations" tab...', 'info');
+    const res = await fetch('/api/registration/pull-from-sheet', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`⚡ ${data.message || 'Updated schools from Agrash Registrations sheet!'}`, 'success');
+      loadRegistrations();
+      loadStats();
+    } else {
+      showToast(`Notice: ${data.message || data.error}`, 'info');
+    }
+  } catch (err) {
+    showToast('Failed to pull from Google Sheet', 'error');
+  }
+}
+
 async function syncRegistrationGSheet() {
   try {
-    showToast('Syncing attendance matrix to Google Sheet...', 'info');
+    showToast('Syncing attendance to Google Sheet "Attendance" tab...', 'info');
     const res = await fetch('/api/registration/sync-sheets', { method: 'POST' });
     const data = await res.json();
     if (data.success) {
-      showToast('⚡ Google Sheet "Master Registrations" tab updated with live attendance!', 'success');
+      showToast('⚡ Google Sheet "Attendance" tab updated with live attendance & check-ins!', 'success');
     } else {
       showToast(`Sync response: ${data.message}`, 'info');
     }

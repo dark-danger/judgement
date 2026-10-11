@@ -152,6 +152,11 @@ class RegistrationService:
 
         if updated_school:
             self._save(data)
+            try:
+                from database import db
+                db.sync_event_sequence_from_attendance()
+            except Exception:
+                pass
         return updated_school
 
     def get_stats(self):

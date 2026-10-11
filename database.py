@@ -84,6 +84,20 @@ def save_json(filepath, data):
     except Exception as e:
         print(f"⚠️ [Storage] Could not write to {filepath}: {e}. Preserved in memory.")
 
+EVENT_CATEGORY_MAP = {
+    "evt-group-dance": "Group Dance",
+    "evt-group-song": "Group Song",
+    "evt-declamation": "Declamation",
+    "evt-science-exhibition": "Science Exhibition"
+}
+
+EVENT_TAB_MAP = {
+    "evt-group-dance": {"short": "Dance", "sequence": "Sequence Dance", "result": "Dance Result"},
+    "evt-group-song": {"short": "Song", "sequence": "Sequence Song", "result": "Song Result"},
+    "evt-declamation": {"short": "Declamation", "sequence": "Sequence Declamation", "result": "Declamation Result"},
+    "evt-science-exhibition": {"short": "Exhibition", "sequence": "Sequence Exhibition", "result": "Science Result"}
+}
+
 class DB:
     def __init__(self):
         self.supabase = None
@@ -108,6 +122,9 @@ class DB:
                 if not events:
                     events = default_events
                 save_json(EVENTS_FILE, events)
+
+            # Ensure sequences only contain PRESENT approved teams
+            self.sync_event_sequence_from_attendance()
         except Exception as e:
             print(f"⚠️ Error initializing default events: {e}")
 
@@ -413,6 +430,70 @@ class DB:
             event["completed_tags"] = completed_list
             return self.update_event(event["id"], event)
         return None
+
+    def sync_event_sequence_from_attendance(self, target_event_id=None):
+        """
+        Synchronizes the performance sequence dynamically from attendance records.
+        Strict rule: A team ONLY enters the active performance queue when approved (PRESENT) at registration.
+        If marked ABSENT or PENDING and has no submitted scores, it is removed from the active queue.
+        """
+        try:
+            from registration_service import registration_service
+            schools = registration_service.get_all()
+        except Exception:
+            schools = []
+
+        events = load_json(EVENTS_FILE, [])
+        updated_events = []
+
+        for ev in events:
+            if target_event_id and ev["id"] != target_event_id:
+                continue
+
+            category = EVENT_CATEGORY_MAP.get(ev["id"])
+            if not category:
+                continue
+
+            current_seq = list(ev.get("sequence", []))
+            completed_list = list(ev.get("completed_tags", []))
+            completed_tag_set = {c.get("tag_no") for c in completed_list if isinstance(c, dict)}
+            existing_tags = [item.get("tag_no") for item in current_seq]
+
+            # 1. Add any school event that is PRESENT and not in queue or completed
+            for s in schools:
+                ev_entry = next((e for e in s.get("events", []) if e.get("category") == category), None)
+                if not ev_entry or not ev_entry.get("tag_no"):
+                    continue
+                tag_no = ev_entry.get("tag_no")
+                status = ev_entry.get("status", "PENDING")
+                school_name = s.get("school_name", "")
+                room_no = s.get("room_no") or "TBD"
+                notes = f"{school_name} [Room: {room_no}]"
+                approved_at = ev_entry.get("marked_at") or s.get("arrived_at")
+
+                if status == "PRESENT":
+                    if tag_no not in completed_tag_set and tag_no not in existing_tags:
+                        current_seq.append({
+                            "tag_no": tag_no,
+                            "notes": notes,
+                            "school_name": school_name,
+                            "room_no": room_no,
+                            "approved_at": approved_at or datetime.now().strftime("%I:%M %p")
+                        })
+                        existing_tags.append(tag_no)
+                else:
+                    # If NOT present, remove from active queue ONLY IF unscored and not completed
+                    if tag_no in existing_tags:
+                        tag_scores = [sc for sc in self.get_scores(ev["id"], tag_no)]
+                        if not tag_scores and tag_no not in completed_tag_set:
+                            current_seq = [item for item in current_seq if item.get("tag_no") != tag_no]
+                            existing_tags = [item.get("tag_no") for item in current_seq]
+
+            ev["sequence"] = current_seq
+            updated_events.append(ev)
+
+        save_json(EVENTS_FILE, events)
+        return updated_events
 
     def get_scores(self, event_id=None, tag_no=None):
         if self.is_supabase_connected and self.supabase:

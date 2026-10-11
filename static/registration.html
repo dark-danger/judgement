@@ -32,8 +32,11 @@
         </div>
       </a>
       <div class="nav-actions">
-        <button class="btn btn-emerald btn-sm" onclick="syncRegistrationGSheet()" title="Push attendance to Google Sheet Master tab">
-          <i data-lucide="refresh-cw"></i> Sync Google Sheet
+        <button class="btn btn-outline btn-sm" onclick="pullFromAgrashSheet()" title="Fetch school data from Agrash Registrations tab">
+          <i data-lucide="cloud-download"></i> Pull from Sheet
+        </button>
+        <button class="btn btn-emerald btn-sm" onclick="syncRegistrationGSheet()" title="Push attendance to Google Sheet Attendance tab">
+          <i data-lucide="refresh-cw"></i> Sync Attendance
         </button>
         <a href="/admin" class="btn btn-ghost btn-sm">
           <i data-lucide="arrow-left"></i> Admin Panel

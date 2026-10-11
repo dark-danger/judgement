@@ -43,10 +43,16 @@ class SheetsService:
         return None
 
     def trigger_attendance_sync(self, event_id=None):
-        """Ultra-fast sync for attendance updates only (updates Master Registrations tab without touching scores)"""
+        """Ultra-fast sync for attendance and dynamic sequence updates without touching scores"""
         def _worker():
             try:
                 self.sync_master_registrations()
+                if event_id:
+                    self.sync_event_sequence(event_id)
+                else:
+                    from database import db
+                    for ev in db.get_events():
+                        self.sync_event_sequence(ev["id"])
             except Exception as ex:
                 logger.error(f"Attendance sync error: {ex}")
 
@@ -57,12 +63,14 @@ class SheetsService:
             thread = threading.Thread(target=_worker, daemon=True)
             thread.start()
 
-    def trigger_background_sync(self, event_id=None, sync_registration=False):
-        """Spawns non-blocking background thread (or synchronous if serverless) to update connected Google Sheet and Final Result tab"""
+    def trigger_background_sync(self, event_id=None, sync_registration=False, sync_sequence=True):
+        """Spawns non-blocking background thread to update connected Google Sheet result, sequence, and championship tabs"""
         def _sync_worker():
             try:
                 if event_id:
                     self.auto_sync_event(event_id)
+                    if sync_sequence:
+                        self.sync_event_sequence(event_id)
                 else:
                     self.sync_all_events()
                 self.sync_final_championship()
@@ -323,7 +331,7 @@ class SheetsService:
             return {}
 
     def sync_final_championship(self, webhook_url=None):
-        """Pushes the combined 4-event Top 10 Championship results to Google Sheet 'Final Result' tab"""
+        """Pushes the combined 4-event Championship results to Google Sheet 'Championship' tab (Max 210)"""
         try:
             from database import db
             championship_list = self.calculate_championship_data()
@@ -399,7 +407,7 @@ class SheetsService:
                     webhook,
                     json={
                         "event_name": "Agrash Overall Championship",
-                        "tab_name": "Final Result",
+                        "tab_name": "Championship",
                         "rows": final_rows,
                         "timestamp": datetime.now().isoformat()
                     },
@@ -407,8 +415,8 @@ class SheetsService:
                     timeout=25,
                     allow_redirects=True
                 )
-                logger.info(f"⚡ [Final Result Webhook] Synced successfully! Status: {resp.status_code}")
-                return True, "Final Result tab synced successfully"
+                logger.info(f"⚡ [Championship Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, "Championship tab synced successfully"
 
             return False, "No webhook configured"
         except Exception as e:
@@ -416,7 +424,7 @@ class SheetsService:
             return False, str(e)
 
     def sync_master_registrations(self, webhook_url=None):
-        """Pushes the master school registrations & attendance matrix to Google Sheet 'Master Registrations' tab"""
+        """Pushes the master school registrations & attendance matrix to Google Sheet 'Attendance' tab"""
         try:
             from database import db
             from registration_service import registration_service
@@ -483,8 +491,8 @@ class SheetsService:
                 resp = requests.post(
                     webhook,
                     json={
-                        "event_name": "Agrash Master Registrations",
-                        "tab_name": "Master Registrations",
+                        "event_name": "Agrash Attendance Matrix",
+                        "tab_name": "Attendance",
                         "rows": rows,
                         "timestamp": datetime.now().isoformat()
                     },
@@ -492,16 +500,122 @@ class SheetsService:
                     timeout=25,
                     allow_redirects=True
                 )
-                logger.info(f"⚡ [Master Registrations Webhook] Synced successfully! Status: {resp.status_code}")
-                return True, "Master Registrations tab synced successfully"
+                logger.info(f"⚡ [Attendance Webhook] Synced successfully! Status: {resp.status_code}")
+                return True, "Attendance tab synced successfully"
 
             return False, "No webhook configured"
         except Exception as e:
-            logger.error(f"Error syncing master registrations: {e}")
+            logger.error(f"Error syncing attendance: {e}")
             return False, str(e)
 
-    def auto_sync_event(self, event_id):
-        """Automatically pushes live leaderboard and marksheet with Attendance column to connected Google Sheet"""
+    def sync_event_sequence(self, event_id, webhook_url=None):
+        """Pushes dynamic stage sequence of PRESENT teams to dedicated 'Sequence <Event>' tab in Google Sheets"""
+        try:
+            from database import db
+            event = db.get_event(event_id)
+            if not event:
+                return False, "Event not found"
+
+            SEQUENCE_TAB_MAP = {
+                "evt-group-dance": "Sequence Dance",
+                "evt-group-song": "Sequence Song",
+                "evt-declamation": "Sequence Declamation",
+                "evt-science-exhibition": "Sequence Exhibition"
+            }
+            tab_name = SEQUENCE_TAB_MAP.get(event["id"], f"Sequence {event.get('name', 'Event')}")
+
+            headers = [
+                "Seq Order",
+                "Tag No",
+                "School Name",
+                "Room / Flat",
+                "Stage Status",
+                "Approved Time",
+                "Last Updated"
+            ]
+
+            rows = [headers]
+            seq_items = event.get("sequence", [])
+            for idx, item in enumerate(seq_items):
+                tag_no = item.get("tag_no", "")
+                school_name = item.get("school_name", "")
+                room_no = item.get("room_no", "")
+                notes = item.get("notes", "")
+                if not school_name and notes:
+                    if "[Room:" in notes:
+                        parts = notes.split("[Room:")
+                        school_name = parts[0].strip()
+                        room_no = parts[1].replace("]", "").strip()
+                    else:
+                        school_name = notes
+
+                stage_status = "🔴 LIVE ON STAGE" if idx == 0 else f"⏳ IN QUEUE (WAITING #{idx + 1})"
+                approved_time = item.get("approved_at") or get_ist_time_str()
+
+                rows.append([
+                    f"#{idx + 1}",
+                    tag_no,
+                    school_name,
+                    room_no or "TBD",
+                    stage_status,
+                    approved_time,
+                    get_ist_time_str()
+                ])
+
+            # Add completed teams section
+            completed_items = event.get("completed_tags", [])
+            for c in completed_items:
+                tag_no = c.get("tag_no", "")
+                notes = c.get("notes", "")
+                school_name = notes.split("[Room:")[0].strip() if "[Room:" in notes else notes
+                room_no = notes.split("[Room:")[1].replace("]", "").strip() if "[Room:" in notes else "TBD"
+
+                rows.append([
+                    "DONE",
+                    tag_no,
+                    school_name,
+                    room_no or "TBD",
+                    "✅ COMPLETED",
+                    c.get("completed_at") or "-",
+                    get_ist_time_str()
+                ])
+
+            if len(rows) == 1:
+                rows.append([
+                    "-",
+                    "-",
+                    "No teams registered present yet",
+                    "-",
+                    "WAITING FOR DESK APPROVAL",
+                    "-",
+                    get_ist_time_str()
+                ])
+
+            webhook = webhook_url or event.get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.post(
+                    webhook,
+                    json={
+                        "event_name": f"Agrash Sequence - {tab_name}",
+                        "tab_name": tab_name,
+                        "rows": rows,
+                        "timestamp": datetime.now().isoformat()
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=25,
+                    allow_redirects=True
+                )
+                logger.info(f"⚡ [Sequence Webhook] Updated '{tab_name}'! Status: {resp.status_code}")
+                return True, f"Sequence updated for '{tab_name}'"
+
+            return False, "No webhook configured"
+        except Exception as e:
+            logger.error(f"Error syncing event sequence: {e}")
+            return False, str(e)
+
+    def auto_sync_event(self, event_id, webhook_url=None):
+        """Automatically pushes live event result sheet to dedicated '<Event> Result' tab in Google Sheets"""
         try:
             from database import db
             from registration_service import registration_service
@@ -509,6 +623,14 @@ class SheetsService:
             event = db.get_event(event_id)
             if not event:
                 return False, "Event not found"
+
+            RESULT_TAB_MAP = {
+                "evt-group-dance": "Dance Result",
+                "evt-group-song": "Song Result",
+                "evt-declamation": "Declamation Result",
+                "evt-science-exhibition": "Science Result"
+            }
+            tab_name = RESULT_TAB_MAP.get(event["id"], f"{event.get('name', 'Event')} Result")
 
             scores = db.get_scores(event_id=event["id"])
             judges = event.get("judges", [])
@@ -595,15 +717,14 @@ class SheetsService:
                 final_table_rows.append(row)
 
             # Push to Google Sheet Webhook
-            webhook_url = event.get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
-            tab_name = event.get("name", "Live Scores")
+            webhook_url = webhook_url or event.get("google_sheet_webhook_url") or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
 
             if webhook_url and webhook_url.startswith("http"):
                 import requests
                 resp = requests.post(
                     webhook_url,
                     json={
-                        "event_name": event["name"],
+                        "event_name": f"Agrash Result - {tab_name}",
                         "tab_name": tab_name,
                         "rows": final_table_rows,
                         "timestamp": datetime.now().isoformat()
@@ -615,43 +736,66 @@ class SheetsService:
                 logger.info(f"⚡ [Google Sheet Webhook] Auto-updated '{tab_name}'! Status: {resp.status_code}")
                 return True, f"Auto-updated '{tab_name}' via Webhook"
 
-            # Fallback to Service Account if configured
-            client = self._get_client()
-            target_sheet = event.get("google_sheet_url") or os.environ.get("GOOGLE_SHEET_URL")
-            if client and target_sheet:
-                if "docs.google.com/spreadsheets" in str(target_sheet):
-                    sheet = client.open_by_url(target_sheet)
-                else:
-                    sheet = client.open_by_key(target_sheet)
-
-                try:
-                    worksheet = sheet.worksheet(tab_name)
-                    worksheet.clear()
-                except Exception:
-                    worksheet = sheet.add_worksheet(title=tab_name, rows=len(final_table_rows) + 20, cols=20)
-
-                worksheet.update("A1", final_table_rows)
-                logger.info(f"⚡ [Google Sheet Service Account] Auto-updated '{sheet.title}' ({tab_name})!")
-                return True, f"Auto-updated '{tab_name}' via Service Account"
-
-            return False, "No Google Sheet Webhook or Service Account configured"
+            return False, "No Google Sheet Webhook configured"
         except Exception as e:
             logger.error(f"Auto-sync error: {e}")
             return False, str(e)
 
+    def pull_from_agrash_sheet(self, webhook_url=None):
+        """Pulls school registration data directly from Google Sheet 'Agrash Registrations' tab"""
+        try:
+            from database import db
+            from registration_service import registration_service
+
+            events = db.get_events()
+            webhook = webhook_url or (events[0].get("google_sheet_webhook_url") if events else None) or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
+
+            schools_data = []
+            if webhook and webhook.startswith("http"):
+                import requests
+                url = f"{webhook}?action=get_registrations"
+                resp = requests.get(url, timeout=25, allow_redirects=True)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    schools_data = data.get("schools", [])
+
+            if schools_data:
+                updated_count = 0
+                for s in schools_data:
+                    rec = registration_service.upsert_school(
+                        school_name=s.get("school_name", ""),
+                        dance_tag=s.get("dance_tag", ""),
+                        song_tag=s.get("song_tag", ""),
+                        declamation_tag=s.get("declamation_tag", ""),
+                        science_tag=s.get("science_tag", ""),
+                        room_no=s.get("room_no", "TBD"),
+                        desk_no=s.get("desk_no")
+                    )
+                    if rec:
+                        updated_count += 1
+                return True, f"Successfully synced {updated_count} schools from 'Agrash Registrations' sheet"
+            return False, "No schools returned from 'Agrash Registrations' sheet"
+        except Exception as e:
+            logger.error(f"Error pulling from Agrash Registrations sheet: {e}")
+            return False, str(e)
+
     def sync_all_events(self):
-        """Syncs all 4 category evaluation events and Final Result to Google Sheet"""
+        """Syncs all 4 category sequences, results, championship, and attendance to Google Sheet"""
         try:
             from database import db
             events = db.get_events()
             results = {}
             for ev in events:
-                ok, msg = self.auto_sync_event(ev["id"])
-                results[ev["name"]] = {"success": ok, "message": msg}
+                ok_seq, msg_seq = self.sync_event_sequence(ev["id"])
+                ok_res, msg_res = self.auto_sync_event(ev["id"])
+                results[f"{ev['name']} Sequence"] = {"success": ok_seq, "message": msg_seq}
+                results[f"{ev['name']} Result"] = {"success": ok_res, "message": msg_res}
 
-            # Sync Final Combined Result
-            ok_fin, msg_fin = self.sync_final_championship()
-            results["Final Result"] = {"success": ok_fin, "message": msg_fin}
+            # Sync Championship & Attendance
+            ok_champ, msg_champ = self.sync_final_championship()
+            ok_att, msg_att = self.sync_master_registrations()
+            results["Championship"] = {"success": ok_champ, "message": msg_champ}
+            results["Attendance"] = {"success": ok_att, "message": msg_att}
 
             return True, results
         except Exception as e:

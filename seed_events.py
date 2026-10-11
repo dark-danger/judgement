@@ -31,30 +31,40 @@ def create_judges(count=5):
     return [{"id": f"j{i}", "name": f"Judge {i}", "is_active": True} for i in range(1, count + 1)]
 
 def build_category_events():
+    # Dynamic sequence rule: Performance sequences start EMPTY and are populated
+    # dynamically ONLY as schools are approved (marked PRESENT) at the Registration Desk!
     dance_seq = []
     song_seq = []
     dec_seq = []
     sci_seq = []
 
-    for row in schools_data:
-        school_name = row[0]
-        room = f" [Room: {row[9]}]" if row[9] else ""
-        
-        # Group Dance
-        if row[1] == "YES" and row[2]:
-            dance_seq.append({"tag_no": row[2], "notes": f"{school_name}{room}"})
-            
-        # Group Song
-        if row[3] == "YES" and row[4]:
-            song_seq.append({"tag_no": row[4], "notes": f"{school_name}{room}"})
-            
-        # Declamation
-        if row[5] == "YES" and row[6]:
-            dec_seq.append({"tag_no": row[6], "notes": f"{school_name}{room}"})
-            
-        # Science Exhibition
-        if row[7] == "YES" and row[8]:
-            sci_seq.append({"tag_no": row[8], "notes": f"{school_name}{room}"})
+    # If registration records already exist with PRESENT status, populate them
+    try:
+        from database import DATA_DIR, load_json
+        reg_file = os.path.join(DATA_DIR, "registration.json")
+        reg_data = load_json(reg_file, [])
+        for s in reg_data:
+            school_name = s.get("school_name", "")
+            room = f" [Room: {s.get('room_no')}]" if s.get("room_no") else ""
+            for ev in s.get("events", []):
+                if ev.get("status") == "PRESENT" and ev.get("tag_no"):
+                    item = {
+                        "tag_no": ev["tag_no"],
+                        "notes": f"{school_name}{room}",
+                        "school_name": school_name,
+                        "room_no": s.get("room_no", "TBD"),
+                        "approved_at": ev.get("marked_at") or s.get("arrived_at")
+                    }
+                    if ev.get("category") == "Group Dance":
+                        dance_seq.append(item)
+                    elif ev.get("category") == "Group Song":
+                        song_seq.append(item)
+                    elif ev.get("category") == "Declamation":
+                        dec_seq.append(item)
+                    elif ev.get("category") == "Science Exhibition":
+                        sci_seq.append(item)
+    except Exception:
+        pass
 
     events = [
         {

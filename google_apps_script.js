@@ -1,17 +1,24 @@
 /**
- * 🔥 AGRASH 2026 - BULLETPROOF GOOGLE APPS SCRIPT LIVE SYNC & DATA PRESERVATION ENGINE
- * ======================================================================================
+ * 🔥 AGRASH 2026 - BULLETPROOF GOOGLE APPS SCRIPT MULTI-TAB ARCHITECTURE ENGINE
+ * ==============================================================================
  * SPREADSHEET ID: 1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk
  * WEB PORTAL URL: https://judgement-ten.vercel.app
  * 
- * CORE GUARANTEES:
- * 1. ZERO DATA LOSS: Judge scores entered on the portal are PERMANENT and will NEVER be wiped
- *    or overwritten by "Pending", even during background syncs.
- * 2. ATTENDANCE PRESERVATION: Once marked "PRESENT (✅)" or "ARRIVED", attendance will NEVER
- *    revert to "PENDING (⏳)".
- * 3. NO RECURRING WIPING TIMERS: Deleted all periodic time triggers that were repeatedly erasing data.
- * 4. EVENT TAB PROTECTION: "Group Dance", "Group Song", "Declamation", and "Science Exhibition"
- *    are protected marksheets managed strictly by scoring submissions.
+ * CORE TAB ARCHITECTURE:
+ * 1. "Agrash Registrations": Master input data of all registered schools & tags.
+ * 2. "Attendance": Live attendance status (PRESENT / ABSENT, Desk, Check-In Time).
+ * 3. Dynamic Sequence Sheets (Added ONLY as schools are marked PRESENT):
+ *    - "Sequence Dance"
+ *    - "Sequence Song"
+ *    - "Sequence Declamation"
+ *    - "Sequence Exhibition"
+ * 4. Dedicated Event Marksheets:
+ *    - "Dance Result"
+ *    - "Song Result"
+ *    - "Declamation Result"
+ *    - "Science Result"
+ * 5. Overall Trophy Leaderboard:
+ *    - "Championship" (Combined 4-event total out of 210)
  */
 
 var TARGET_SPREADSHEET_ID = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk";
@@ -22,18 +29,46 @@ var TARGET_SPREADSHEET_ID = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk";
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu("⚡ AGRASH 2026")
-    .addItem("🔄 Sync Agrash Registrations to Master Registrations", "syncMainSheetToAllTabs")
+    .addItem("🔄 Read 'Agrash Registrations' -> Update Attendance", "syncMainSheetToAttendance")
+    .addItem("📋 Setup / Verify All Clean Tabs", "setupAllCleanTabs")
     .addItem("⚡ Setup Real-time onEdit Trigger (Safe)", "setupTriggers")
     .addItem("🛑 Delete ALL Background Timers (Stop Wiping)", "removeAllBackgroundTriggers")
-    .addItem("🧹 Clean Duplicate / Unwanted Tabs", "cleanUnwantedTabs")
+    .addItem("🧹 Clean Old Duplicate Tabs", "cleanUnwantedTabs")
     .addToUi();
 }
 
 /**
- * WebApp GET Handler (Health Check)
+ * WebApp GET Handler
  */
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "";
+
+  // 1. Return Master Registrations JSON to Web Portal
+  if (action === "get_registrations") {
+    try {
+      var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
+      var masterSheet = getAgrashMasterSheet(ss);
+      if (!masterSheet) {
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "error",
+          message: "Could not find 'Agrash Registrations' tab"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+      var schools = parseAgrashSheetData(masterSheet);
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        count: schools.length,
+        schools: schools
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "error",
+        message: err.toString()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  // 2. Cloud Backup Query
   if (action === "get_state" || action === "get_scores") {
     var props = PropertiesService.getScriptProperties();
     var scoresJson = props.getProperty("agrash_scores") || "[]";
@@ -48,12 +83,12 @@ function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
     sheet_id: TARGET_SPREADSHEET_ID,
-    message: "⚡ Agrash Live Sync & Data Protection Engine is active and running!"
+    message: "⚡ Agrash 2026 Live Sync & Dedicated Tab Architecture Engine is ACTIVE!"
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
- * WebApp POST Handler (Receives updates from Web Portal with Intelligent Merging & Score Preservation)
+ * WebApp POST Handler (Receives updates from Web Portal with Tab Routing & Score Preservation)
  */
 function doPost(e) {
   try {
@@ -100,24 +135,6 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    // Tab deletion support
-    if (payload.action === "delete_tabs" || payload.delete_tabs) {
-      var toDelete = payload.delete_tabs || ["registration_dance", "registration_song", "registration_declamation", "registration_science", "Sheet1", "Sheet2"];
-      var deleted = [];
-      for (var i = 0; i < toDelete.length; i++) {
-        var sh = ss.getSheetByName(toDelete[i]);
-        if (sh && ss.getSheets().length > 1) {
-          ss.deleteSheet(sh);
-          deleted.push(toDelete[i]);
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        deleted_tabs: deleted,
-        remaining_tabs: ss.getSheets().map(function(s) { return s.getName(); })
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
     var tabName = payload.tab_name || "Live Scores";
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) {
@@ -133,14 +150,16 @@ function doPost(e) {
     var existingData = sheet.getDataRange().getValues();
     var finalRows = [];
 
-    var isEventSheet = (tabName === "Group Dance" || tabName === "Group Song" || tabName === "Declamation" || tabName === "Science Exhibition");
-    var isMasterReg = (tabName === "Master Registrations");
+    var isSequenceSheet = (tabName.indexOf("Sequence ") === 0);
+    var isResultSheet = (tabName.indexOf("Result") !== -1 || tabName === "Group Dance" || tabName === "Group Song" || tabName === "Declamation" || tabName === "Science Exhibition");
+    var isChampionshipSheet = (tabName === "Championship" || tabName === "Final Result");
+    var isAttendanceSheet = (tabName === "Attendance" || tabName === "Master Registrations");
 
     // =========================================================================
-    // CASE 1: EVENT MARKSHEETS (Group Dance, Group Song, Declamation, Science)
+    // CASE 1: EVENT RESULT MARKSHEETS (Dance Result, Song Result, Declamation Result, Science Result)
     // Preserves existing judge scores so they NEVER get wiped by "Pending"
     // =========================================================================
-    if (isEventSheet && existingData.length > 1) {
+    if (isResultSheet && existingData.length > 1) {
       var existingTagMap = {};
       for (var er = 1; er < existingData.length; er++) {
         var exRow = existingData[er];
@@ -154,7 +173,6 @@ function doPost(e) {
       var judgeStartCol = 4;
       var judgeEndCol = incomingHeaders.length - 4; // up to Overall Average
 
-      // Map existing judges by name (e.g. "Judge 1 (/50)" -> "judge 1") so deleted/added judges align correctly
       function getCleanJudgeName(headerStr) {
         return (headerStr || "").toString().split("(")[0].trim().toLowerCase();
       }
@@ -174,15 +192,14 @@ function doPost(e) {
         if (exRow) {
           var mergedRow = inRow.slice();
 
-          // 1. Preserve Attendance (Col 3: "Attendance (Present/Absent)")
+          // 1. Preserve Attendance
           var exAtt = (exRow[3] || "").toString().trim();
           var inAtt = (inRow[3] || "").toString().trim();
           if (exAtt.indexOf("PRESENT") !== -1 && inAtt.indexOf("PENDING") !== -1) {
             mergedRow[3] = exAtt;
           }
 
-          // 2. Preserve Judge Scores dynamically matching each judge by name
-          var preservedAnyScore = false;
+          // 2. Preserve Judge Scores dynamically
           for (var c = judgeStartCol; c < judgeEndCol; c++) {
             var inScore = (inRow[c] !== undefined ? inRow[c] : "").toString().trim();
             var jName = getCleanJudgeName(incomingHeaders[c]);
@@ -194,11 +211,10 @@ function doPost(e) {
 
             if (isExScoreNumeric && isInScoreEmpty) {
               mergedRow[c] = Number(exScore);
-              preservedAnyScore = true;
             }
           }
 
-          // 3. Recalculate Overall Average & Judges Scored if existing score was preserved
+          // 3. Recalculate Average if scores were preserved
           var numScores = [];
           for (var sc = judgeStartCol; sc < judgeEndCol; sc++) {
             var val = mergedRow[sc];
@@ -222,7 +238,7 @@ function doPost(e) {
         }
       }
 
-      // Re-sort all scored rows by Overall Average descending
+      // Re-sort all scored rows descending by average
       var scoredRows = [];
       var unscoredRows = [];
       for (var fr = 0; fr < finalRows.length; fr++) {
@@ -253,10 +269,10 @@ function doPost(e) {
       finalRows = reRanked;
 
     // =========================================================================
-    // CASE 2: MASTER REGISTRATIONS (Attendance & Arrival Status)
+    // CASE 2: ATTENDANCE SHEET (Attendance / Master Registrations)
     // Preserves ARRIVED and PRESENT so they NEVER revert to PENDING
     // =========================================================================
-    } else if (isMasterReg && existingData.length > 1) {
+    } else if (isAttendanceSheet && existingData.length > 1) {
       var existingSchMap = {};
       for (var mr = 1; mr < existingData.length; mr++) {
         var mRow = existingData[mr];
@@ -300,12 +316,15 @@ function doPost(e) {
         }
       }
 
+    // =========================================================================
+    // CASE 3: SEQUENCE SHEETS & CHAMPIONSHIP SHEET
+    // =========================================================================
     } else {
       finalRows = incomingRows;
     }
 
     // =========================================================================
-    // WRITE PROTECTED DATA TO GOOGLE SHEET
+    // WRITE DATA TO SHEET & APPLY GORGEOUS FORMATTING
     // =========================================================================
     sheet.clear();
     var numRows = finalRows.length;
@@ -317,6 +336,9 @@ function doPost(e) {
     range.setFontFamily("Arial");
     range.setFontSize(10);
 
+    // Freeze header row
+    sheet.setFrozenRows(1);
+
     // Header styling
     var headerRange = sheet.getRange(1, 1, 1, numCols);
     headerRange.setFontWeight("bold");
@@ -325,7 +347,7 @@ function doPost(e) {
     headerRange.setHorizontalAlignment("center");
     sheet.setRowHeight(1, 32);
 
-    // Alignment
+    // Column Alignment
     for (var col = 1; col <= numCols; col++) {
       if (col === 2 || col === 3) {
         sheet.getRange(2, col, numRows - 1, 1).setHorizontalAlignment("left");
@@ -334,8 +356,22 @@ function doPost(e) {
       }
     }
 
-    // Top 3 Leaderboard highlight
-    if (tabName !== "Master Registrations") {
+    // Sequence Highlight (Vibrant Amber for LIVE ON STAGE)
+    if (isSequenceSheet) {
+      for (var seqR = 2; seqR <= numRows; seqR++) {
+        var statusCell = (finalRows[seqR - 1][4] || "").toString();
+        if (statusCell.indexOf("LIVE ON STAGE") !== -1 || statusCell.indexOf("ON STAGE") !== -1) {
+          sheet.getRange(seqR, 1, 1, numCols).setBackground("#fef08a"); // Soft bright yellow
+          sheet.getRange(seqR, 1, 1, numCols).setFontWeight("bold");
+        } else if (statusCell.indexOf("COMPLETED") !== -1) {
+          sheet.getRange(seqR, 1, 1, numCols).setBackground("#f8fafc"); // Subtle completed gray
+          sheet.getRange(seqR, 1, 1, numCols).setFontColor("#64748b");
+        }
+      }
+    }
+
+    // Result & Championship Leaderboard Top 3 Highlights (Gold, Silver, Bronze)
+    if (isResultSheet || isChampionshipSheet) {
       if (numRows > 1 && finalRows[1][0] === "#1") sheet.getRange(2, 1, 1, numCols).setBackground("#fef3c7");
       if (numRows > 2 && finalRows[2][0] === "#2") sheet.getRange(3, 1, 1, numCols).setBackground("#f1f5f9");
       if (numRows > 3 && finalRows[3][0] === "#3") sheet.getRange(4, 1, 1, numCols).setBackground("#ffedd5");
@@ -363,49 +399,32 @@ function doPost(e) {
 }
 
 /**
- * ⚡ ROUTER: Reads 'Agrash Registrations' and Syncs ONLY to 'Master Registrations'
- * (DOES NOT touch or clear the 4 event marksheets, protecting judge scores)
+ * ⚡ Syncs 'Agrash Registrations' directly to 'Attendance' tab preserving live timestamps
  */
-function syncMainSheetToAllTabs() {
+function syncMainSheetToAttendance() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
   if (!ss) return;
 
-  var masterSheet = null;
-  var possibleNames = [
-    "Agrash Registrations",
-    "AGRASH REGISTRATION",
-    "Agrash Registration",
-    "agrash_schools_sheet",
-    "Master",
-    "Registration"
-  ];
-  
-  for (var i = 0; i < possibleNames.length; i++) {
-    masterSheet = ss.getSheetByName(possibleNames[i]);
-    if (masterSheet) break;
-  }
-
+  var masterSheet = getAgrashMasterSheet(ss);
   if (!masterSheet) {
-    var allSheets = ss.getSheets();
-    for (var k = 0; k < allSheets.length; k++) {
-      var sName = allSheets[k].getName();
-      if (sName !== "Group Dance" && sName !== "Group Song" && sName !== "Declamation" && sName !== "Science Exhibition" && sName !== "Final Result" && sName !== "Live Scores" && sName !== "Master Registrations") {
-        masterSheet = allSheets[k];
-        break;
-      }
-    }
-  }
-
-  if (!masterSheet) {
-    Logger.log("⚠️ Agrash Registrations sheet not found.");
+    SpreadsheetApp.getUi().alert("Error", "Could not find 'Agrash Registrations' tab in your Google Sheet.", SpreadsheetApp.getUi().ButtonSet.OK);
     return;
   }
 
+  var schoolsToSync = parseAgrashSheetData(masterSheet);
+  syncAttendanceTab(ss, schoolsToSync);
+  SpreadsheetApp.getUi().alert("✅ Attendance Tab Updated!", "Successfully synced " + schoolsToSync.length + " schools into 'Attendance' tab with live desk numbers.", SpreadsheetApp.getUi().ButtonSet.OK);
+}
+
+/**
+ * Parses schools data from Agrash Registrations tab dynamically
+ */
+function parseAgrashSheetData(masterSheet) {
   var data = masterSheet.getDataRange().getValues();
-  if (data.length <= 1) return;
+  if (data.length <= 1) return [];
 
   var header = data[0].map(function(h) { return h.toString().trim().toLowerCase(); });
-  
+
   var colSchool = findColIndex(header, ["school name", "school", "name of school", "institution"]);
   if (colSchool === -1) colSchool = 0;
 
@@ -437,7 +456,6 @@ function syncMainSheetToAllTabs() {
   if (colRoom === -1) colRoom = 9;
 
   var schoolsToSync = [];
-
   for (var r = 1; r < data.length; r++) {
     var row = data[r];
     var schoolName = (row[colSchool] || "").toString().trim();
@@ -454,35 +472,44 @@ function syncMainSheetToAllTabs() {
       return "";
     }
 
-    var danceTag = extractTag(colDanceTag, colDance);
-    var songTag = extractTag(colSongTag, colSong);
-    var decTag = extractTag(colDecTag, colDec);
-    var sciTag = extractTag(colSciTag, colSci);
-    var roomNo = colRoom >= 0 ? (row[colRoom] || "").toString().trim() : "TBD";
-
     schoolsToSync.push({
       school_name: schoolName,
-      dance_tag: danceTag,
-      song_tag: songTag,
-      declamation_tag: decTag,
-      science_tag: sciTag,
-      room_no: roomNo || "TBD"
+      dance_tag: extractTag(colDanceTag, colDance),
+      song_tag: extractTag(colSongTag, colSong),
+      declamation_tag: extractTag(colDecTag, colDec),
+      science_tag: extractTag(colSciTag, colSci),
+      room_no: (colRoom >= 0 ? (row[colRoom] || "").toString().trim() : "") || "TBD"
     });
   }
-
-  Logger.log("Parsed " + schoolsToSync.length + " schools. Updating Master Registrations tab only.");
-
-  // Update Master Registrations tab preserving live check-in timestamps & arrival status
-  syncMasterRegistrationsTab(ss, schoolsToSync);
+  return schoolsToSync;
 }
 
 /**
- * Syncs 'Master Registrations' tab with arrival status across 6 desks preserving live timestamps
+ * Finds master input sheet
  */
-function syncMasterRegistrationsTab(ss, schools) {
-  var sheet = ss.getSheetByName("Master Registrations");
+function getAgrashMasterSheet(ss) {
+  var possibleNames = [
+    "Agrash Registrations",
+    "AGRASH REGISTRATION",
+    "Agrash Registration",
+    "agrash_schools_sheet",
+    "Master",
+    "Registration"
+  ];
+  for (var i = 0; i < possibleNames.length; i++) {
+    var s = ss.getSheetByName(possibleNames[i]);
+    if (s) return s;
+  }
+  return null;
+}
+
+/**
+ * Updates 'Attendance' tab with arrival status across 6 desks
+ */
+function syncAttendanceTab(ss, schools) {
+  var sheet = ss.getSheetByName("Attendance");
   if (!sheet) {
-    sheet = ss.insertSheet("Master Registrations");
+    sheet = ss.insertSheet("Attendance");
   }
 
   var existingData = sheet.getDataRange().getValues();
@@ -523,7 +550,7 @@ function syncMasterRegistrationsTab(ss, schools) {
     function formatTag(tag, existingCell) {
       if (!tag) return "-";
       if (existingCell && existingCell.toString().indexOf(tag) !== -1) {
-        return existingCell.toString(); // Preserves live status like "D-21 (✅ PRESENT)"
+        return existingCell.toString();
       }
       return tag + " (⏳ PENDING)";
     }
@@ -556,6 +583,7 @@ function syncMasterRegistrationsTab(ss, schools) {
   range.setFontFamily("Arial");
   range.setFontSize(10);
 
+  sheet.setFrozenRows(1);
   var hRange = sheet.getRange(1, 1, 1, headers.length);
   hRange.setFontWeight("bold");
   hRange.setBackground("#0f172a");
@@ -574,6 +602,38 @@ function syncMasterRegistrationsTab(ss, schools) {
 }
 
 /**
+ * Creates/Verifies all dedicated tabs
+ */
+function setupAllCleanTabs() {
+  var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
+  var requiredTabs = [
+    "Agrash Registrations",
+    "Attendance",
+    "Sequence Dance",
+    "Sequence Song",
+    "Sequence Declamation",
+    "Sequence Exhibition",
+    "Dance Result",
+    "Song Result",
+    "Declamation Result",
+    "Science Result",
+    "Championship"
+  ];
+
+  var created = [];
+  for (var i = 0; i < requiredTabs.length; i++) {
+    var tName = requiredTabs[i];
+    var sh = ss.getSheetByName(tName);
+    if (!sh) {
+      ss.insertSheet(tName);
+      created.push(tName);
+    }
+  }
+
+  SpreadsheetApp.getUi().alert("✅ Tabs Ready", "All dedicated tabs are verified and active.\nCreated: " + (created.length > 0 ? created.join(", ") : "All tabs already exist!"), SpreadsheetApp.getUi().ButtonSet.OK);
+}
+
+/**
  * Auto-trigger when any edit happens in Google Sheets
  */
 function onEdit(e) {
@@ -581,7 +641,7 @@ function onEdit(e) {
     if (e && e.range) {
       var sName = e.range.getSheet().getName();
       if (sName === "Agrash Registrations" || sName === "AGRASH REGISTRATION" || sName === "agrash_schools_sheet") {
-        syncMainSheetToAllTabs();
+        syncMainSheetToAttendance();
       }
     }
   } catch (err) {
@@ -599,7 +659,6 @@ function setupTriggers() {
     ScriptApp.deleteTrigger(triggers[i]);
   }
 
-  // ONLY setup onEdit trigger - NO periodic/time triggers!
   ScriptApp.newTrigger("onEdit")
     .forSpreadsheet(ss)
     .onEdit()

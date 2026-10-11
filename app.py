@@ -121,7 +121,21 @@ def update_attendance_api():
         if not updated:
             return jsonify({"success": False, "error": "School not found"}), 404
 
+        # Dynamically sync event sequence: ONLY present teams enter active queue
+        db.sync_event_sequence_from_attendance()
+
+        # Update Google Sheets (Attendance tab & Sequence tabs)
+        sheets_service.trigger_attendance_sync()
+
         return jsonify({"success": True, "school": updated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/registration/pull-from-sheet", methods=["GET", "POST"])
+def pull_registration_from_sheet_api():
+    try:
+        ok, msg = sheets_service.pull_from_agrash_sheet()
+        return jsonify({"success": ok, "message": msg})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -410,6 +424,7 @@ def update_sequence(event_id):
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
 
+        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -427,6 +442,7 @@ def set_current_tag(event_id):
         if not updated:
             return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
 
+        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -447,6 +463,7 @@ def complete_tag(event_id):
         if not updated:
             return jsonify({"success": False, "error": msg}), 400
 
+        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
         return jsonify({"success": True, "message": msg, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -463,6 +480,7 @@ def restore_tag(event_id):
         if not updated:
             return jsonify({"success": False, "error": "Could not restore tag"}), 400
 
+        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
         return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
