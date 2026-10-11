@@ -107,10 +107,18 @@ class SheetsService:
             sci_max = get_event_max("evt-science-exhibition", 50)
             combined_max = dance_max + song_max + dec_max + sci_max
 
+            def clean_norm_tag(t):
+                return str(t or "").upper().replace(" ", "").replace("-", "")
+
             def get_tag_avg(event_id, tag_no):
                 if not tag_no:
                     return None, "-"
-                tag_scores = [s for s in all_scores if s.get("event_id") == event_id and s.get("tag_no") == tag_no]
+                t_clean = clean_norm_tag(tag_no)
+                tag_scores = [
+                    s for s in all_scores
+                    if (s.get("event_id") == event_id or event_id in str(s.get("event_id", "")))
+                    and clean_norm_tag(s.get("tag_no")) == t_clean
+                ]
                 if not tag_scores:
                     return 0, f"{tag_no} (Pending)"
                 totals = [s.get("total", 0) for s in tag_scores]
@@ -652,14 +660,48 @@ class SheetsService:
             all_tags = []
             tag_meta = {}
 
-            for item in event.get("sequence", []):
-                all_tags.append(item["tag_no"])
-                tag_meta[item["tag_no"]] = item.get("notes", "")
+            EVENT_CAT_MAP = {
+                "evt-group-dance": "Group Dance",
+                "evt-group-song": "Group Song",
+                "evt-declamation": "Declamation",
+                "evt-science-exhibition": "Science Exhibition"
+            }
+            target_cat = EVENT_CAT_MAP.get(event["id"], event.get("name", ""))
 
+            # 1. Include all registered schools for this category
+            for s in all_reg:
+                sch_name = s.get("school_name", "")
+                r_no = s.get("room_no") or "TBD"
+                for ev in s.get("events", []):
+                    if ev.get("category") == target_cat and ev.get("tag_no"):
+                        t_no = ev["tag_no"]
+                        if t_no not in all_tags:
+                            all_tags.append(t_no)
+                            tag_meta[t_no] = f"{sch_name} [Room: {r_no}]"
+
+            # 2. Include tags from active sequence
+            for item in event.get("sequence", []):
+                t_no = item.get("tag_no")
+                if t_no and t_no not in all_tags:
+                    all_tags.append(t_no)
+                    tag_meta[t_no] = item.get("notes", "")
+
+            # 3. Include tags from completed
             for c in event.get("completed_tags", []):
-                if c["tag_no"] not in all_tags:
-                    all_tags.append(c["tag_no"])
-                    tag_meta[c["tag_no"]] = c.get("notes", "")
+                t_no = c.get("tag_no")
+                if t_no and t_no not in all_tags:
+                    all_tags.append(t_no)
+                    tag_meta[t_no] = c.get("notes", "")
+
+            # 4. Include any scored tags
+            for sc in scores:
+                t_no = sc.get("tag_no")
+                if t_no and t_no not in all_tags:
+                    all_tags.append(t_no)
+                    tag_meta[t_no] = f"Tag {t_no}"
+
+            def clean_norm_tag(t):
+                return str(t or "").upper().replace(" ", "").replace("-", "")
 
             # Distinct Attendance (Present/Absent) column
             total_max = sum(c.get("max_marks", 10) for c in event.get("criteria", [])) or 50
@@ -670,9 +712,10 @@ class SheetsService:
 
             rows_data = []
             for tag_no in all_tags:
-                tag_scores = [s for s in scores if s.get("tag_no") == tag_no]
-                is_completed = any(c.get("tag_no") == tag_no for c in event.get("completed_tags", []))
-                is_live = (event.get("sequence") and event["sequence"][0]["tag_no"] == tag_no)
+                t_clean = clean_norm_tag(tag_no)
+                tag_scores = [s for s in scores if clean_norm_tag(s.get("tag_no")) == t_clean]
+                is_completed = any(clean_norm_tag(c.get("tag_no")) == t_clean for c in event.get("completed_tags", []))
+                is_live = bool(event.get("sequence") and clean_norm_tag(event["sequence"][0]["tag_no"]) == t_clean)
                 
                 stage_status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else "IN QUEUE")
                 att_status = tag_att_map.get(tag_no, "PENDING (⏳)")

@@ -51,9 +51,30 @@ DEFAULT_CRITERIA = [
     {"id": "c5", "name": "Feasibility & Impact", "max_marks": 10}
 ]
 
+TMP_DATA_DIR = "/tmp/agrash_data"
+try:
+    os.makedirs(TMP_DATA_DIR, exist_ok=True)
+except Exception:
+    pass
+
 def load_json(filepath, default):
     if filepath in _IN_MEMORY_CACHE:
         return _IN_MEMORY_CACHE[filepath]
+
+    base_name = os.path.basename(filepath)
+    tmp_path = os.path.join(TMP_DATA_DIR, base_name)
+
+    # 1. Check /tmp (writable in serverless)
+    if os.path.exists(tmp_path):
+        try:
+            with open(tmp_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                _IN_MEMORY_CACHE[filepath] = data
+                return data
+        except Exception:
+            pass
+
+    # 2. Check local file
     if os.path.exists(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
@@ -62,8 +83,8 @@ def load_json(filepath, default):
                 return data
         except Exception:
             pass
-    # Fallback to initial data folder
-    base_name = os.path.basename(filepath)
+
+    # 3. Fallback to initial data folder
     fallback_path = os.path.join(INITIAL_DATA_DIR, base_name)
     if os.path.exists(fallback_path):
         try:
@@ -73,16 +94,28 @@ def load_json(filepath, default):
                 return data
         except Exception:
             pass
+
     _IN_MEMORY_CACHE[filepath] = default
     return default
 
 def save_json(filepath, data):
     _IN_MEMORY_CACHE[filepath] = data
+    base_name = os.path.basename(filepath)
+    tmp_path = os.path.join(TMP_DATA_DIR, base_name)
+
+    # Always write to /tmp
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+    # Also try local write
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
     except Exception as e:
-        print(f"⚠️ [Storage] Could not write to {filepath}: {e}. Preserved in memory.")
+        pass
 
 EVENT_CATEGORY_MAP = {
     "evt-group-dance": "Group Dance",
@@ -510,10 +543,27 @@ class DB:
                 print(f"⚠️ [Supabase] get_scores error: {e}")
 
         scores = load_json(SCORES_FILE, [])
+        if not scores:
+            try:
+                from seed_events import GSHEET_WEBHOOK_URL
+                webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+                if webhook and webhook.startswith("http"):
+                    import requests
+                    resp = requests.get(f"{webhook}?action=get_scores", timeout=4)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        cloud_scores = data.get("scores", [])
+                        if cloud_scores:
+                            scores = cloud_scores
+                            save_json(SCORES_FILE, scores)
+            except Exception:
+                pass
+
         if event_id:
-            scores = [s for s in scores if s.get("event_id") == event_id]
+            scores = [s for s in scores if s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))]
         if tag_no:
-            scores = [s for s in scores if s.get("tag_no") == tag_no]
+            t_norm = str(tag_no).upper().replace(" ", "").replace("-", "")
+            scores = [s for s in scores if str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "") == t_norm]
         return scores
 
     def submit_score(self, event_id, tag_no, judge_id, judge_name, criteria_scores, remarks=""):
@@ -521,8 +571,10 @@ class DB:
         total = sum(float(v) for v in criteria_scores.values() if v is not None and str(v).replace('.', '', 1).isdigit())
 
         existing_idx = None
+        t_norm = str(tag_no).upper().replace(" ", "").replace("-", "")
         for i, s in enumerate(scores):
-            if s.get("event_id") == event_id and s.get("tag_no") == tag_no and s.get("judge_id") == judge_id:
+            s_tag_norm = str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "")
+            if (s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))) and s_tag_norm == t_norm and s.get("judge_id") == judge_id:
                 existing_idx = i
                 break
 
@@ -545,6 +597,26 @@ class DB:
             scores.append(score_entry)
 
         save_json(SCORES_FILE, scores)
+
+        # Cloud backup to Google Apps Script Properties
+        try:
+            from seed_events import GSHEET_WEBHOOK_URL
+            webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+            if webhook and webhook.startswith("http"):
+                import threading
+                def _cloud_bk():
+                    try:
+                        import requests
+                        requests.post(webhook, json={"action": "save_score", "score": score_entry}, timeout=8)
+                    except Exception:
+                        pass
+                is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+                if is_serverless:
+                    _cloud_bk()
+                else:
+                    threading.Thread(target=_cloud_bk, daemon=True).start()
+        except Exception:
+            pass
 
         if self.is_supabase_connected and self.supabase:
             try:
