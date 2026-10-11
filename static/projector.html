@@ -420,7 +420,10 @@
       document.getElementById('podium3Badge').textContent = '🥉 2ND RUNNER UP (BRONZE)';
       document.getElementById('podium3Label').textContent = 'Combined Score / 210';
 
-      const res = await fetch('/api/championship');
+      const res = await fetch(`/api/championship?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       const data = await res.json();
       if (!data.success) return;
 
@@ -533,8 +536,14 @@
       document.getElementById('podium3Label').textContent = `Average Score / ${rubricConfig.max}`;
 
       const [evtRes, scRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`),
-        fetch(`/api/events/${eventId}/scores`)
+        fetch(`/api/events/${eventId}?_t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        }),
+        fetch(`/api/events/${eventId}/scores?_t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        })
       ]);
 
       const evtData = await evtRes.json();
@@ -673,7 +682,25 @@
 
       if (window.lucide) lucide.createIcons();
       loadProjectorData();
-      setInterval(loadProjectorData, 4000);
+      
+      // Real-time 1.5-second polling
+      setInterval(loadProjectorData, 1500);
+
+      // Multi-tab instant sync via BroadcastChannel & LocalStorage
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          const channel = new BroadcastChannel('stage_sequence_sync');
+          channel.onmessage = () => { loadProjectorData(); };
+          const regChannel = new BroadcastChannel('agrash_sync');
+          regChannel.onmessage = () => { loadProjectorData(); };
+        } catch (e) {}
+      }
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'stage_sequence_last_update' || e.key === 'agrash_sync_ping') {
+          loadProjectorData();
+        }
+      });
+      window.addEventListener('focus', loadProjectorData);
     });
   </script>
 </body>

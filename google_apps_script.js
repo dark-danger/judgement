@@ -23,6 +23,37 @@
 
 var TARGET_SPREADSHEET_ID = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk";
 
+var FORBIDDEN_TABS = [
+  "Group Dance", "Group Song", "Declamation", "Science Exhibition",
+  "Live Scores", "Final Result", "Master Registrations",
+  "registration_dance", "registration_song", "registration_declamation", "registration_science",
+  "Sheet1", "Sheet2"
+];
+
+var TAB_RENAME_MAP = {
+  "Group Dance": "Dance Result",
+  "Group Song": "Song Result",
+  "Declamation": "Declamation Result",
+  "Science Exhibition": "Science Result",
+  "Live Scores": "Championship",
+  "Final Result": "Championship",
+  "Master Registrations": "Attendance"
+};
+
+function purgeForbiddenSheets(ss) {
+  var deleted = [];
+  for (var i = 0; i < FORBIDDEN_TABS.length; i++) {
+    var sh = ss.getSheetByName(FORBIDDEN_TABS[i]);
+    if (sh && ss.getSheets().length > 1) {
+      try {
+        ss.deleteSheet(sh);
+        deleted.push(FORBIDDEN_TABS[i]);
+      } catch (e) {}
+    }
+  }
+  return deleted;
+}
+
 /**
  * Custom Menu inside Google Sheets
  */
@@ -33,7 +64,7 @@ function onOpen() {
     .addItem("📋 Setup / Verify All Clean Tabs", "setupAllCleanTabs")
     .addItem("⚡ Setup Real-time onEdit Trigger (Safe)", "setupTriggers")
     .addItem("🛑 Delete ALL Background Timers (Stop Wiping)", "removeAllBackgroundTriggers")
-    .addItem("🧹 Clean Old Duplicate Tabs", "cleanUnwantedTabs")
+    .addItem("🧹 Clean Old Duplicate Tabs (Permanent)", "cleanUnwantedTabs")
     .addToUi();
 }
 
@@ -42,6 +73,23 @@ function onOpen() {
  */
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "";
+
+  // Permanent Delete Tabs Trigger via GET
+  if (action === "delete_tabs") {
+    try {
+      var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
+      var del = purgeForbiddenSheets(ss);
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        message: "Purged all old duplicate tabs successfully!",
+        deleted_tabs: del,
+        remaining_tabs: ss.getSheets().map(function(s) { return s.getName(); })
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
 
   // 1. Return Master Registrations JSON to Web Portal
   if (action === "get_registrations") {
@@ -73,10 +121,12 @@ function doGet(e) {
     var props = PropertiesService.getScriptProperties();
     var scoresJson = props.getProperty("agrash_scores") || "[]";
     var compJson = props.getProperty("agrash_completed_tags") || "{}";
+    var attJson = props.getProperty("agrash_attendance_data") || "{}";
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       scores: JSON.parse(scoresJson),
-      completed_tags: JSON.parse(compJson)
+      completed_tags: JSON.parse(compJson),
+      attendance: JSON.parse(attJson)
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
@@ -98,6 +148,15 @@ function doPost(e) {
     }
 
     var payload = JSON.parse(e.postData.contents);
+    var sheetId = payload.sheet_id || TARGET_SPREADSHEET_ID;
+    var ss = SpreadsheetApp.openById(sheetId);
+    if (!ss) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Could not open spreadsheet with ID: " + sheetId }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Always purge forbidden legacy tabs on every write
+    purgeForbiddenSheets(ss);
 
     // 1. Cloud Score Backup
     if (payload.action === "save_score" && payload.score) {
@@ -128,29 +187,9 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({ status: "success", completed: compMap[evKey] })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    var sheetId = payload.sheet_id || TARGET_SPREADSHEET_ID;
-    var ss = SpreadsheetApp.openById(sheetId);
-    if (!ss) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Could not open spreadsheet with ID: " + sheetId }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-
     // 3. Tab Deletion Support
     if (payload.action === "delete_tabs" || payload.delete_tabs) {
-      var toDelete = payload.delete_tabs || [
-        "Group Dance", "Declamation", "Science Exhibition", "Group Song",
-        "Master Registrations", "Final Result", "Live Scores",
-        "registration_dance", "registration_song", "registration_declamation", "registration_science",
-        "Sheet1", "Sheet2"
-      ];
-      var deleted = [];
-      for (var dIdx = 0; dIdx < toDelete.length; dIdx++) {
-        var shDel = ss.getSheetByName(toDelete[dIdx]);
-        if (shDel && ss.getSheets().length > 1) {
-          ss.deleteSheet(shDel);
-          deleted.push(toDelete[dIdx]);
-        }
-      }
+      var deleted = purgeForbiddenSheets(ss);
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
         deleted_tabs: deleted,
@@ -158,7 +197,16 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    var tabName = payload.tab_name || "Live Scores";
+    // Normalize & Remap Tab Name
+    var rawTabName = (payload.tab_name || "").toString().trim();
+    if (!rawTabName) {
+      rawTabName = "Championship";
+    }
+    var tabName = TAB_RENAME_MAP[rawTabName] || rawTabName;
+    if (FORBIDDEN_TABS.indexOf(tabName) !== -1) {
+      tabName = TAB_RENAME_MAP[tabName] || "Championship";
+    }
+
     var sheet = ss.getSheetByName(tabName);
     if (!sheet) {
       sheet = ss.insertSheet(tabName);
@@ -174,9 +222,32 @@ function doPost(e) {
     var finalRows = [];
 
     var isSequenceSheet = (tabName.indexOf("Sequence ") === 0);
-    var isResultSheet = (tabName.indexOf("Result") !== -1 || tabName === "Group Dance" || tabName === "Group Song" || tabName === "Declamation" || tabName === "Science Exhibition");
-    var isChampionshipSheet = (tabName === "Championship" || tabName === "Final Result");
-    var isAttendanceSheet = (tabName === "Attendance" || tabName === "Master Registrations");
+    var isResultSheet = (tabName.indexOf("Result") !== -1);
+    var isChampionshipSheet = (tabName === "Championship");
+    var isAttendanceSheet = (tabName === "Attendance");
+
+    // Cache Attendance in Properties for fast cloud retrieval
+    if (isAttendanceSheet && incomingRows.length > 1) {
+      try {
+        var attProps = PropertiesService.getScriptProperties();
+        var attObj = {};
+        for (var ar = 1; ar < incomingRows.length; ar++) {
+          var aRow = incomingRows[ar];
+          var aSchool = (aRow[1] || "").toString().trim();
+          if (aSchool) {
+            attObj[aSchool] = {
+              arrived: aRow[8] || "",
+              check_in: aRow[9] || "",
+              dance: aRow[4] || "",
+              song: aRow[5] || "",
+              declamation: aRow[6] || "",
+              science: aRow[7] || ""
+            };
+          }
+        }
+        attProps.setProperty("agrash_attendance_data", JSON.stringify(attObj));
+      } catch (eAtt) {}
+    }
 
     // =========================================================================
     // CASE 1: EVENT RESULT MARKSHEETS (Dance Result, Song Result, Declamation Result, Science Result)
@@ -704,23 +775,8 @@ function removeAllBackgroundTriggers() {
 
 function cleanUnwantedTabs() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
-  var toDelete = [
-    "Group Dance", "Declamation", "Science Exhibition", "Group Song",
-    "Master Registrations", "Final Result", "Live Scores",
-    "registration_dance", "registration_song", "registration_declamation", "registration_science",
-    "Sheet1", "Sheet2"
-  ];
-  var count = 0;
-  var deleted = [];
-  for (var i = 0; i < toDelete.length; i++) {
-    var sh = ss.getSheetByName(toDelete[i]);
-    if (sh && ss.getSheets().length > 1) {
-      ss.deleteSheet(sh);
-      deleted.push(toDelete[i]);
-      count++;
-    }
-  }
-  SpreadsheetApp.getUi().alert("✅ Old Tabs Removed", "Successfully deleted " + count + " old duplicate tabs:\n" + (deleted.length > 0 ? deleted.join(", ") : "None found!"), SpreadsheetApp.getUi().ButtonSet.OK);
+  var deleted = purgeForbiddenSheets(ss);
+  SpreadsheetApp.getUi().alert("✅ Old Tabs Removed", "Successfully deleted " + deleted.length + " old duplicate tabs:\n" + (deleted.length > 0 ? deleted.join(", ") : "None found! Sheet is clean."), SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 function findColIndex(header, candidates) {

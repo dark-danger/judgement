@@ -92,16 +92,35 @@ def reset_all():
     from sheets_service import SheetsService
     sheets_srv = SheetsService()
     
-    # Sync all 4 category tabs
+    # 1. Purge legacy unwanted tabs
+    import requests
+    from seed_events import GSHEET_WEBHOOK_URL
+    webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+    if webhook:
+        try:
+            print("  • Requesting purge of old duplicate tabs...")
+            requests.post(webhook, json={"action": "delete_tabs"}, timeout=15)
+        except Exception as eDel:
+            print(f"    Notice: {eDel}")
+
+    # 2. Sync all 4 category result sheets & dynamic sequence sheets
     for ev in events:
-        print(f"  • Syncing clean tab: '{ev['name']}'...")
+        print(f"  • Syncing '{ev['name']} Result'...")
         success, msg = sheets_srv.auto_sync_event(ev["id"])
         print(f"    -> Result: {msg}")
 
-    # Sync Final Result tab
-    print("  • Syncing clean 'Final Result' tab...")
+        print(f"  • Syncing 'Sequence {ev['name']}'...")
+        s_ok, s_msg = sheets_srv.sync_event_sequence(ev["id"])
+        print(f"    -> Sequence: {s_msg}")
+
+    # 3. Sync Championship & Attendance tabs
+    print("  • Syncing clean 'Championship' tab...")
     f_success, f_msg = sheets_srv.sync_final_championship()
     print(f"    -> Result: {f_msg}")
+
+    print("  • Syncing clean 'Attendance' tab...")
+    a_success, a_msg = sheets_srv.sync_master_registrations()
+    print(f"    -> Attendance: {a_msg}")
 
     print("\n🎉 ALL BACKEND DATA & GOOGLE SHEET RESET SUCCESSFULLY!")
 

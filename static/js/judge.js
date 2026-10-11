@@ -75,9 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Continuous real-time polling (every 1 second) for zero-delay synchronization across devices
   setInterval(loadEventData, 1000);
 
-  // Instant local storage event for multi-tab sync
+  // Multi-tab instant sync via BroadcastChannel & LocalStorage
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const stageChannel = new BroadcastChannel('stage_sequence_sync');
+      stageChannel.onmessage = () => { loadEventData(); };
+      const regChannel = new BroadcastChannel('agrash_sync');
+      regChannel.onmessage = () => { loadEventData(); };
+    } catch (e) {}
+  }
   window.addEventListener('storage', (e) => {
-    if (e.key === 'stage_sequence_last_update') {
+    if (e.key === 'stage_sequence_last_update' || e.key === 'agrash_sync_ping') {
       loadEventData();
     }
   });
@@ -93,7 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadEventData() {
   try {
-    const res = await fetch(`/api/events/${eventId}`);
+    const res = await fetch(`/api/events/${eventId}?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const data = await res.json();
     if (data.success) {
       const isFirstLoad = !currentEvent;
@@ -398,7 +409,10 @@ async function submitEvaluation() {
       document.getElementById('btnDoorReopen').style.display = 'inline-flex';
 
       // 2. Fetch latest server state to see if stage sequence already moved ahead
-      const resLatest = await fetch(`/api/events/${eventId}`);
+      const resLatest = await fetch(`/api/events/${eventId}?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       const latestData = await resLatest.json();
       if (latestData.success) {
         currentEvent = latestData.event;
@@ -784,7 +798,10 @@ function recalculateTotal() {
 async function checkExistingScoreForTag(tagNo) {
   if (!activeJudge || !tagNo || tagNo === 'NO TAG') return null;
   try {
-    const res = await fetch(`/api/events/${eventId}/scores`);
+    const res = await fetch(`/api/events/${eventId}/scores?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const data = await res.json();
     if (data.success && data.scores) {
       return data.scores.find(s => s.tag_no === tagNo && s.judge_id === activeJudge.id) || null;

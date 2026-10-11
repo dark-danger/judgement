@@ -58,9 +58,6 @@ except Exception:
     pass
 
 def load_json(filepath, default):
-    if filepath in _IN_MEMORY_CACHE:
-        return _IN_MEMORY_CACHE[filepath]
-
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
@@ -68,9 +65,7 @@ def load_json(filepath, default):
     if os.path.exists(tmp_path):
         try:
             with open(tmp_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                _IN_MEMORY_CACHE[filepath] = data
-                return data
+                return json.load(f)
         except Exception:
             pass
 
@@ -78,9 +73,7 @@ def load_json(filepath, default):
     if os.path.exists(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                _IN_MEMORY_CACHE[filepath] = data
-                return data
+                return json.load(f)
         except Exception:
             pass
 
@@ -89,17 +82,13 @@ def load_json(filepath, default):
     if os.path.exists(fallback_path):
         try:
             with open(fallback_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                _IN_MEMORY_CACHE[filepath] = data
-                return data
+                return json.load(f)
         except Exception:
             pass
 
-    _IN_MEMORY_CACHE[filepath] = default
     return default
 
 def save_json(filepath, data):
-    _IN_MEMORY_CACHE[filepath] = data
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
@@ -239,6 +228,12 @@ class DB:
         return load_json(EVENTS_FILE, [])
 
     def get_event(self, event_id):
+        # 1. Dynamically sync stage sequence from approved attendance records
+        try:
+            self.sync_event_sequence_from_attendance(event_id)
+        except Exception:
+            pass
+
         events = self.get_events()
         matched = None
         for e in events:

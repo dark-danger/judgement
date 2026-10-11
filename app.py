@@ -36,6 +36,14 @@ def get_local_ip():
     except Exception:
         return '127.0.0.1'
 
+# --- No-Cache Middleware for Instant Real-Time Multi-Device Sync ---
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "-1"
+    return response
+
 # --- Web Page Routes ---
 
 @app.route("/")
@@ -225,11 +233,19 @@ def sync_supabase():
 
 @app.route("/api/events", methods=["GET"])
 def get_all_events():
+    try:
+        db.sync_event_sequence_from_attendance()
+    except Exception:
+        pass
     events = db.get_events()
     return jsonify({"success": True, "events": events})
 
 @app.route("/api/events/<event_id>", methods=["GET"])
 def get_single_event(event_id):
+    try:
+        db.sync_event_sequence_from_attendance(event_id)
+    except Exception:
+        pass
     event = db.get_event(event_id)
     if not event:
         return jsonify({"success": False, "error": "Event not found"}), 404

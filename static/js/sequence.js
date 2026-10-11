@@ -23,12 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
   loadSequenceData();
   
-  // Background polling (paused while dragging)
+  // Real-time 1-second polling (paused while dragging)
   setInterval(() => {
     if (!isDragging) {
       loadSequenceData();
     }
-  }, 3000);
+  }, 1000);
+
+  // Multi-tab instant sync via BroadcastChannel & LocalStorage
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const channel = new BroadcastChannel('stage_sequence_sync');
+      channel.onmessage = () => { if (!isDragging) loadSequenceData(); };
+      const regChannel = new BroadcastChannel('agrash_sync');
+      regChannel.onmessage = () => { if (!isDragging) loadSequenceData(); };
+    } catch (e) {}
+  }
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'stage_sequence_last_update' || e.key === 'agrash_sync_ping') {
+      if (!isDragging) loadSequenceData();
+    }
+  });
+  window.addEventListener('focus', () => { if (!isDragging) loadSequenceData(); });
 });
 
 function getActiveEventId() {
@@ -39,7 +55,10 @@ async function loadSequenceData() {
   if (isDragging) return;
   try {
     const targetId = getActiveEventId();
-    const res = await fetch(`/api/events/${targetId}`);
+    const res = await fetch(`/api/events/${targetId}?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const data = await res.json();
     if (data.success && data.event) {
       currentEvent = data.event;

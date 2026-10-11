@@ -36,8 +36,12 @@ async function loadRegistrations() {
     let url = '/api/registration?';
     if (currentDeskFilter) url += `desk=${currentDeskFilter}&`;
     if (currentSearchQuery) url += `q=${encodeURIComponent(currentSearchQuery)}&`;
+    url += `_t=${Date.now()}`;
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const data = await res.json();
 
     if (data.success && data.schools) {
@@ -53,7 +57,10 @@ async function loadRegistrations() {
 
 async function loadStats() {
   try {
-    const res = await fetch('/api/registration/stats');
+    const res = await fetch(`/api/registration/stats?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const data = await res.json();
     if (data.success && data.stats) {
       const st = data.stats;
@@ -199,6 +206,16 @@ async function markCategoryAttendance(schoolId, category, tagNo, status) {
       if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
       renderSchools(allSchoolsData);
       loadStats();
+
+      // Instant cross-tab & cross-device notification
+      try {
+        const bc = new BroadcastChannel('stage_sequence_sync');
+        bc.postMessage({ type: 'SEQUENCE_UPDATED', tag_no: tagNo, status: status, timestamp: Date.now() });
+        const regChannel = new BroadcastChannel('agrash_sync');
+        regChannel.postMessage({ type: 'ATTENDANCE_UPDATED', tag_no: tagNo, status: status, timestamp: Date.now() });
+      } catch (eBc) {}
+      localStorage.setItem('stage_sequence_last_update', Date.now().toString());
+      localStorage.setItem('agrash_sync_ping', Date.now().toString());
     } else {
       if (backupSchool && schIdx !== -1) {
         allSchoolsData[schIdx] = backupSchool;
@@ -250,6 +267,16 @@ async function checkInAllCategories(schoolId) {
       if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
       renderSchools(allSchoolsData);
       loadStats();
+
+      // Instant cross-tab & cross-device notification
+      try {
+        const bc = new BroadcastChannel('stage_sequence_sync');
+        bc.postMessage({ type: 'SEQUENCE_UPDATED', school: data.school, timestamp: Date.now() });
+        const regChannel = new BroadcastChannel('agrash_sync');
+        regChannel.postMessage({ type: 'ATTENDANCE_UPDATED', school: data.school, timestamp: Date.now() });
+      } catch (eBc) {}
+      localStorage.setItem('stage_sequence_last_update', Date.now().toString());
+      localStorage.setItem('agrash_sync_ping', Date.now().toString());
     } else {
       if (backupSchool && schIdx !== -1) {
         allSchoolsData[schIdx] = backupSchool;
