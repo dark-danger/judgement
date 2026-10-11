@@ -62,6 +62,8 @@ def sequence_page(event_id=None):
 @app.route("/projector/<event_id>")
 @app.route("/leaderboard")
 @app.route("/leaderboard/<event_id>")
+@app.route("/championship")
+@app.route("/results")
 def projector_page(event_id=None):
     return send_from_directory(app.static_folder, "projector.html")
 
@@ -393,6 +395,14 @@ def get_event_winners():
             "success": True,
             "event_winners": event_winners
         })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/sync-championship", methods=["GET", "POST"])
+def sync_championship_api():
+    try:
+        ok, res = sheets_service.sync_final_championship()
+        return jsonify({"success": ok, "message": res})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
