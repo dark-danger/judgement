@@ -469,10 +469,11 @@ class SheetsService:
                     tag_meta[c["tag_no"]] = c.get("notes", "")
 
             # Distinct Attendance (Present/Absent) column
+            total_max = sum(c.get("max_marks", 10) for c in event.get("criteria", [])) or 50
             headers = ["Rank", "Tag No", "School & Details", "Attendance (Present/Absent)"]
             for j in judges:
-                headers.append(f"{j['name']} (/100)")
-            headers.extend(["Overall Average (/100)", "Judges Scored", "Stage Status", "Last Updated"])
+                headers.append(f"{j['name']} (/{total_max})")
+            headers.extend([f"Overall Average (/{total_max})", "Judges Scored", "Stage Status", "Last Updated"])
 
             rows_data = []
             for tag_no in all_tags:
