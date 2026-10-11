@@ -328,7 +328,7 @@ function syncEventTab(ss, tabName, tagKey, schools) {
       // Preserve existing judge scores & status, update school details if changed
       var exRow = existingMap[tag];
       exRow[2] = schoolDetail;
-      newRows.append ? newRows.push(exRow) : newRows.push(exRow);
+      newRows.push(exRow);
     } else {
       // Brand new row
       newRows.push([
@@ -364,7 +364,7 @@ function syncEventTab(ss, tabName, tagKey, schools) {
 }
 
 /**
- * Syncs 'Master Registrations' tab with arrival status
+ * Syncs 'Master Registrations' tab with arrival status across 6 desks
  */
 function syncMasterRegistrationsTab(ss, schools) {
   var sheet = ss.getSheetByName("Master Registrations");
@@ -391,12 +391,12 @@ function syncMasterRegistrationsTab(ss, schools) {
 
   var rows = [headers];
   var totalSchools = schools.length;
-  var schoolsPerDesk = Math.ceil(totalSchools / 5);
+  var schoolsPerDesk = Math.ceil(totalSchools / 6);
   var nowStr = Utilities.formatDate(new Date(), "GMT+5:30", "hh:mm a");
 
   for (var idx = 0; idx < schools.length; idx++) {
     var s = schools[idx];
-    var calculatedDesk = Math.min(5, Math.floor(idx / schoolsPerDesk) + 1);
+    var calculatedDesk = Math.min(6, Math.floor(idx / schoolsPerDesk) + 1);
     var key = s.school_name.trim().toLowerCase();
 
     var arrivalStatus = "⏳ PENDING";
@@ -407,19 +407,29 @@ function syncMasterRegistrationsTab(ss, schools) {
       checkInTime = existingMap[key][9] || "-";
     }
 
-    function formatTag(tag) {
-      return tag ? tag + " (⏳ PENDING)" : "-";
+    function formatTag(tag, existingCell) {
+      if (!tag) return "-";
+      if (existingCell && existingCell.toString().indexOf(tag) !== -1) {
+        return existingCell.toString(); // Preserves live status like "D-21 (✅ PRESENT)"
+      }
+      return tag + " (⏳ PENDING)";
     }
+
+    var ex = existingMap[key];
+    var danceVal = formatTag(s.dance_tag, ex ? ex[4] : null);
+    var songVal = formatTag(s.song_tag, ex ? ex[5] : null);
+    var decVal = formatTag(s.declamation_tag, ex ? ex[6] : null);
+    var sciVal = formatTag(s.science_tag, ex ? ex[7] : null);
 
     rows.push([
       "#" + (idx + 1),
       s.school_name,
       "Desk " + calculatedDesk,
       s.room_no || "TBD",
-      formatTag(s.dance_tag),
-      formatTag(s.song_tag),
-      formatTag(s.declamation_tag),
-      formatTag(s.science_tag),
+      danceVal,
+      songVal,
+      decVal,
+      sciVal,
       arrivalStatus,
       checkInTime,
       nowStr
@@ -457,12 +467,10 @@ function onEdit(e) {
   try {
     if (e && e.range) {
       var sName = e.range.getSheet().getName();
-      // If someone edits Agrash Registrations, auto-distribute to all other tabs & portal
+      // Only sync when someone actually edits the Agrash Registrations sheet
       if (sName === "Agrash Registrations" || sName === "AGRASH REGISTRATION" || sName === "agrash_schools_sheet") {
         syncMainSheetToAllTabs();
       }
-    } else {
-      syncMainSheetToAllTabs();
     }
   } catch (err) {
     Logger.log("onEdit error: " + err.toString());
@@ -477,7 +485,7 @@ function onFormSubmit(e) {
 }
 
 /**
- * Setup Triggers for 100% Real-time and Background Execution
+ * Setup Triggers for Real-time Execution (Instant onEdit without background wiping timer)
  */
 function setupTriggers() {
   var ss = SpreadsheetApp.openById(TARGET_SPREADSHEET_ID);
@@ -486,19 +494,13 @@ function setupTriggers() {
     ScriptApp.deleteTrigger(triggers[i]);
   }
 
-  // 1. onEdit Trigger (Runs instantly when a cell is edited)
+  // onEdit Trigger (Runs instantly ONLY when a cell in Agrash Registrations is edited)
   ScriptApp.newTrigger("onEdit")
     .forSpreadsheet(ss)
     .onEdit()
     .create();
 
-  // 2. 1-Minute Time-based backup trigger (Catches pastes, imports, and offline updates)
-  ScriptApp.newTrigger("syncMainSheetToAllTabs")
-    .timeBased()
-    .everyMinutes(1)
-    .create();
-
-  SpreadsheetApp.getUi().alert("✅ Triggers Configured!", "Real-time auto-sync onEdit and 1-minute background auto-sync are now ACTIVE.", SpreadsheetApp.getUi().ButtonSet.OK);
+  SpreadsheetApp.getUi().alert("✅ Triggers Configured!", "Real-time onEdit auto-sync is now ACTIVE. Background wiping timer removed.", SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 function cleanUnwantedTabs() {

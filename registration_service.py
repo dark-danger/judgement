@@ -1,11 +1,16 @@
 import os
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from create_excel import schools_data
 from database import DATA_DIR, load_json, save_json
 
 logger = logging.getLogger("registration_service")
+
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def get_ist_time_str():
+    return datetime.now(IST).strftime("%I:%M %p")
 
 REG_FILE = os.path.join(DATA_DIR, "registration.json")
 
@@ -121,7 +126,7 @@ class RegistrationService:
 
         for s in data:
             if s["id"] == school_id or s["school_name"] == school_id:
-                now_str = datetime.now().strftime("%I:%M %p")
+                now_str = get_ist_time_str()
                 
                 if mark_all:
                     for ev in s.get("events", []):
@@ -147,11 +152,11 @@ class RegistrationService:
 
         if updated_school:
             self._save(data)
-            # Trigger background sheet sync for the main category sheets directly
+            # Fast Attendance Sheet Sync
             try:
                 from sheets_service import sheets_service
                 if mark_all:
-                    sheets_service.trigger_background_sync(None, sync_registration=True)
+                    sheets_service.trigger_attendance_sync(None)
                 else:
                     cat_event_map = {
                         "group dance": "evt-group-dance",
@@ -160,7 +165,7 @@ class RegistrationService:
                         "science exhibition": "evt-science-exhibition"
                     }
                     ev_id = cat_event_map.get(category.lower() if category else "", None)
-                    sheets_service.trigger_background_sync(ev_id, sync_registration=True)
+                    sheets_service.trigger_attendance_sync(ev_id)
             except Exception as e:
                 logger.error(f"Error triggering sheet sync on attendance: {e}")
 
