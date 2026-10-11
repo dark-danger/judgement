@@ -25,7 +25,7 @@ DEFAULT_CRITERIA = [
 ]
 
 GSHEET_URL = "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing"
-GSHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyr_3MfnGGtZp4qUKEJ1-afuVPpSrOeD0U6wZ2HLAP3QHwTflRLJ-34fhDQRL3SaA88BA/exec"
+GSHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
 
 def create_judges(count=5):
     return [{"id": f"j{i}", "name": f"Judge {i}", "is_active": True} for i in range(1, count + 1)]
