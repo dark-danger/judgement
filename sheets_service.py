@@ -2,9 +2,14 @@ import os
 import json
 import logging
 import threading
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger("sheets_service")
+
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def get_ist_time_str():
+    return datetime.now(IST).strftime("%I:%M %p")
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -36,6 +41,23 @@ class SheetsService:
         except Exception as e:
             logger.error(f"Error authorizing gspread: {e}")
         return None
+
+    def trigger_attendance_sync(self, event_id=None):
+        """Ultra-fast sync for attendance updates only (updates Master Registrations and affected event tab)"""
+        def _worker():
+            try:
+                self.sync_master_registrations()
+                if event_id:
+                    self.auto_sync_event(event_id)
+            except Exception as ex:
+                logger.error(f"Attendance sync error: {ex}")
+
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        if is_serverless:
+            _worker()
+        else:
+            thread = threading.Thread(target=_worker, daemon=True)
+            thread.start()
 
     def trigger_background_sync(self, event_id=None, sync_registration=False):
         """Spawns non-blocking background thread (or synchronous if serverless) to update connected Google Sheet and Final Result tab"""
@@ -296,7 +318,7 @@ class SheetsService:
                     r["overall_avg"] if r["overall_avg"] > 0 else "-",
                     f"{r['events_done']}/4",
                     standing,
-                    datetime.now().strftime("%I:%M %p")
+                    get_ist_time_str()
                 ]
                 final_rows.append(row)
 
@@ -382,7 +404,7 @@ class SheetsService:
                     se_str,
                     arrived_status,
                     check_in,
-                    datetime.now().strftime("%I:%M %p")
+                    get_ist_time_str()
                 ])
 
             if webhook and webhook.startswith("http"):
@@ -491,13 +513,13 @@ class SheetsService:
             for idx, r in enumerate(scored_rows, start=1):
                 row = [f"#{idx}", r["tag_no"], r["details"], r["attendance"]]
                 row.extend(r["judge_scores"])
-                row.extend([r["avg"], f"{r['count']}/{len(judges)}", r["status"], datetime.now().strftime("%I:%M %p")])
+                row.extend([r["avg"], f"{r['count']}/{len(judges)}", r["status"], get_ist_time_str()])
                 final_table_rows.append(row)
 
             for r in unscored_rows:
                 row = ["-", r["tag_no"], r["details"], r["attendance"]]
                 row.extend(r["judge_scores"])
-                row.extend(["-", f"0/{len(judges)}", r["status"], datetime.now().strftime("%I:%M %p")])
+                row.extend(["-", f"0/{len(judges)}", r["status"], get_ist_time_str()])
                 final_table_rows.append(row)
 
             # Push to Google Sheet Webhook

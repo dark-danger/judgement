@@ -162,6 +162,25 @@ function renderSchools(schools) {
 }
 
 async function markCategoryAttendance(schoolId, category, tagNo, status) {
+  // 1. Optimistic Instant UI Update (0 ms feedback)
+  const schIdx = allSchoolsData.findIndex(s => s.id === schoolId);
+  let backupSchool = null;
+  if (schIdx !== -1) {
+    backupSchool = JSON.parse(JSON.stringify(allSchoolsData[schIdx]));
+    const sch = allSchoolsData[schIdx];
+    const ev = (sch.events || []).find(e => e.tag_no === tagNo || e.category.toLowerCase() === category.toLowerCase());
+    if (ev) {
+      ev.status = status;
+    }
+    const hasPresent = (sch.events || []).some(e => e.status === 'PRESENT');
+    sch.is_arrived = hasPresent;
+    if (hasPresent && !sch.arrived_at) {
+      sch.arrived_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    renderSchools(allSchoolsData);
+    loadStats();
+  }
+
   try {
     const res = await fetch('/api/registration/attendance', {
       method: 'POST',
@@ -177,20 +196,43 @@ async function markCategoryAttendance(schoolId, category, tagNo, status) {
     const data = await res.json();
     if (data.success && data.school) {
       showToast(`${tagNo} (${category}) marked ${status}! Google Sheet updated.`, status === 'PRESENT' ? 'success' : 'info');
-      // Update local item
-      const idx = allSchoolsData.findIndex(s => s.id === schoolId);
-      if (idx !== -1) allSchoolsData[idx] = data.school;
+      if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
       renderSchools(allSchoolsData);
       loadStats();
     } else {
+      if (backupSchool && schIdx !== -1) {
+        allSchoolsData[schIdx] = backupSchool;
+        renderSchools(allSchoolsData);
+        loadStats();
+      }
       showToast(`Error: ${data.error}`, 'error');
     }
   } catch (err) {
+    if (backupSchool && schIdx !== -1) {
+      allSchoolsData[schIdx] = backupSchool;
+      renderSchools(allSchoolsData);
+      loadStats();
+    }
     showToast('Failed to mark attendance. Check server.', 'error');
   }
 }
 
 async function checkInAllCategories(schoolId) {
+  // 1. Optimistic Instant UI Update (0 ms feedback)
+  const schIdx = allSchoolsData.findIndex(s => s.id === schoolId);
+  let backupSchool = null;
+  if (schIdx !== -1) {
+    backupSchool = JSON.parse(JSON.stringify(allSchoolsData[schIdx]));
+    const sch = allSchoolsData[schIdx];
+    (sch.events || []).forEach(e => e.status = 'PRESENT');
+    sch.is_arrived = true;
+    if (!sch.arrived_at) {
+      sch.arrived_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    renderSchools(allSchoolsData);
+    loadStats();
+  }
+
   try {
     const res = await fetch('/api/registration/attendance', {
       method: 'POST',
@@ -205,12 +247,23 @@ async function checkInAllCategories(schoolId) {
     const data = await res.json();
     if (data.success && data.school) {
       showToast(`✅ ${data.school.school_name} - All categories checked in Present!`, 'success');
-      const idx = allSchoolsData.findIndex(s => s.id === schoolId);
-      if (idx !== -1) allSchoolsData[idx] = data.school;
+      if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
+      renderSchools(allSchoolsData);
+      loadStats();
+    } else {
+      if (backupSchool && schIdx !== -1) {
+        allSchoolsData[schIdx] = backupSchool;
+        renderSchools(allSchoolsData);
+        loadStats();
+      }
+      showToast(`Error: ${data.error}`, 'error');
+    }
+  } catch (err) {
+    if (backupSchool && schIdx !== -1) {
+      allSchoolsData[schIdx] = backupSchool;
       renderSchools(allSchoolsData);
       loadStats();
     }
-  } catch (err) {
     showToast('Check-in failed. Check server.', 'error');
   }
 }
