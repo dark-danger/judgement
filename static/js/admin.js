@@ -584,10 +584,20 @@ function renderMatrixTable() {
   const tbody = document.getElementById('matrixBody');
   const judges = currentEventData.judges || [];
   
-  // Combine sequence and completed tags
-  let allTags = currentEventData.sequence.map(s => s.tag_no);
-  (currentEventData.completed_tags || []).forEach(c => {
-    if (!allTags.includes(c.tag_no)) allTags.push(c.tag_no);
+  const cleanNorm = (t) => String(t || '').toUpperCase().replace(/[\s-]/g, '');
+  const completedTags = currentEventData.completed_tags || [];
+  const completedSet = new Set(completedTags.map(c => cleanNorm(typeof c === 'object' && c !== null ? c.tag_no : c)));
+
+  // Combine sequence, completed tags, and scored tags
+  let allTags = (currentEventData.sequence || []).map(s => s.tag_no);
+  completedTags.forEach(c => {
+    const t = typeof c === 'object' && c !== null ? c.tag_no : c;
+    if (t && !allTags.some(existing => cleanNorm(existing) === cleanNorm(t))) allTags.push(t);
+  });
+  (currentScoresData || []).forEach(s => {
+    if (s.tag_no && s.tag_no !== '__STAGE_SEQUENCE__' && !allTags.some(existing => cleanNorm(existing) === cleanNorm(s.tag_no))) {
+      allTags.push(s.tag_no);
+    }
   });
 
   let headHtml = `
@@ -607,10 +617,11 @@ function renderMatrixTable() {
   `;
   thead.innerHTML = headHtml;
 
-  const rowsData = allTags.map((tagNo, seqIdx) => {
-    const tagScores = currentScoresData.filter(s => s.tag_no === tagNo);
-    const isCompleted = (currentEventData.completed_tags || []).some(c => c.tag_no === tagNo);
-    const isCurrent = currentEventData.sequence.length > 0 && currentEventData.sequence[0].tag_no === tagNo;
+  const rowsData = allTags.map((tagNo) => {
+    const tagNorm = cleanNorm(tagNo);
+    const tagScores = (currentScoresData || []).filter(s => cleanNorm(s.tag_no) === tagNorm);
+    const isCompleted = completedSet.has(tagNorm);
+    const isCurrent = currentEventData.sequence && currentEventData.sequence.length > 0 && cleanNorm(currentEventData.sequence[0].tag_no) === tagNorm && !isCompleted;
 
     let judgeScores = [];
     let sum = 0;
@@ -618,7 +629,7 @@ function renderMatrixTable() {
 
     judges.forEach(j => {
       const match = tagScores.find(s => s.judge_id === j.id);
-      if (match) {
+      if (match && match.total !== undefined) {
         judgeScores.push({ judgeId: j.id, scoreId: match.id, total: match.total, scores: match.scores });
         sum += match.total;
         count++;
@@ -638,15 +649,26 @@ function renderMatrixTable() {
     };
   });
 
-  const sorted = [...rowsData].filter(r => r.count > 0).sort((a, b) => b.avg - a.avg);
-  rowsData.forEach(r => {
-    const rankIdx = sorted.findIndex(s => s.tagNo === r.tagNo);
-    r.rank = rankIdx >= 0 ? `#${rankIdx + 1}` : '-';
-  });
+  // Separate evaluated teams and pending queue teams, sort evaluated by highest average score
+  const evaluated = rowsData.filter(r => r.count > 0).sort((a, b) => (b.avg - a.avg) || (b.count - a.count));
+  const pending = rowsData.filter(r => r.count === 0);
 
-  tbody.innerHTML = rowsData.map(r => `
+  // Assign ranks with proper tie handling
+  let currentRank = 1;
+  evaluated.forEach((item, i) => {
+    if (i > 0 && item.avg < evaluated[i - 1].avg) {
+      currentRank = i + 1;
+    }
+    item.rank = `#${currentRank}`;
+  });
+  pending.forEach(item => { item.rank = '-'; });
+
+  // Display evaluated first (sorted by rank), then pending queue teams
+  const displayList = [...evaluated, ...pending];
+
+  tbody.innerHTML = displayList.map(r => `
     <tr style="${r.isCurrent ? 'background: rgba(255, 42, 75, 0.12);' : ''}">
-      <td><strong style="color: #ff4d6a;">${r.rank}</strong></td>
+      <td><strong style="color: ${r.rank !== '-' ? '#ff4d6a' : 'var(--text-dim)'};">${r.rank}</strong></td>
       <td>
         <strong style="font-family: var(--font-heading); font-size: 1.15rem; color: #fff;">${escapeHtml(r.tagNo)}</strong>
         ${r.isCurrent ? ' <span class="badge badge-live" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;"><span class="dot-pulse"></span> STAGE</span>' : ''}
@@ -668,10 +690,13 @@ function renderMatrixTable() {
       <td><strong class="avg-highlight">${r.count > 0 ? r.avg : '-'}</strong></td>
       <td><span style="color: var(--text-muted);">${r.count} / ${judges.length}</span></td>
       <td>
-        ${r.isCompleted ? '<span class="badge badge-done" style="font-size:0.7rem;">COMPLETED</span>' : (r.isCurrent ? '<span class="badge badge-live" style="font-size:0.7rem;">LIVE</span>' : '<span class="badge badge-next" style="font-size:0.7rem;">IN QUEUE</span>')}
+        ${r.isCompleted ? '<span class="badge badge-done" style="font-size:0.7rem;">COMPLETED</span>' : (r.isCurrent ? '<span class="badge badge-live" style="font-size:0.7rem;">LIVE</span>' : (r.count > 0 ? '<span class="badge badge-next" style="font-size:0.7rem;">EVALUATED</span>' : '<span class="badge badge-next" style="font-size:0.7rem; opacity:0.6;">IN QUEUE</span>'))}
       </td>
     </tr>
   `).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
 
   if (window.lucide) lucide.createIcons();
 }

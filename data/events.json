@@ -77,34 +77,12 @@
     ],
     "sequence": [
       {
-        "approved_at": "12:53 AM",
-        "notes": "Delhi Public School DPS Kathua [Room: F-501]",
-        "room_no": "F-501",
-        "school_name": "Delhi Public School DPS Kathua",
-        "tag_no": "D-21",
-        "status": "PRESENT"
-      },
-      {
         "approved_at": "07:38 AM",
         "notes": "SMR International School Safidon [Room: F-502]",
         "room_no": "F-502",
         "school_name": "SMR International School Safidon",
         "tag_no": "D-22",
         "status": "PRESENT"
-      },
-      {
-        "approved_at": "07:38 AM",
-        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
-        "room_no": "F-504",
-        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
-        "tag_no": "D-24",
-        "status": "PRESENT"
-      },
-      {
-        "notes": "Added by Stage Coordinator",
-        "tag_no": "D-33",
-        "school_name": "DAV Police Public Sr Sec School Police Line Sonipat",
-        "room_no": "F-513"
       },
       {
         "tag_no": "D-04",
@@ -119,43 +97,11 @@
         "status": "PRESENT"
       },
       {
-        "tag_no": "D-39",
-        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
-        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
-        "room_no": "F-410",
-        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "D-44",
-        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
-        "school_name": "Mothers Pride School Pataudi Gurugram",
-        "room_no": "F-304",
-        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
         "tag_no": "D-77",
         "notes": "RKSD Public School Kaithal [Room: C-206]",
         "school_name": "RKSD Public School Kaithal",
         "room_no": "C-206",
         "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "D-28",
-        "notes": "Doon Public School Gohana [Room: F-509]",
-        "school_name": "Doon Public School Gohana",
-        "room_no": "F-509",
-        "approved_at": "9:56 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "D-50",
-        "notes": "Rishikul Vidyapeeth Sonipat [Room: F-311]",
-        "school_name": "Rishikul Vidyapeeth Sonipat",
-        "room_no": "F-311",
-        "approved_at": "10:11 AM",
         "status": "PRESENT"
       },
       {
@@ -215,14 +161,6 @@
         "status": "PRESENT"
       },
       {
-        "tag_no": "D-25",
-        "notes": "JP Jain Sr Sec School Sonipat [Room: F-505]",
-        "school_name": "JP Jain Sr Sec School Sonipat",
-        "room_no": "F-505",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "D-26",
         "notes": "Himgiri Public School Samalkha [Room: F-506]",
         "school_name": "Himgiri Public School Samalkha",
@@ -235,7 +173,7 @@
         "notes": "Arya Kanya Gurukul Sr Sec School Karnal [Room: F-510]",
         "school_name": "Arya Kanya Gurukul Sr Sec School Karnal",
         "room_no": "F-510",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -251,7 +189,7 @@
         "notes": "Ujala Modern Sr Sec School Kaith Shahpur Israna [Room: F-401]",
         "school_name": "Ujala Modern Sr Sec School Kaith Shahpur Israna",
         "room_no": "F-401",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -259,15 +197,7 @@
         "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
         "school_name": "DAV Police Public School Police Line Karnal",
         "room_no": "F-406",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-38",
-        "notes": "Sarv Vidya Public School Indri [Room: F-407]",
-        "school_name": "Sarv Vidya Public School Indri",
-        "room_no": "F-407",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -275,7 +205,7 @@
         "notes": "MM Public School Assandh [Room: F-303]",
         "school_name": "MM Public School Assandh",
         "room_no": "F-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -291,7 +221,7 @@
         "notes": "Lakshay International School Naultha Panipat [Room: F-310]",
         "school_name": "Lakshay International School Naultha Panipat",
         "room_no": "F-310",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -299,7 +229,7 @@
         "notes": "SD Sr Sec School Panipat [Room: F-202]",
         "school_name": "SD Sr Sec School Panipat",
         "room_no": "F-202",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -307,7 +237,7 @@
         "notes": "Saraswati Public School Jagadhri Yamunanagar [Room: F-204]",
         "school_name": "Saraswati Public School Jagadhri Yamunanagar",
         "room_no": "F-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -315,7 +245,7 @@
         "notes": "JPS Academy Assandh [Room: F-206]",
         "school_name": "JPS Academy Assandh",
         "room_no": "F-206",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -323,7 +253,7 @@
         "notes": "Delhi Public School Jind [Room: F-207]",
         "school_name": "Delhi Public School Jind",
         "room_no": "F-207",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -331,31 +261,7 @@
         "notes": "Yaduvanshi Niketan School Sector 33 Gurugram [Room: F-210]",
         "school_name": "Yaduvanshi Niketan School Sector 33 Gurugram",
         "room_no": "F-210",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-62",
-        "notes": "Geeta Vidya Mandir Public School NHBC Panipat [Room: B-203]",
-        "school_name": "Geeta Vidya Mandir Public School NHBC Panipat",
-        "room_no": "B-203",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-63",
-        "notes": "Shaheed Bhagat Singh Sr Sec School Karnal [Room: B-302]",
-        "school_name": "Shaheed Bhagat Singh Sr Sec School Karnal",
-        "room_no": "B-302",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-64",
-        "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
-        "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
-        "room_no": "B-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -367,19 +273,11 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "D-68",
-        "notes": "SD Modern Sr Sec School Panipat [Room: C-102]",
-        "school_name": "SD Modern Sr Sec School Panipat",
-        "room_no": "C-102",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "D-69",
         "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
         "school_name": "DR MKK Arya Model Sr Sec School Panipat",
         "room_no": "C-103",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -395,7 +293,7 @@
         "notes": "Gyandeep Sr Sec School Gannaur [Room: C-105]",
         "school_name": "Gyandeep Sr Sec School Gannaur",
         "room_no": "C-105",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -403,15 +301,7 @@
         "notes": "Montessori City School Kathua [Room: C-202]",
         "school_name": "Montessori City School Kathua",
         "room_no": "C-202",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-75",
-        "notes": "Adarsh Vidya Mandir Sr Sec School Panipat [Room: C-203]",
-        "school_name": "Adarsh Vidya Mandir Sr Sec School Panipat",
-        "room_no": "C-203",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -419,7 +309,7 @@
         "notes": "North Valley Public School [Room: C-204]",
         "school_name": "North Valley Public School",
         "room_no": "C-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -427,15 +317,7 @@
         "notes": "DAV Police Public School Kurukshetra [Room: C-207]",
         "school_name": "DAV Police Public School Kurukshetra",
         "room_no": "C-207",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "D-80",
-        "notes": "Gyan Bharti Public Sr Sec School Kabri Panipat [Room: C-306]",
-        "school_name": "Gyan Bharti Public Sr Sec School Kabri Panipat",
-        "room_no": "C-306",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -443,7 +325,7 @@
         "notes": "SDVM City Panipat [Room: TBD]",
         "school_name": "SDVM City Panipat",
         "room_no": "TBD",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -451,17 +333,106 @@
         "notes": "Government Model Sanskriti Sr Sec School Safidon [Room: D-203]",
         "school_name": "Government Model Sanskriti Sr Sec School Safidon",
         "room_no": "D-203",
-        "status": "PENDING",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "D-91",
+        "notes": "JPS Academy Nissing [Room: TBD]",
+        "school_name": "JPS Academy Nissing",
+        "room_no": "TBD",
+        "status": "PRESENT",
         "approved_at": "-"
       }
     ],
-    "completed_tags": [],
+    "completed_tags": [
+      {
+        "tag_no": "D-21",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-44",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-33",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-64",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-29",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-80",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-24",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-50",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-28",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-63",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-75",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-68",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-25",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-39",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-38",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      },
+      {
+        "tag_no": "D-62",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "01:25 PM"
+      }
+    ],
     "current_index": 0,
     "next_transition_time": 1791775387.3163068,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
-    "seq_version": 1791787223642
+    "seq_version": 1791791763430
   },
   {
     "id": "evt-group-song",
@@ -644,7 +615,7 @@
         "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
         "school_name": "DAV Police Public School Police Line Karnal",
         "room_no": "F-406",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -652,7 +623,7 @@
         "notes": "Babu Ram ( BR ) Global School Gannaur [Room: F-302]",
         "school_name": "Babu Ram ( BR ) Global School Gannaur",
         "room_no": "F-302",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -660,7 +631,7 @@
         "notes": "MM Public School Assandh [Room: F-303]",
         "school_name": "MM Public School Assandh",
         "room_no": "F-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -676,7 +647,7 @@
         "notes": "SD Sr Sec School Panipat [Room: F-202]",
         "school_name": "SD Sr Sec School Panipat",
         "room_no": "F-202",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -684,7 +655,7 @@
         "notes": "Saraswati Public School Jagadhri Yamunanagar [Room: F-204]",
         "school_name": "Saraswati Public School Jagadhri Yamunanagar",
         "room_no": "F-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -692,7 +663,7 @@
         "notes": "JPS Academy Assandh [Room: F-206]",
         "school_name": "JPS Academy Assandh",
         "room_no": "F-206",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -708,7 +679,7 @@
         "notes": "Geeta Vidya Mandir Public School NHBC Panipat [Room: B-203]",
         "school_name": "Geeta Vidya Mandir Public School NHBC Panipat",
         "room_no": "B-203",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -716,7 +687,7 @@
         "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
         "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
         "room_no": "B-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -724,7 +695,7 @@
         "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
         "school_name": "DR MKK Arya Model Sr Sec School Panipat",
         "room_no": "C-103",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -732,7 +703,7 @@
         "notes": "North Valley Public School [Room: C-204]",
         "school_name": "North Valley Public School",
         "room_no": "C-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -740,7 +711,7 @@
         "notes": "DAV Police Public School Kurukshetra [Room: C-207]",
         "school_name": "DAV Police Public School Kurukshetra",
         "room_no": "C-207",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       }
     ],
@@ -750,7 +721,7 @@
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
-    "seq_version": 1791786880355
+    "seq_version": 1791791253554
   },
   {
     "id": "evt-declamation",
@@ -989,7 +960,7 @@
         "notes": "Arya Kanya Gurukul Sr Sec School Karnal [Room: F-510]",
         "school_name": "Arya Kanya Gurukul Sr Sec School Karnal",
         "room_no": "F-510",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1005,7 +976,7 @@
         "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
         "school_name": "DAV Police Public School Police Line Karnal",
         "room_no": "F-406",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1013,7 +984,7 @@
         "notes": "Sarv Vidya Public School Indri [Room: F-407]",
         "school_name": "Sarv Vidya Public School Indri",
         "room_no": "F-407",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1021,7 +992,7 @@
         "notes": "Babu Ram ( BR ) Global School Gannaur [Room: F-302]",
         "school_name": "Babu Ram ( BR ) Global School Gannaur",
         "room_no": "F-302",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1029,7 +1000,7 @@
         "notes": "MM Public School Assandh [Room: F-303]",
         "school_name": "MM Public School Assandh",
         "room_no": "F-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1053,7 +1024,7 @@
         "notes": "Lakshay International School Naultha Panipat [Room: F-310]",
         "school_name": "Lakshay International School Naultha Panipat",
         "room_no": "F-310",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1061,7 +1032,7 @@
         "notes": "SD Sr Sec School Panipat [Room: F-202]",
         "school_name": "SD Sr Sec School Panipat",
         "room_no": "F-202",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1069,7 +1040,7 @@
         "notes": "Saraswati Public School Jagadhri Yamunanagar [Room: F-204]",
         "school_name": "Saraswati Public School Jagadhri Yamunanagar",
         "room_no": "F-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1077,7 +1048,7 @@
         "notes": "JPS Academy Assandh [Room: F-206]",
         "school_name": "JPS Academy Assandh",
         "room_no": "F-206",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1085,7 +1056,7 @@
         "notes": "Delhi Public School Jind [Room: F-207]",
         "school_name": "Delhi Public School Jind",
         "room_no": "F-207",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1093,7 +1064,7 @@
         "notes": "Yaduvanshi Niketan School Sector 33 Gurugram [Room: F-210]",
         "school_name": "Yaduvanshi Niketan School Sector 33 Gurugram",
         "room_no": "F-210",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1101,7 +1072,7 @@
         "notes": "Geeta Vidya Mandir Public School NHBC Panipat [Room: B-203]",
         "school_name": "Geeta Vidya Mandir Public School NHBC Panipat",
         "room_no": "B-203",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1109,7 +1080,7 @@
         "notes": "Shaheed Bhagat Singh Sr Sec School Karnal [Room: B-302]",
         "school_name": "Shaheed Bhagat Singh Sr Sec School Karnal",
         "room_no": "B-302",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1117,7 +1088,7 @@
         "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
         "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
         "room_no": "B-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1125,7 +1096,7 @@
         "notes": "MASD Public School Panipat [Room: TBD]",
         "school_name": "MASD Public School Panipat",
         "room_no": "TBD",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1133,7 +1104,7 @@
         "notes": "SD Modern Sr Sec School Panipat [Room: C-102]",
         "school_name": "SD Modern Sr Sec School Panipat",
         "room_no": "C-102",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1141,7 +1112,7 @@
         "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
         "school_name": "DR MKK Arya Model Sr Sec School Panipat",
         "room_no": "C-103",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1157,7 +1128,7 @@
         "notes": "Gyandeep Sr Sec School Gannaur [Room: C-105]",
         "school_name": "Gyandeep Sr Sec School Gannaur",
         "room_no": "C-105",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1165,7 +1136,7 @@
         "notes": "North Valley Public School [Room: C-204]",
         "school_name": "North Valley Public School",
         "room_no": "C-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1173,7 +1144,7 @@
         "notes": "DAV Police Public School Kurukshetra [Room: C-207]",
         "school_name": "DAV Police Public School Kurukshetra",
         "room_no": "C-207",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1181,7 +1152,7 @@
         "notes": "SDVM City Panipat [Room: TBD]",
         "school_name": "SDVM City Panipat",
         "room_no": "TBD",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1189,7 +1160,7 @@
         "notes": "Swami Chetna Sr Sec School Gannaur [Room: TBD]",
         "school_name": "Swami Chetna Sr Sec School Gannaur",
         "room_no": "TBD",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1197,7 +1168,39 @@
         "notes": "Arya Sr Sec School Shahabad Markanda [Room: TBD]",
         "school_name": "Arya Sr Sec School Shahabad Markanda",
         "room_no": "TBD",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "DC-33",
+        "notes": "DAV Police Public Sr Sec School Police Line Sonipat [Room: F-513]",
+        "school_name": "DAV Police Public Sr Sec School Police Line Sonipat",
+        "room_no": "F-513",
         "status": "PENDING",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "DC-87",
+        "notes": "Dyal Singh Public School Panipat [Room: TBD]",
+        "school_name": "Dyal Singh Public School Panipat",
+        "room_no": "TBD",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "DC-89",
+        "notes": "GN Vidya Mandir Panipat [Room: TBD]",
+        "school_name": "GN Vidya Mandir Panipat",
+        "room_no": "TBD",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "DC-90",
+        "notes": "Yaduvanshi Shiksha Niketan Bibipur Jind [Room: TBD]",
+        "school_name": "Yaduvanshi Shiksha Niketan Bibipur Jind",
+        "room_no": "TBD",
+        "status": "PRESENT",
         "approved_at": "-"
       }
     ],
@@ -1224,7 +1227,7 @@
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
     "current_tag": "DC-44",
     "next_tag": "DC-22",
-    "seq_version": 1791786880356
+    "seq_version": 1791791255017
   },
   {
     "id": "evt-science-exhibition",
@@ -1433,7 +1436,7 @@
         "notes": "DAV Police Public Sr Sec School Police Line Sonipat [Room: F-513]",
         "school_name": "DAV Police Public Sr Sec School Police Line Sonipat",
         "room_no": "F-513",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1449,7 +1452,7 @@
         "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
         "school_name": "DAV Police Public School Police Line Karnal",
         "room_no": "F-406",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1457,7 +1460,7 @@
         "notes": "Babu Ram ( BR ) Global School Gannaur [Room: F-302]",
         "school_name": "Babu Ram ( BR ) Global School Gannaur",
         "room_no": "F-302",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1481,7 +1484,7 @@
         "notes": "Lakshay International School Naultha Panipat [Room: F-310]",
         "school_name": "Lakshay International School Naultha Panipat",
         "room_no": "F-310",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1489,7 +1492,7 @@
         "notes": "SD Sr Sec School Panipat [Room: F-202]",
         "school_name": "SD Sr Sec School Panipat",
         "room_no": "F-202",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1497,7 +1500,7 @@
         "notes": "Saraswati Public School Jagadhri Yamunanagar [Room: F-204]",
         "school_name": "Saraswati Public School Jagadhri Yamunanagar",
         "room_no": "F-204",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1505,7 +1508,7 @@
         "notes": "JPS Academy Assandh [Room: F-206]",
         "school_name": "JPS Academy Assandh",
         "room_no": "F-206",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1513,7 +1516,7 @@
         "notes": "Yaduvanshi Niketan School Sector 33 Gurugram [Room: F-210]",
         "school_name": "Yaduvanshi Niketan School Sector 33 Gurugram",
         "room_no": "F-210",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1521,7 +1524,7 @@
         "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
         "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
         "room_no": "B-303",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1529,7 +1532,7 @@
         "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
         "school_name": "DR MKK Arya Model Sr Sec School Panipat",
         "room_no": "C-103",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1537,7 +1540,7 @@
         "notes": "Gyandeep Sr Sec School Gannaur [Room: C-105]",
         "school_name": "Gyandeep Sr Sec School Gannaur",
         "room_no": "C-105",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1545,7 +1548,7 @@
         "notes": "Pooja Modern School Panipat [Room: TBD]",
         "school_name": "Pooja Modern School Panipat",
         "room_no": "TBD",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1553,7 +1556,7 @@
         "notes": "Gyan Bharti Public Sr Sec School Kabri Panipat [Room: C-306]",
         "school_name": "Gyan Bharti Public Sr Sec School Kabri Panipat",
         "room_no": "C-306",
-        "status": "PENDING",
+        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -1561,7 +1564,31 @@
         "notes": "Swami Chetna Sr Sec School Gannaur [Room: TBD]",
         "school_name": "Swami Chetna Sr Sec School Gannaur",
         "room_no": "TBD",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "SE-58",
+        "notes": "Delhi Public School Jind [Room: F-207]",
+        "school_name": "Delhi Public School Jind",
+        "room_no": "F-207",
         "status": "PENDING",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "SE-87",
+        "notes": "Dyal Singh Public School Panipat [Room: TBD]",
+        "school_name": "Dyal Singh Public School Panipat",
+        "room_no": "TBD",
+        "status": "PRESENT",
+        "approved_at": "-"
+      },
+      {
+        "tag_no": "SE-88",
+        "notes": "Panipat International School Panipat [Room: TBD]",
+        "school_name": "Panipat International School Panipat",
+        "room_no": "TBD",
+        "status": "PRESENT",
         "approved_at": "-"
       }
     ],
@@ -1571,6 +1598,6 @@
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
-    "seq_version": 1791786880357
+    "seq_version": 1791791255018
   }
 ]

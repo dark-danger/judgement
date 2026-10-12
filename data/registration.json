@@ -124,8 +124,8 @@
     "school_name": "JP Jain Sr Sec School Sonipat",
     "desk_no": 1,
     "room_no": "F-505",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -134,8 +134,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-25",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
@@ -243,6 +243,13 @@
     "notes": "",
     "events": [
       {
+        "category": "Group Dance",
+        "event_id": "evt-group-dance",
+        "tag_no": "D-29",
+        "status": "PENDING",
+        "marked_at": null
+      },
+      {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-29",
@@ -257,8 +264,8 @@
     "school_name": "Arya Kanya Gurukul Sr Sec School Karnal",
     "desk_no": 1,
     "room_no": "F-510",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:29:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -267,8 +274,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-30",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:29:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
@@ -281,8 +288,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-30",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:29:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -348,8 +355,8 @@
     "school_name": "DAV Police Public Sr Sec School Police Line Sonipat",
     "desk_no": 2,
     "room_no": "F-513",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -358,6 +365,13 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-33",
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-33",
         "status": "PENDING",
         "marked_at": null
       },
@@ -365,8 +379,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-33",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -418,8 +432,8 @@
     "school_name": "Ujala Modern Sr Sec School Kaith Shahpur Israna",
     "desk_no": 2,
     "room_no": "F-401",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:02:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -428,8 +442,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-35",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:02:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -474,8 +488,8 @@
     "school_name": "DAV Police Public School Police Line Karnal",
     "desk_no": 2,
     "room_no": "F-406",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:06:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -484,29 +498,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-37",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:06:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-37",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:06:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-37",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:06:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-37",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:06:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -516,8 +530,8 @@
     "school_name": "Sarv Vidya Public School Indri",
     "desk_no": 2,
     "room_no": "F-407",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:39:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -526,15 +540,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-38",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:39:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-38",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:39:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -635,8 +649,8 @@
     "school_name": "Babu Ram ( BR ) Global School Gannaur",
     "desk_no": 3,
     "room_no": "F-302",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -645,22 +659,22 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-42",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-42",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-42",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -670,8 +684,8 @@
     "school_name": "MM Public School Assandh",
     "desk_no": 3,
     "room_no": "F-303",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -680,22 +694,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-43",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-43",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-43",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:03:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
@@ -859,8 +873,8 @@
     "school_name": "Lakshay International School Naultha Panipat",
     "desk_no": 3,
     "room_no": "F-310",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:37:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -869,22 +883,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-49",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:37:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-49",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:37:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-49",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:37:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -964,8 +978,8 @@
     "school_name": "SD Sr Sec School Panipat",
     "desk_no": 4,
     "room_no": "F-202",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:25:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -974,29 +988,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-52",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:25:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-52",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:25:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-52",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:25:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-52",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:25:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1076,8 +1090,8 @@
     "school_name": "Saraswati Public School Jagadhri Yamunanagar",
     "desk_no": 4,
     "room_no": "F-204",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:32:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1086,29 +1100,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-55",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:32:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-55",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:32:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-55",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:32:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-55",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:32:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1146,8 +1160,8 @@
     "school_name": "JPS Academy Assandh",
     "desk_no": 4,
     "room_no": "F-206",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:42:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1156,29 +1170,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-57",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:42:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-57",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:42:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-57",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:42:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-57",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:42:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1188,8 +1202,8 @@
     "school_name": "Delhi Public School Jind",
     "desk_no": 4,
     "room_no": "F-207",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "12:24 PM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1198,20 +1212,20 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-58",
-        "status": "PENDING",
-        "marked_at": null
-      },
-      {
-        "category": "Group Song",
-        "event_id": "evt-group-song",
-        "tag_no": "S-58",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "12:24 PM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-58",
+        "status": "PRESENT",
+        "marked_at": "12:24 PM"
+      },
+      {
+        "category": "Science Exhibition",
+        "event_id": "evt-science-exhibition",
+        "tag_no": "SE-58",
         "status": "PENDING",
         "marked_at": null
       }
@@ -1244,8 +1258,8 @@
     "school_name": "Yaduvanshi Niketan School Sector 33 Gurugram",
     "desk_no": 4,
     "room_no": "F-210",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1254,22 +1268,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-60",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-60",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-60",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1314,8 +1328,8 @@
     "school_name": "Geeta Vidya Mandir Public School NHBC Panipat",
     "desk_no": 5,
     "room_no": "B-203",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:57:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1324,22 +1338,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-62",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:57:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-62",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:57:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-62",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:57:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1349,8 +1363,8 @@
     "school_name": "Shaheed Bhagat Singh Sr Sec School Karnal",
     "desk_no": 5,
     "room_no": "B-302",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:10:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1359,15 +1373,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-63",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:10:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-63",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:10:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1377,8 +1391,8 @@
     "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
     "desk_no": 5,
     "room_no": "B-303",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:53:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1387,29 +1401,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-64",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:53:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-64",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:53:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-64",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:53:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-64",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:53:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1468,8 +1482,8 @@
     "school_name": "MASD Public School Panipat",
     "desk_no": 5,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1478,8 +1492,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-67",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1489,8 +1503,8 @@
     "school_name": "SD Modern Sr Sec School Panipat",
     "desk_no": 5,
     "room_no": "C-102",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1499,15 +1513,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-68",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-68",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:45:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1517,8 +1531,8 @@
     "school_name": "DR MKK Arya Model Sr Sec School Panipat",
     "desk_no": 5,
     "room_no": "C-103",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1527,29 +1541,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-69",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-69",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-69",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-69",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:00:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1608,8 +1622,8 @@
     "school_name": "Gyandeep Sr Sec School Gannaur",
     "desk_no": 6,
     "room_no": "C-105",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1618,22 +1632,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-72",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-72",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-72",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1685,8 +1699,8 @@
     "school_name": "Montessori City School Kathua",
     "desk_no": 6,
     "room_no": "C-202",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:20:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1695,8 +1709,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-74",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:20:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1706,8 +1720,8 @@
     "school_name": "Adarsh Vidya Mandir Sr Sec School Panipat",
     "desk_no": 6,
     "room_no": "C-203",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1716,8 +1730,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-75",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:15:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1727,8 +1741,8 @@
     "school_name": "North Valley Public School",
     "desk_no": 6,
     "room_no": "C-204",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:58:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1737,22 +1751,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-76",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:58:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-76",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:58:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-76",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:58:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1790,8 +1804,8 @@
     "school_name": "DAV Police Public School Kurukshetra",
     "desk_no": 6,
     "room_no": "C-207",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:12:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1800,22 +1814,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-78",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:12:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-78",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:12:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-78",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:12:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1825,8 +1839,8 @@
     "school_name": "Pooja Modern School Panipat",
     "desk_no": 6,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1835,8 +1849,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-79",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:31:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1846,8 +1860,8 @@
     "school_name": "Gyan Bharti Public Sr Sec School Kabri Panipat",
     "desk_no": 6,
     "room_no": "C-306",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:21:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1856,15 +1870,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-80",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:21:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-80",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:21:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1895,8 +1909,8 @@
     "school_name": "SDVM City Panipat",
     "desk_no": 6,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 23:41:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1905,15 +1919,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-82",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:41:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-82",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 23:41:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1923,8 +1937,8 @@
     "school_name": "Government Model Sanskriti Sr Sec School Safidon",
     "desk_no": 6,
     "room_no": "D-203",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:35:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1933,8 +1947,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-83",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:35:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1965,8 +1979,8 @@
     "school_name": "Swami Chetna Sr Sec School Gannaur",
     "desk_no": 6,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sun Dec 31 1899 00:33:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1975,15 +1989,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-85",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:33:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-85",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sun Dec 31 1899 00:33:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1993,8 +2007,8 @@
     "school_name": "Arya Sr Sec School Shahabad Markanda",
     "desk_no": 6,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "12:30 PM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -2003,8 +2017,120 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-86",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "12:30 PM"
+      }
+    ]
+  },
+  {
+    "id": "sch-67",
+    "seq_no": 67,
+    "school_name": "Dyal Singh Public School Panipat",
+    "desk_no": 6,
+    "room_no": "TBD",
+    "is_arrived": true,
+    "arrived_at": "12:47 PM",
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-87",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
+      },
+      {
+        "category": "Science Exhibition",
+        "event_id": "evt-science-exhibition",
+        "tag_no": "SE-87",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
+      }
+    ]
+  },
+  {
+    "id": "sch-68",
+    "seq_no": 68,
+    "school_name": "Panipat International School Panipat",
+    "desk_no": 6,
+    "room_no": "TBD",
+    "is_arrived": true,
+    "arrived_at": "12:47 PM",
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Science Exhibition",
+        "event_id": "evt-science-exhibition",
+        "tag_no": "SE-88",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
+      }
+    ]
+  },
+  {
+    "id": "sch-69",
+    "seq_no": 69,
+    "school_name": "GN Vidya Mandir Panipat",
+    "desk_no": 6,
+    "room_no": "TBD",
+    "is_arrived": true,
+    "arrived_at": "12:47 PM",
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-89",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
+      }
+    ]
+  },
+  {
+    "id": "sch-70",
+    "seq_no": 70,
+    "school_name": "Yaduvanshi Shiksha Niketan Bibipur Jind",
+    "desk_no": 6,
+    "room_no": "TBD",
+    "is_arrived": true,
+    "arrived_at": "12:47 PM",
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-90",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
+      }
+    ]
+  },
+  {
+    "id": "sch-71",
+    "seq_no": 71,
+    "school_name": "JPS Academy Nissing",
+    "desk_no": 6,
+    "room_no": "TBD",
+    "is_arrived": true,
+    "arrived_at": "12:47 PM",
+    "contact_person": "",
+    "contact_phone": "",
+    "notes": "",
+    "events": [
+      {
+        "category": "Group Dance",
+        "event_id": "evt-group-dance",
+        "tag_no": "D-91",
+        "status": "PRESENT",
+        "marked_at": "12:47 PM"
       }
     ]
   }

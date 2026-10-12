@@ -228,6 +228,14 @@ class DB:
                                 "room_no": c.get("room_no", ""),
                                 "completed_at": c.get("completed_at", "")
                             })
+                        elif isinstance(c, str) and c.strip():
+                            clean_comp.append({
+                                "tag_no": c.strip(),
+                                "notes": "",
+                                "school_name": "",
+                                "room_no": "",
+                                "completed_at": ""
+                            })
                     
                     # 1. Primary dedicated sequence backup with monotonic versioning
                     seq_payload = {
@@ -468,10 +476,47 @@ class DB:
             def clean_norm_tag(t):
                 return str(t or "").upper().replace(" ", "").replace("-", "")
 
+            def extract_clean_tag(item):
+                if isinstance(item, dict):
+                    return clean_norm_tag(item.get("tag_no"))
+                elif isinstance(item, str):
+                    return clean_norm_tag(item)
+                return ""
+
             comp_tags = matched.get("completed_tags", [])
-            comp_set = {clean_norm_tag(c.get("tag_no")) for c in comp_tags if isinstance(c, dict) and c.get("tag_no")}
-            if comp_set and matched.get("sequence"):
-                matched["sequence"] = [item for item in matched["sequence"] if clean_norm_tag(item.get("tag_no")) not in comp_set]
+            comp_set = {extract_clean_tag(c) for c in comp_tags if extract_clean_tag(c)}
+
+            # Check scores to automatically mark fully-scored tags as completed
+            scores = self.get_scores(matched["id"], sync_cloud=False)
+            active_judges = [j for j in matched.get("judges", []) if j.get("is_active", True)]
+            active_judge_ids = {j["id"] for j in active_judges}
+            active_count = len(active_judges) or 1
+
+            scores_by_tag = {}
+            for s in scores:
+                t = clean_norm_tag(s.get("tag_no"))
+                if t and t != "__STAGESEQUENCE__":
+                    scores_by_tag.setdefault(t, set()).add(s.get("judge_id"))
+
+            auto_completed_any = False
+            for t_norm, j_set in scores_by_tag.items():
+                if len(j_set) >= active_count or (active_judge_ids and active_judge_ids.issubset(j_set)):
+                    comp_set.add(t_norm)
+                    if not any(extract_clean_tag(c) == t_norm for c in comp_tags):
+                        raw_tag = next((s.get("tag_no") for s in scores if clean_norm_tag(s.get("tag_no")) == t_norm), t_norm)
+                        comp_tags.append({
+                            "tag_no": raw_tag,
+                            "notes": "Completed via judge evaluation",
+                            "completed_at": datetime.now().strftime("%I:%M %p")
+                        })
+                        auto_completed_any = True
+
+            # Filter out all completed / fully scored tags from sequence
+            orig_seq = matched.get("sequence", [])
+            filtered_seq = [item for item in orig_seq if extract_clean_tag(item) not in comp_set]
+            if len(filtered_seq) != len(orig_seq):
+                matched["sequence"] = filtered_seq
+                auto_completed_any = True
 
             # Dynamically ensure ALL registered schools are in the sequence queue (so no teams are missing)
             category = EVENT_CATEGORY_MAP.get(matched.get("id"))
@@ -480,7 +525,7 @@ class DB:
                     from registration_service import registration_service
                     schools = registration_service.get_all()
                     seq = list(matched.get("sequence", []))
-                    existing_tags = {clean_norm_tag(s.get("tag_no")) for s in seq if isinstance(s, dict)}
+                    existing_tags = {extract_clean_tag(s) for s in seq if extract_clean_tag(s)}
                     changed = False
                     for s in schools:
                         ev_entry = next((e for e in s.get("events", []) if e.get("category") == category), None)
@@ -501,13 +546,19 @@ class DB:
                             })
                             existing_tags.add(t_norm)
                             changed = True
-                    if changed:
+                    if changed or auto_completed_any:
                         matched["sequence"] = seq
-                        matched["seq_version"] = int(time.time() * 1000)
+                        matched["completed_tags"] = comp_tags
+                        matched["seq_version"] = max(int(matched.get("seq_version") or 0) + 1, int(time.time() * 1000))
                         self.update_event(matched["id"], matched)
                         self._backup_sequence_to_cloud(matched["id"], seq, comp_tags, seq_version=matched["seq_version"])
                 except Exception:
                     pass
+            elif auto_completed_any:
+                matched["completed_tags"] = comp_tags
+                matched["seq_version"] = max(int(matched.get("seq_version") or 0) + 1, int(time.time() * 1000))
+                self.update_event(matched["id"], matched)
+                self._backup_sequence_to_cloud(matched["id"], matched.get("sequence", []), comp_tags, seq_version=matched["seq_version"])
 
         return matched
 
@@ -679,14 +730,28 @@ class DB:
         self._backup_sequence_to_cloud(event["id"], new_sequence, event.get("completed_tags", []), seq_version=ver)
         return updated
 
-    def set_current_tag(self, event_id, target_index, seq_version=None):
+    def set_current_tag(self, event_id, target_index=None, tag_no=None, seq_version=None):
         """Brings the selected tag to the top of the queue (index 0) so it becomes live on stage"""
         event = self.get_event(event_id)
         if not event or not event.get("sequence"):
             return None
         seq = list(event["sequence"])
-        if 0 <= target_index < len(seq):
-            item = seq.pop(target_index)
+
+        def clean_norm_tag(t):
+            return str(t or "").upper().replace(" ", "").replace("-", "")
+
+        matched_idx = None
+        if tag_no:
+            t_norm = clean_norm_tag(tag_no)
+            for i, item in enumerate(seq):
+                if clean_norm_tag(item.get("tag_no") if isinstance(item, dict) else item) == t_norm:
+                    matched_idx = i
+                    break
+        elif target_index is not None and 0 <= target_index < len(seq):
+            matched_idx = target_index
+
+        if matched_idx is not None and 0 <= matched_idx < len(seq):
+            item = seq.pop(matched_idx)
             seq.insert(0, item)
             ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
             event["sequence"] = seq
@@ -716,17 +781,24 @@ class DB:
         def clean_norm_tag(t):
             return str(t or "").upper().replace(" ", "").replace("-", "")
 
+        def extract_clean_tag(item):
+            if isinstance(item, dict):
+                return clean_norm_tag(item.get("tag_no"))
+            elif isinstance(item, str):
+                return clean_norm_tag(item)
+            return ""
+
         if target_tag:
             t_norm = clean_norm_tag(target_tag)
-            matched_item = next((item for item in seq if clean_norm_tag(item.get("tag_no")) == t_norm), None)
-            notes = matched_item.get("notes", "") if matched_item else ""
-            actual_tag = matched_item.get("tag_no", target_tag) if matched_item else target_tag
+            matched_item = next((item for item in seq if extract_clean_tag(item) == t_norm), None)
+            notes = matched_item.get("notes", "") if isinstance(matched_item, dict) else ""
+            actual_tag = matched_item.get("tag_no", target_tag) if isinstance(matched_item, dict) else target_tag
 
             # Remove ALL instances of target_tag from sequence
-            seq = [item for item in seq if clean_norm_tag(item.get("tag_no")) != t_norm]
+            seq = [item for item in seq if extract_clean_tag(item) != t_norm]
 
             # Add to completed list
-            if not any(clean_norm_tag(c.get("tag_no")) == t_norm for c in completed_list):
+            if not any(extract_clean_tag(c) == t_norm for c in completed_list):
                 completed_list.append({
                     "tag_no": actual_tag,
                     "notes": notes,
@@ -756,17 +828,26 @@ class DB:
         def clean_norm_tag(t):
             return str(t or "").upper().replace(" ", "").replace("-", "")
 
+        def extract_clean_tag(item):
+            if isinstance(item, dict):
+                return clean_norm_tag(item.get("tag_no"))
+            elif isinstance(item, str):
+                return clean_norm_tag(item)
+            return ""
+
         completed_list = list(event.get("completed_tags", []))
         matched = None
         t_norm = clean_norm_tag(tag_no)
         for i, c in enumerate(completed_list):
-            if clean_norm_tag(c.get("tag_no")) == t_norm:
+            if extract_clean_tag(c) == t_norm:
                 matched = completed_list.pop(i)
                 break
         
         if matched:
             seq = list(event.get("sequence", []))
-            seq.append({"tag_no": matched["tag_no"], "notes": matched.get("notes", "")})
+            tag_name = matched.get("tag_no") if isinstance(matched, dict) else str(matched)
+            notes = matched.get("notes", "") if isinstance(matched, dict) else ""
+            seq.append({"tag_no": tag_name, "notes": notes})
             ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
             event["sequence"] = seq
             event["completed_tags"] = completed_list
@@ -803,10 +884,31 @@ class DB:
             def clean_norm_tag(t):
                 return str(t or "").upper().replace(" ", "").replace("-", "")
 
+            def extract_clean_tag(item):
+                if isinstance(item, dict):
+                    return clean_norm_tag(item.get("tag_no"))
+                elif isinstance(item, str):
+                    return clean_norm_tag(item)
+                return ""
+
             current_seq = list(ev.get("sequence", []))
             completed_list = list(ev.get("completed_tags", []))
-            completed_tag_set = {clean_norm_tag(c.get("tag_no")) for c in completed_list if isinstance(c, dict)}
-            existing_tag_set = {clean_norm_tag(item.get("tag_no")) for item in current_seq if isinstance(item, dict)}
+            completed_tag_set = {extract_clean_tag(c) for c in completed_list if extract_clean_tag(c)}
+            
+            # Also include fully scored tags
+            scores = self.get_scores(ev.get("id"), sync_cloud=False)
+            active_judges = [j for j in ev.get("judges", []) if j.get("is_active", True)]
+            active_count = len(active_judges) or 1
+            scores_by_tag = {}
+            for s in scores:
+                t = clean_norm_tag(s.get("tag_no"))
+                if t and t != "__STAGESEQUENCE__":
+                    scores_by_tag.setdefault(t, set()).add(s.get("judge_id"))
+            for t_norm, j_set in scores_by_tag.items():
+                if len(j_set) >= active_count:
+                    completed_tag_set.add(t_norm)
+
+            existing_tag_set = {extract_clean_tag(item) for item in current_seq if extract_clean_tag(item)}
             ev_changed = False
 
             # 1. Add any school event that is PRESENT and not in queue or completed
@@ -924,10 +1026,16 @@ class DB:
             except Exception as e:
                 print(f"⚠️ [Supabase] get_scores error: {e}")
 
-        if sync_cloud:
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        now = time.time()
+        last_sync = getattr(self, "_last_cloud_score_sync", 0)
+        local_scores = load_json(SCORES_FILE, [])
+
+        if sync_cloud or is_serverless or not local_scores or (now - last_sync > 5):
+            self._last_cloud_score_sync = now
             scores = self._sync_cloud_scores()
         else:
-            scores = load_json(SCORES_FILE, [])
+            scores = local_scores
 
         scores = [s for s in scores if s.get("tag_no") != "__STAGE_SEQUENCE__"]
 

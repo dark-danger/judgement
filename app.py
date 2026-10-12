@@ -494,14 +494,20 @@ def set_current_tag(event_id):
     try:
         data = request.get_json(silent=True) or {}
         target_index = data.get("index")
+        tag_no = data.get("tag_no")
         seq_version = data.get("seq_version")
 
-        if target_index is None:
-            return jsonify({"success": False, "error": "Index required"}), 400
+        if target_index is None and not tag_no:
+            return jsonify({"success": False, "error": "Index or tag_no required"}), 400
 
-        updated = db.set_current_tag(event_id, int(target_index), seq_version=seq_version)
+        updated = db.set_current_tag(
+            event_id,
+            target_index=int(target_index) if target_index is not None else None,
+            tag_no=tag_no,
+            seq_version=seq_version
+        )
         if not updated:
-            return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
+            return jsonify({"success": False, "error": "Tag not found or invalid index"}), 400
 
         sheets_service.trigger_sequence_only_sync(event_id)
         return jsonify({"success": True, "event": updated, "seq_version": updated.get("seq_version")})
@@ -618,6 +624,28 @@ def submit_score(event_id):
         criteria_scores=criteria_scores,
         remarks=remarks
     )
+
+    # Check if all active judges have now submitted their scores for this tag -> Auto advance stage!
+    try:
+        event = db.get_event(event_id)
+        if event:
+            def clean_norm_tag(t):
+                return str(t or "").upper().replace(" ", "").replace("-", "")
+
+            t_clean = clean_norm_tag(tag_no)
+            active_judges = [j for j in event.get("judges", []) if j.get("is_active", True)]
+            active_judge_ids = {j["id"] for j in active_judges}
+            active_count = len(active_judges) or 1
+
+            all_scores_for_tag = db.get_scores(event_id=event.get("id", event_id), tag_no=tag_no)
+            scored_judge_ids = {s.get("judge_id") for s in all_scores_for_tag if clean_norm_tag(s.get("tag_no")) == t_clean}
+
+            # If all active judges have evaluated this team:
+            if (active_judge_ids and active_judge_ids.issubset(scored_judge_ids)) or len(scored_judge_ids) >= active_count:
+                db.complete_and_remove_tag(event["id"], tag_no=tag_no)
+                sheets_service.trigger_sequence_only_sync(event["id"])
+    except Exception as e:
+        print(f"Error during auto stage advance: {e}")
 
     # Permanent Google Sheet Real-time Auto-Sync
     sheets_service.trigger_background_sync(event_id)

@@ -90,8 +90,12 @@ async function loadSequenceData(force = false) {
 
       // Filter out any completed tags from the active queue
       const compTags = data.completed_tags || [];
-      const compSet = new Set(compTags.map(c => c.tag_no));
-      currentEvent.sequence = (currentEvent.sequence || []).filter(s => !compSet.has(s.tag_no));
+      const cleanNorm = (t) => String(t || '').toUpperCase().replace(/[\s-]/g, '');
+      const compSet = new Set(compTags.map(c => cleanNorm(typeof c === 'object' && c !== null ? c.tag_no : c)));
+      currentEvent.sequence = (currentEvent.sequence || []).filter(s => {
+        const t = cleanNorm(typeof s === 'object' && s !== null ? s.tag_no : s);
+        return !compSet.has(t);
+      });
       
       const navTitle = document.getElementById('eventTitleNav');
       if (navTitle) navTitle.innerHTML = `${escapeHtml(currentEvent.name)} • <span>Sequence</span>`;
@@ -116,58 +120,11 @@ async function loadSequenceData(force = false) {
 }
 
 function initSortable() {
-  const container = document.getElementById('sequenceList');
-  if (!container || !window.Sortable) return;
-
+  // Drag and drop disabled as requested - Bring to Stage button is the single reliable source of truth
   if (sortableInstance) {
-    sortableInstance.destroy();
+    try { sortableInstance.destroy(); } catch(e) {}
+    sortableInstance = null;
   }
-
-  sortableInstance = new Sortable(container, {
-    animation: 250,
-    handle: '.drag-handle',
-    ghostClass: 'sortable-ghost',
-    chosenClass: 'sortable-chosen',
-    dragClass: 'sortable-drag',
-    touchStartThreshold: 3,
-    scroll: true,
-    scrollSensitivity: 90,
-    scrollSpeed: 20,
-    onStart: function() {
-      isDragging = true;
-      lastUserActionTimestamp = Date.now();
-    },
-    onEnd: async function(evt) {
-      if (evt.oldIndex === evt.newIndex) {
-        isDragging = false;
-        return;
-      }
-      if (!currentEvent || !currentEvent.sequence) {
-        isDragging = false;
-        return;
-      }
-
-      lastUserActionTimestamp = Date.now();
-      localSeqVersion = Date.now();
-      isSaving = true;
-
-      const newSeq = [...currentEvent.sequence];
-      const [movedItem] = newSeq.splice(evt.oldIndex, 1);
-      newSeq.splice(evt.newIndex, 0, movedItem);
-
-      currentEvent.sequence = newSeq;
-      renderSequenceList(newSeq);
-      try {
-        await saveSequenceToServer(newSeq, localSeqVersion);
-      } finally {
-        isDragging = false;
-        isSaving = false;
-      }
-      
-      const newStageTag = newSeq[0] ? newSeq[0].tag_no : '';
-      showToast(`⚡ Queue updated! Live on stage: '${newStageTag}'`, 'success');
-    }
-  });
 }
 
 let lastRenderedSeqJson = '';
@@ -232,11 +189,6 @@ function renderSequenceList(sequence) {
     return `
       <div class="sequence-item ${idx === 0 ? 'is-current' : ''} ${idx === 1 ? 'is-next' : ''}" id="seq-item-${idx}" data-index="${idx}" style="${tierStyle}">
         <div class="item-left">
-          <!-- Touch & Mouse Drag Grip Handle -->
-          <div class="drag-handle" title="Touch & Drag to reorder queue">
-            <i data-lucide="grip-vertical" style="width: 18px; height: 18px;"></i>
-          </div>
-
           <span class="seq-order-badge" style="${orderBadgeStyle}">#${idx + 1}</span>
           <div>
             <div class="seq-tag-name" style="${tagNameStyle}">
@@ -250,29 +202,16 @@ function renderSequenceList(sequence) {
         </div>
 
         <div class="item-actions">
-          <!-- Complete & Remove Button for Stage Team -->
+          <!-- Stage Actions: Complete for #1, Bring to Stage for all others -->
           ${idx === 0 ? `
-            <button class="btn btn-emerald btn-md" onclick="completeTagAction(0, '${escapeHtml(item.tag_no)}')" title="Complete presentation & bring next team to stage">
+            <button class="btn btn-emerald btn-md" onclick="completeTagAction(0, '${escapeHtml(item.tag_no)}')" title="Complete presentation & bring next team to stage" style="font-weight: 800; padding: 0.55rem 1.25rem;">
               <i data-lucide="check-check"></i> Complete & Next
             </button>
           ` : `
-            <button class="btn btn-sm btn-ghost" onclick="completeTagAction(${idx}, '${escapeHtml(item.tag_no)}')" title="Remove this tag from queue" style="color: #f87171;">
-              <i data-lucide="trash-2"></i> Remove
-            </button>
-            <button class="btn btn-sm btn-cyan" onclick="bringToStageAction(${idx})" title="Bring this team to #1 Live on Stage">
+            <button class="btn btn-md btn-cyan" onclick="bringToStageAction(${idx}, '${escapeHtml(item.tag_no)}')" title="Bring this team directly to #1 Live on Stage" style="font-weight: 800; padding: 0.5rem 1.15rem; box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);">
               <i data-lucide="chevrons-up"></i> Bring to Stage
             </button>
           `}
-
-          <!-- Quick Move Up Button -->
-          <button class="btn-icon" onclick="moveTagUp(${idx})" title="Move Up (Uppar)" ${idx === 0 ? 'disabled style="opacity:0.25;"' : ''}>
-            <i data-lucide="chevron-up"></i>
-          </button>
-
-          <!-- Quick Move Down Button -->
-          <button class="btn-icon" onclick="moveTagDown(${idx})" title="Move Down (Nicha)" ${idx === sequence.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>
-            <i data-lucide="chevron-down"></i>
-          </button>
         </div>
       </div>
     `;
@@ -300,17 +239,21 @@ function renderCompletedList(completedTags) {
     return;
   }
 
-  container.innerHTML = completedTags.slice(-15).reverse().map(item => `
+  container.innerHTML = completedTags.slice(-15).reverse().map(item => {
+    const tag = (typeof item === 'object' && item !== null) ? (item.tag_no || '') : String(item);
+    const compAt = (typeof item === 'object' && item !== null) ? (item.completed_at || 'Just now') : 'Earlier';
+    return `
     <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
       <div>
-        <strong style="color: #34d399; font-family: var(--font-heading); font-size: 0.95rem;">${escapeHtml(item.tag_no)}</strong>
-        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 0.5rem;">Completed at ${item.completed_at || 'Just now'}</span>
+        <strong style="color: #34d399; font-family: var(--font-heading); font-size: 0.95rem;">${escapeHtml(tag)}</strong>
+        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 0.5rem;">Completed at ${compAt}</span>
       </div>
-      <button class="btn btn-ghost btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="restoreTagAction('${escapeHtml(item.tag_no)}')" title="Restore back to bottom of active queue">
+      <button class="btn btn-ghost btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="restoreTagAction('${escapeHtml(tag)}')" title="Restore back to bottom of active queue">
         <i data-lucide="rotate-ccw"></i> Restore
       </button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   if (window.lucide) lucide.createIcons();
 }
@@ -357,7 +300,7 @@ async function completeCurrentActiveTag() {
 }
 
 // Bring Tag directly to Stage (#1 in queue)
-async function bringToStageAction(idx) {
+async function bringToStageAction(idx, tagNo) {
   if (!currentEvent || !currentEvent.sequence || isSaving) return;
   const targetId = getActiveEventId();
   lastUserActionTimestamp = Date.now();
@@ -366,7 +309,12 @@ async function bringToStageAction(idx) {
 
   // Local optimistic update: immediately put item at index 0
   const seq = [...currentEvent.sequence];
-  const [item] = seq.splice(idx, 1);
+  let targetIdx = idx;
+  if (tagNo) {
+    const fIdx = seq.findIndex(s => s.tag_no === tagNo);
+    if (fIdx !== -1) targetIdx = fIdx;
+  }
+  const [item] = seq.splice(targetIdx, 1);
   seq.unshift(item);
   currentEvent.sequence = seq;
   renderSequenceList(seq);
@@ -380,7 +328,7 @@ async function bringToStageAction(idx) {
     const res = await fetch(`/api/events/${targetId}/current-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: idx, seq_version: localSeqVersion })
+      body: JSON.stringify({ index: targetIdx, tag_no: item.tag_no, seq_version: localSeqVersion })
     });
     const data = await res.json();
     showToast(`⚡ Brought '${item.tag_no}' to Stage!`, 'success');

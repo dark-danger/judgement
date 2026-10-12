@@ -225,6 +225,17 @@ class SheetsService:
                     })
 
             results.sort(key=lambda x: (x["total_score"], x["overall_avg"]), reverse=True)
+            current_rank = 1
+            for i, r in enumerate(results):
+                r["school_name"] = r.get("school", "")
+                if r.get("total_score", 0) > 0:
+                    if i > 0 and results[i - 1].get("total_score", 0) > r.get("total_score", 0):
+                        current_rank = i + 1
+                    r["rank"] = current_rank
+                    r["display_rank"] = f"#{current_rank}"
+                else:
+                    r["rank"] = None
+                    r["display_rank"] = "-"
             return results
         except Exception as e:
             logger.error(f"Error calculating championship data: {e}")
@@ -301,7 +312,7 @@ class SheetsService:
                         avg_score = round(sum(totals) / judges_scored, 2) if judges_scored > 0 else 0
 
                         # Check status
-                        is_completed = any(c.get("tag_no") == tag_no for c in ev_data.get("completed_tags", []))
+                        is_completed = any((c.get("tag_no") if isinstance(c, dict) else str(c)) == tag_no for c in ev_data.get("completed_tags", []))
                         is_live = bool(ev_data.get("sequence") and ev_data["sequence"][0]["tag_no"] == tag_no)
                         status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else ("EVALUATED" if judges_scored > 0 else "IN QUEUE"))
 
@@ -318,20 +329,25 @@ class SheetsService:
                 # Sort by average score descending, then judges scored
                 team_items.sort(key=lambda x: (x["average_score"], x["judges_scored"]), reverse=True)
 
-                # Assign ranks
-                for idx, team in enumerate(team_items, start=1):
+                # Assign ranks with proper tie handling
+                current_rank = 1
+                for idx, team in enumerate(team_items):
                     if team["average_score"] > 0:
-                        team["rank"] = idx
-                        if idx == 1:
+                        if idx > 0 and team_items[idx - 1]["average_score"] > team["average_score"]:
+                            current_rank = idx + 1
+                        team["rank"] = current_rank
+                        team["display_rank"] = f"#{current_rank}"
+                        if current_rank == 1:
                             team["standing"] = "🥇 1st Place (Gold Winner)"
-                        elif idx == 2:
+                        elif current_rank == 2:
                             team["standing"] = "🥈 2nd Place (Silver Winner)"
-                        elif idx == 3:
+                        elif current_rank == 3:
                             team["standing"] = "🥉 3rd Place (Bronze Winner)"
                         else:
-                            team["standing"] = f"Position #{idx}"
+                            team["standing"] = f"Position #{current_rank}"
                     else:
                         team["rank"] = "-"
+                        team["display_rank"] = "-"
                         team["standing"] = "Pending Evaluation"
 
                 top3 = [t for t in team_items if t["average_score"] > 0][:3]
@@ -585,8 +601,8 @@ class SheetsService:
             # Add completed teams section
             completed_items = event.get("completed_tags", [])
             for c in completed_items:
-                tag_no = c.get("tag_no", "")
-                notes = c.get("notes", "")
+                tag_no = c.get("tag_no", "") if isinstance(c, dict) else str(c)
+                notes = c.get("notes", "") if isinstance(c, dict) else ""
                 school_name = notes.split("[Room:")[0].strip() if "[Room:" in notes else notes
                 room_no = notes.split("[Room:")[1].replace("]", "").strip() if "[Room:" in notes else "TBD"
 
@@ -700,10 +716,10 @@ class SheetsService:
 
             # 3. Include tags from completed
             for c in event.get("completed_tags", []):
-                t_no = c.get("tag_no")
+                t_no = c.get("tag_no") if isinstance(c, dict) else str(c)
                 if t_no and t_no not in all_tags:
                     all_tags.append(t_no)
-                    tag_meta[t_no] = c.get("notes", "")
+                    tag_meta[t_no] = c.get("notes", "") if isinstance(c, dict) else ""
 
             # 4. Include any scored tags
             for sc in scores:
@@ -726,7 +742,7 @@ class SheetsService:
             for tag_no in all_tags:
                 t_clean = clean_norm_tag(tag_no)
                 tag_scores = [s for s in scores if clean_norm_tag(s.get("tag_no")) == t_clean]
-                is_completed = any(clean_norm_tag(c.get("tag_no")) == t_clean for c in event.get("completed_tags", []))
+                is_completed = any(clean_norm_tag(c.get("tag_no") if isinstance(c, dict) else c) == t_clean for c in event.get("completed_tags", []))
                 is_live = bool(event.get("sequence") and clean_norm_tag(event["sequence"][0]["tag_no"]) == t_clean)
                 
                 stage_status = "COMPLETED" if is_completed else ("LIVE ON STAGE" if is_live else "IN QUEUE")
