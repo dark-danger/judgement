@@ -447,6 +447,7 @@ class DB:
         if (is_serverless or sync_cloud) and (now - getattr(self, "_last_cloud_event_sync", 0) > 6):
             self._last_cloud_event_sync = now
             self._sync_cloud_scores()
+            self._sync_cloud_sequence()
             return self._sync_cloud_events()
 
         return load_json(EVENTS_FILE, [])
