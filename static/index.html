@@ -91,9 +91,6 @@
         <a href="https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit#gid=0" target="_blank" class="btn btn-secondary" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
           <i data-lucide="file-spreadsheet"></i> 📊 Live Google Sheet
         </a>
-        <a href="/admin" class="btn btn-secondary">
-          <i data-lucide="shield-check"></i> Super Admin
-        </a>
       </div>
     </header>
 
@@ -212,9 +209,6 @@
             Access judge scoring panels, stage sequence controllers, and individual marksheets.
           </p>
         </div>
-        <a href="/admin" class="btn btn-primary btn-sm">
-          <i data-lucide="plus"></i> Create New Event
-        </a>
       </div>
 
       <div id="eventsContainer" class="admin-grid">
@@ -444,9 +438,6 @@
                 <a href="/sequence/${evt.id}" class="btn btn-cyan">
                   <i data-lucide="list-ordered"></i> Open Sequence Controller
                 </a>
-                <a href="/admin" class="btn btn-secondary">
-                  <i data-lucide="settings"></i> Manage in Admin
-                </a>
               </div>
             </div>
           `).join('');
@@ -454,8 +445,7 @@
         } else {
           container.innerHTML = `
             <div class="current-team-card" style="text-align: center; padding: 3rem;">
-              <p style="color: var(--text-muted); margin-bottom: 1rem;">No events found. Create your first event in Admin.</p>
-              <a href="/admin" class="btn btn-primary"><i data-lucide="plus"></i> Go to Admin Dashboard</a>
+              <p style="color: var(--text-muted); margin-bottom: 0.5rem;">No active events found.</p>
             </div>
           `;
           if (window.lucide) lucide.createIcons();

@@ -61,18 +61,18 @@ def load_json(filepath, default):
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
-    # 1. Check /tmp (writable in serverless)
-    if os.path.exists(tmp_path):
+    # 1. Check local file (primary source of truth)
+    if os.path.exists(filepath):
         try:
-            with open(tmp_path, "r", encoding="utf-8") as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
 
-    # 2. Check local file
-    if os.path.exists(filepath):
+    # 2. Check /tmp (fallback for serverless read-only environments)
+    if os.path.exists(tmp_path):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(tmp_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
@@ -92,18 +92,20 @@ def save_json(filepath, data):
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
-    # Always write to /tmp
+    # 1. Primary write to local data directory
     try:
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-    except Exception:
-        pass
-
-    # Also try local write
-    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
     except Exception as e:
+        pass
+
+    # 2. Also keep /tmp in sync for serverless
+    try:
+        os.makedirs(TMP_DATA_DIR, exist_ok=True)
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception:
         pass
 
 EVENT_CATEGORY_MAP = {

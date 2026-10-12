@@ -78,7 +78,8 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-23",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -112,7 +113,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-24",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -132,13 +134,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-25",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-25",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -158,7 +162,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-26",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -178,13 +183,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-27",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-27",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -204,19 +211,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-28",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-28",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-28",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -236,7 +246,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-29",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -256,19 +267,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-30",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-30",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-30",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -288,19 +302,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-31",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-31",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-31",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -320,13 +337,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-32",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-32",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -346,13 +365,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-33",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-33",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -372,25 +393,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-34",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-34",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-34",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-34",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -410,7 +435,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-35",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -430,19 +456,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-36",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-36",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-36",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -462,25 +491,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-37",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-37",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-37",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-37",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -500,13 +533,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-38",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-38",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -526,25 +561,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-39",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-39",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-39",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-39",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -564,7 +603,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-40",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -584,13 +624,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-41",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-41",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -610,19 +652,22 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-42",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-42",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-42",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -642,25 +687,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-43",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-43",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-43",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-43",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -680,25 +729,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-44",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-44",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-44",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-44",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -718,25 +771,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-45",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-45",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-45",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-45",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -756,7 +813,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-46",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -776,7 +834,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-47",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -796,13 +855,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-48",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-48",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -822,19 +883,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-49",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-49",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-49",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -854,19 +918,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-50",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-50",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-50",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -886,25 +953,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-51",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-51",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-51",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-51",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -924,25 +995,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-52",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-52",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-52",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-52",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -962,13 +1037,15 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-53",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-53",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -988,13 +1065,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-54",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-54",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1014,25 +1093,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-55",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-55",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-55",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-55",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1052,13 +1135,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-56",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-56",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1078,25 +1163,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-57",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-57",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-57",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-57",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1116,19 +1205,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-58",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-58",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-58",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1148,7 +1240,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-59",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1168,19 +1261,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-60",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-60",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-60",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1200,19 +1296,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-61",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-61",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-61",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1232,19 +1331,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-62",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-62",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-62",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1264,13 +1366,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-63",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-63",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1290,25 +1394,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-64",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-64",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-64",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-64",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1328,13 +1436,15 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-65",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-65",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1354,7 +1464,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-66",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1374,7 +1485,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-67",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1394,13 +1506,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-68",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-68",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1420,25 +1534,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-69",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-69",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-69",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-69",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1458,7 +1576,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-70",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1478,13 +1597,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-71",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-71",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1504,19 +1625,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-72",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-72",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-72",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1536,25 +1660,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-73",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-73",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-73",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-73",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1574,7 +1702,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-74",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1594,7 +1723,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-75",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1614,19 +1744,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-76",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-76",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-76",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1646,13 +1779,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-77",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-77",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1672,19 +1807,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-78",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-78",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-78",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1704,7 +1842,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-79",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1724,13 +1863,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-80",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-80",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1750,7 +1891,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-81",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1770,13 +1912,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-82",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-82",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1796,7 +1940,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-83",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1816,7 +1961,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-84",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1836,13 +1982,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-85",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-85",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   },
@@ -1862,7 +2010,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-86",
-        "status": "PENDING"
+        "status": "PENDING",
+        "marked_at": null
       }
     ]
   }

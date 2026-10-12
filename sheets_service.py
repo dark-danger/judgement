@@ -220,8 +220,8 @@ class SheetsService:
     def calculate_event_winners(self):
         """Calculates individual event rankings and winners for each of the 4 categories"""
         try:
-            from create_excel import schools_data
             from database import db
+            from registration_service import registration_service
 
             all_scores = db.get_scores()
             events = db.get_events()
@@ -263,6 +263,7 @@ class SheetsService:
             ]
 
             category_results = {}
+            all_schools = registration_service.get_all()
 
             for cat in categories:
                 ev_id = cat["event_id"]
@@ -272,17 +273,17 @@ class SheetsService:
 
                 cat_scores = [s for s in all_scores if s.get("event_id") == ev_id]
 
-                # Map schools that participate in this category
+                # Map schools that participate in this category dynamically from registration
                 team_items = []
-                for row in schools_data:
-                    is_registered = row[cat["reg_idx"]] == "YES"
-                    tag_no = row[cat["tag_idx"]]
-                    if is_registered and tag_no:
-                        school_name = row[0]
-                        room_no = row[9] or "TBD"
+                for s in all_schools:
+                    school_name = s.get("school_name", "")
+                    room_no = s.get("room_no") or "TBD"
+                    ev_match = next((e for e in s.get("events", []) if e.get("category") == cat["short_name"] or e.get("event_id") == ev_id), None)
+                    if ev_match and ev_match.get("tag_no"):
+                        tag_no = ev_match["tag_no"]
 
-                        tag_scores = [s for s in cat_scores if s.get("tag_no") == tag_no]
-                        totals = [s.get("total", 0) for s in tag_scores]
+                        tag_scores = [s_sc for s_sc in cat_scores if str(s_sc.get("tag_no", "")).upper().replace(" ", "").replace("-", "") == str(tag_no).upper().replace(" ", "").replace("-", "")]
+                        totals = [s_sc.get("total", 0) for s_sc in tag_scores]
                         judges_scored = len(totals)
                         avg_score = round(sum(totals) / judges_scored, 2) if judges_scored > 0 else 0
 
@@ -783,22 +784,56 @@ class SheetsService:
             return False, str(e)
 
     def pull_from_agrash_sheet(self, webhook_url=None):
-        """Pulls school registration data directly from Google Sheet 'Agrash Registrations' tab"""
+        """Pulls school registration data directly from Google Sheet 'Agrash Registrations' tab with dual high-speed fetch"""
         try:
+            import urllib.request
+            import csv
+            import io
             from database import db
             from registration_service import registration_service
 
-            events = db.get_events()
-            webhook = webhook_url or (events[0].get("google_sheet_webhook_url") if events else None) or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL")
-
             schools_data = []
-            if webhook and webhook.startswith("http"):
-                import requests
-                url = f"{webhook}?action=get_registrations"
-                resp = requests.get(url, timeout=25, allow_redirects=True)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    schools_data = data.get("schools", [])
+
+            # 1. Primary High-Speed Direct Google Sheet CSV Fetch (~500ms, no script quotas)
+            try:
+                sheet_csv_url = "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/gviz/tq?tqx=out:csv&sheet=Agrash%20Registrations"
+                req = urllib.request.Request(sheet_csv_url, headers={"User-Agent": "Mozilla/5.0 (AgrashPortal/2.0)"})
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    if resp.status == 200:
+                        content = resp.read().decode("utf-8")
+                        reader = csv.reader(io.StringIO(content))
+                        rows = list(reader)
+                        for r in rows[2:]:  # Skip headers and count summary row
+                            if len(r) > 0 and r[0].strip() and not r[0].strip().isdigit():
+                                sch_name = r[0].strip()
+                                d_tag = r[2].strip() if len(r) > 2 and (r[1].strip().upper() == "YES" or r[2].strip().startswith("D-")) else ""
+                                s_tag = r[4].strip() if len(r) > 4 and (r[3].strip().upper() == "YES" or r[4].strip().startswith("S-")) else ""
+                                dec_tag = r[6].strip() if len(r) > 6 and (r[5].strip().upper() == "YES" or r[6].strip().startswith("DC-")) else ""
+                                sci_tag = r[8].strip() if len(r) > 8 and (r[7].strip().upper() == "YES" or r[8].strip().startswith("SE-")) else ""
+                                room = r[9].strip() if len(r) > 9 and r[9].strip() else "TBD"
+
+                                schools_data.append({
+                                    "school_name": sch_name,
+                                    "dance_tag": d_tag,
+                                    "song_tag": s_tag,
+                                    "declamation_tag": dec_tag,
+                                    "science_tag": sci_tag,
+                                    "room_no": room
+                                })
+            except Exception as e_csv:
+                logger.warning(f"Direct G-Sheet CSV fetch notice: {e_csv}. Trying Apps Script webhook fallback.")
+
+            # 2. Webhook Fallback if direct CSV returned no rows
+            if not schools_data:
+                events = db.get_events()
+                webhook = webhook_url or os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or (events[0].get("google_sheet_webhook_url") if events else None)
+                if webhook and webhook.startswith("http"):
+                    import requests
+                    url = f"{webhook}?action=get_registrations"
+                    resp = requests.get(url, timeout=12, allow_redirects=True)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        schools_data = data.get("schools", [])
 
             if schools_data:
                 updated_count = 0
@@ -814,6 +849,10 @@ class SheetsService:
                     )
                     if rec:
                         updated_count += 1
+                try:
+                    db.sync_event_sequence_from_attendance()
+                except Exception:
+                    pass
                 return True, f"Successfully synced {updated_count} schools from 'Agrash Registrations' sheet"
             return False, "No schools returned from 'Agrash Registrations' sheet"
         except Exception as e:

@@ -300,12 +300,23 @@ async function quickRenameJudge(judgeId, currentName) {
   }
   if (!currentEventData || !currentEventData.judges) return;
 
+  const originalJudges = [...currentEventData.judges];
   const judgesList = currentEventData.judges.map(j => {
     if (j.id === judgeId) {
       return { ...j, name: trimmed };
     }
     return j;
   });
+
+  // 1. Instant 0ms Optimistic UI Update
+  currentEventData.judges = judgesList;
+  renderJudgesPanel();
+  renderPerJudgeLinks();
+  renderMatrixTable();
+
+  // Sync to allEvents cache
+  const evMatch = allEvents.find(e => e.id === activeEventId);
+  if (evMatch) evMatch.judges = judgesList;
 
   try {
     const res = await fetch(`/api/events/${activeEventId}`, {
@@ -316,11 +327,25 @@ async function quickRenameJudge(judgeId, currentName) {
     const data = await res.json();
     if (data.success) {
       showToast(`✅ Judge renamed to "${trimmed}" successfully!`, 'success');
-      await loadAdminData();
+      currentEventData = data.event;
+      if (evMatch) evMatch.judges = data.event.judges;
+      renderJudgesPanel();
+      renderPerJudgeLinks();
+      renderMatrixTable();
     } else {
+      currentEventData.judges = originalJudges;
+      if (evMatch) evMatch.judges = originalJudges;
+      renderJudgesPanel();
+      renderPerJudgeLinks();
+      renderMatrixTable();
       showToast(data.error || 'Failed to rename judge', 'error');
     }
   } catch (e) {
+    currentEventData.judges = originalJudges;
+    if (evMatch) evMatch.judges = originalJudges;
+    renderJudgesPanel();
+    renderPerJudgeLinks();
+    renderMatrixTable();
     showToast('Error updating judge name', 'error');
   }
 }
@@ -332,6 +357,23 @@ async function quickDeleteJudge(judgeId, judgeName) {
   }
   if (!confirm(`Are you sure you want to remove judge "${judgeName}"?`)) return;
 
+  const originalJudges = [...currentEventData.judges];
+  const filteredJudges = currentEventData.judges.filter(j => j.id !== judgeId);
+
+  // 1. Instant 0ms Optimistic UI Update
+  currentEventData.judges = filteredJudges;
+  currentEventData.judge_count = filteredJudges.length;
+  renderJudgesPanel();
+  renderPerJudgeLinks();
+  renderMatrixTable();
+
+  // Sync to allEvents cache
+  const evMatch = allEvents.find(e => e.id === activeEventId);
+  if (evMatch) {
+    evMatch.judges = filteredJudges;
+    evMatch.judge_count = filteredJudges.length;
+  }
+
   try {
     const res = await fetch(`/api/events/${activeEventId}/judges/${judgeId}`, {
       method: 'DELETE'
@@ -339,11 +381,38 @@ async function quickDeleteJudge(judgeId, judgeName) {
     const data = await res.json();
     if (data.success) {
       showToast(`✅ Judge "${judgeName}" removed!`, 'success');
-      await loadAdminData();
+      if (data.event) {
+        currentEventData = data.event;
+        if (evMatch) {
+          evMatch.judges = data.event.judges;
+          evMatch.judge_count = data.event.judge_count;
+        }
+      }
+      renderJudgesPanel();
+      renderPerJudgeLinks();
+      renderMatrixTable();
     } else {
+      currentEventData.judges = originalJudges;
+      currentEventData.judge_count = originalJudges.length;
+      if (evMatch) {
+        evMatch.judges = originalJudges;
+        evMatch.judge_count = originalJudges.length;
+      }
+      renderJudgesPanel();
+      renderPerJudgeLinks();
+      renderMatrixTable();
       showToast(data.error || 'Failed to remove judge', 'error');
     }
   } catch (e) {
+    currentEventData.judges = originalJudges;
+    currentEventData.judge_count = originalJudges.length;
+    if (evMatch) {
+      evMatch.judges = originalJudges;
+      evMatch.judge_count = originalJudges.length;
+    }
+    renderJudgesPanel();
+    renderPerJudgeLinks();
+    renderMatrixTable();
     showToast('Error removing judge', 'error');
   }
 }

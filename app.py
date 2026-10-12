@@ -5,6 +5,7 @@ import csv
 import json
 import time
 import socket
+import threading
 from datetime import datetime
 
 # Configure Windows console encoding for UTF-8
@@ -87,9 +88,28 @@ def serve_static(filename):
     return send_from_directory(app.static_folder, filename)
 
 # --- Registration API Endpoints ---
+_LAST_SHEET_PULL_TIME = 0
+_SHEET_PULL_LOCK = threading.Lock()
+
+def trigger_auto_sheet_pull_if_needed(interval_seconds=30):
+    global _LAST_SHEET_PULL_TIME
+    now = time.time()
+    if now - _LAST_SHEET_PULL_TIME > interval_seconds:
+        with _SHEET_PULL_LOCK:
+            if now - _LAST_SHEET_PULL_TIME > interval_seconds:
+                _LAST_SHEET_PULL_TIME = now
+                def _bg_pull():
+                    try:
+                        sheets_service.pull_from_agrash_sheet()
+                    except Exception as err:
+                        pass
+                t = threading.Thread(target=_bg_pull, daemon=True)
+                t.start()
+
 @app.route("/api/registration", methods=["GET"])
 def get_registrations_api():
     try:
+        trigger_auto_sheet_pull_if_needed(interval_seconds=30)
         from registration_service import registration_service
         desk_no = request.args.get("desk")
         query = request.args.get("q", "")
@@ -384,6 +404,7 @@ def remove_judge_route(event_id, judge_id=None):
 @app.route("/api/championship", methods=["GET"])
 def get_championship_leaderboard():
     try:
+        trigger_auto_sheet_pull_if_needed(interval_seconds=30)
         data = sheets_service.calculate_championship_data()
         event_winners = sheets_service.calculate_event_winners()
         return jsonify({
@@ -716,4 +737,4 @@ if __name__ == "__main__":
     print(f"   🔄 Sequence:   http://{local_ip}:{port}/sequence/evt-agrash")
     print(f"   📺 Projector:  http://{local_ip}:{port}/projector/evt-agrash")
     print(f"=======================================================\n")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
