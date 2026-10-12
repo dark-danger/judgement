@@ -453,14 +453,6 @@
         "room_no": "D-203",
         "status": "PENDING",
         "approved_at": "-"
-      },
-      {
-        "tag_no": "D-31",
-        "notes": "Pratap Public School Sector 6 Karnal [Room: D-204]",
-        "school_name": "Pratap Public School Sector 6 Karnal",
-        "room_no": "D-204",
-        "status": "ABSENT",
-        "approved_at": "-"
       }
     ],
     "completed_tags": [],
@@ -469,7 +461,7 @@
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
-    "seq_version": 1791787074950
+    "seq_version": 1791787223642
   },
   {
     "id": "evt-group-song",
