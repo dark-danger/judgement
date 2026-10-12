@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import logging
 import threading
@@ -105,6 +106,14 @@ class SheetsService:
         try:
             from database import db
             from registration_service import registration_service
+
+            now_t = time.time()
+            if getattr(self, "_last_sheet_score_pull", 0) < now_t - 25:
+                self._last_sheet_score_pull = now_t
+                try:
+                    self.pull_scores_from_sheet_results()
+                except Exception:
+                    pass
 
             all_scores = db.get_scores()
             events = db.get_events()
@@ -246,6 +255,14 @@ class SheetsService:
         try:
             from database import db
             from registration_service import registration_service
+
+            now_t = time.time()
+            if getattr(self, "_last_sheet_score_pull", 0) < now_t - 25:
+                self._last_sheet_score_pull = now_t
+                try:
+                    self.pull_scores_from_sheet_results()
+                except Exception:
+                    pass
 
             all_scores = db.get_scores()
             events = db.get_events()
@@ -972,6 +989,112 @@ class SheetsService:
             return True, f"Successfully synced attendance for {updated_schools} schools"
         except Exception as e:
             logger.error(f"Error pulling from Attendance sheet: {e}")
+            return False, str(e)
+
+    def pull_scores_from_sheet_results(self):
+        """Pulls manual scores/updates directly from Google Sheet Result tabs (Declamation Result, Dance Result, Song Result, Science Result) into database & Cloud Properties"""
+        try:
+            import urllib.request
+            import csv
+            import io
+            import uuid
+            from database import db, SCORES_FILE, save_json, load_json
+
+            sheet_id = "1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk"
+            webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
+
+            def fetch_tab(name):
+                url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={urllib.parse.quote(name)}"
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (AgrashSync/2.0)"})
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    return list(csv.reader(io.StringIO(resp.read().decode("utf-8"))))
+
+            local_scores = load_json(SCORES_FILE, [])
+
+            configs = [
+                ("Declamation Result", "evt-declamation", [("Dr Ayaz", "j1"), ("Ms Muskan", "j2")], 6),
+                ("Dance Result", "evt-group-dance", [("Vishnu Khatri", "j1"), ("Aswani", "j2"), ("Ranjeet Jha", "j3")], 5),
+                ("Song Result", "evt-group-song", [("Rajkumar Ji", "j1"), ("Dr Jagdish", "j2")], 5),
+                ("Science Result", "evt-science-exhibition", [("Dr Kirti", "j1"), ("Dr Meenu Gupta", "j2")], 5)
+            ]
+
+            imported_count = 0
+            for tab_name, event_id, judges, num_criteria in configs:
+                try:
+                    rows = fetch_tab(tab_name)
+                except Exception:
+                    continue
+                if not rows:
+                    continue
+                headers = rows[0]
+
+                judge_col_map = {}
+                for jname, jid in judges:
+                    for idx, h in enumerate(headers):
+                        if jname.lower() in h.lower():
+                            judge_col_map[(jname, jid)] = idx
+                            break
+
+                for r in rows[1:]:
+                    if len(r) < 2 or not r[1].strip() or not r[0].strip().startswith("#"):
+                        continue
+                    tag = r[1].strip()
+
+                    for (jname, jid), col_idx in judge_col_map.items():
+                        if col_idx < len(r):
+                            val_str = r[col_idx].strip()
+                            if val_str and val_str != "Pending":
+                                try:
+                                    sheet_score = float(val_str)
+                                except Exception:
+                                    continue
+
+                                matched = next((s for s in local_scores if s.get("event_id") == event_id and str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "") == tag.upper().replace(" ", "").replace("-", "") and s.get("judge_id") == jid), None)
+                                if not matched:
+                                    q, rem = divmod(int(round(sheet_score)), num_criteria)
+                                    crit = {}
+                                    for c_i in range(1, num_criteria + 1):
+                                        crit[f"c{c_i}"] = q + (1 if c_i <= rem else 0)
+
+                                    new_sc = {
+                                        "id": f"sc-{uuid.uuid4().hex[:8]}",
+                                        "event_id": event_id,
+                                        "tag_no": tag,
+                                        "judge_id": jid,
+                                        "judge_name": jname,
+                                        "scores": crit,
+                                        "total": sheet_score,
+                                        "remarks": "Synced from Sheet " + tab_name,
+                                        "updated_at": datetime.now().isoformat()
+                                    }
+                                    local_scores.append(new_sc)
+                                    imported_count += 1
+                                    try:
+                                        import requests
+                                        requests.post(webhook, json={"action": "save_score", "score": new_sc}, timeout=5)
+                                    except Exception:
+                                        pass
+                                elif matched.get("total") != sheet_score:
+                                    matched["total"] = sheet_score
+                                    q, rem = divmod(int(round(sheet_score)), num_criteria)
+                                    crit = {}
+                                    for c_i in range(1, num_criteria + 1):
+                                        crit[f"c{c_i}"] = q + (1 if c_i <= rem else 0)
+                                    matched["scores"] = crit
+                                    matched["updated_at"] = datetime.now().isoformat()
+                                    imported_count += 1
+                                    try:
+                                        import requests
+                                        requests.post(webhook, json={"action": "save_score", "score": matched}, timeout=5)
+                                    except Exception:
+                                        pass
+
+            if imported_count > 0:
+                save_json(SCORES_FILE, local_scores)
+                logger.info(f"⚡ [Sheet Scores Pull] Imported/updated {imported_count} scores from Google Sheet results.")
+            return True, f"Synced {imported_count} scores"
+        except Exception as e:
+            logger.error(f"Error pulling scores from result sheets: {e}")
             return False, str(e)
 
     def sync_all_events(self):

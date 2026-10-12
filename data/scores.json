@@ -2566,5 +2566,720 @@
     "total": 45,
     "remarks": "",
     "updated_at": "2026-10-12T07:57:16.516912"
+  },
+  {
+    "id": "sc-4f87bd68",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-77",
+    "judge_id": "j2",
+    "judge_name": "Aswani",
+    "scores": {
+      "c1": 2,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 2
+    },
+    "total": 10,
+    "remarks": "",
+    "updated_at": "2026-10-12T07:58:11.862072"
+  },
+  {
+    "id": "sc-2a99031c",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-77",
+    "judge_id": "j3",
+    "judge_name": "Ranjeet Jha",
+    "scores": {
+      "c1": 5,
+      "c2": 3,
+      "c3": 2,
+      "c4": 3,
+      "c5": 3
+    },
+    "total": 16,
+    "remarks": "",
+    "updated_at": "2026-10-12T07:59:05.984669"
+  },
+  {
+    "id": "sc-5d06e539",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-87",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 10,
+      "c2": 8,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 50,
+    "remarks": "",
+    "updated_at": "2026-10-12T07:59:55.832100"
+  },
+  {
+    "id": "sc-f3dd643f",
+    "event_id": "evt-group-song",
+    "tag_no": "S-73",
+    "judge_id": "j1",
+    "judge_name": "Rajkumar Ji",
+    "scores": {
+      "c1": 6,
+      "c2": 8,
+      "c3": 8,
+      "c4": 6,
+      "c5": 6
+    },
+    "total": 34,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:00:38.162397"
+  },
+  {
+    "id": "sc-157f8156",
+    "event_id": "evt-group-song",
+    "tag_no": "S-73",
+    "judge_id": "j2",
+    "judge_name": "Dr Jagdish",
+    "scores": {
+      "c1": 8,
+      "c2": 8,
+      "c3": 8,
+      "c4": 8,
+      "c5": 10
+    },
+    "total": 42,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:01:13.565618"
+  },
+  {
+    "id": "sc-542860e5",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-38",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 2,
+      "c2": 9,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 43,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:06:38.014147"
+  },
+  {
+    "id": "sc-ec7f25bf",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-38",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 44,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:06:50.102499"
+  },
+  {
+    "id": "sc-f0af7106",
+    "event_id": "evt-group-song",
+    "tag_no": "S-78",
+    "judge_id": "j2",
+    "judge_name": "Dr Jagdish",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4
+    },
+    "total": 20,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:08:17.155826"
+  },
+  {
+    "id": "sc-eacbb93f",
+    "event_id": "evt-group-song",
+    "tag_no": "S-78",
+    "judge_id": "j1",
+    "judge_name": "Rajkumar Ji",
+    "scores": {
+      "c1": 8,
+      "c2": 6,
+      "c3": 4,
+      "c4": 6,
+      "c5": 6
+    },
+    "total": 30,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:08:25.237267"
+  },
+  {
+    "id": "sc-9a4e282c",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-41",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 6,
+      "c2": 8,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 46,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:12:52.867065"
+  },
+  {
+    "id": "sc-6b63e26b",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-49",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 4,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 4
+    },
+    "total": 14,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:13:57.221680"
+  },
+  {
+    "id": "sc-bedabf33",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-49",
+    "judge_id": "j3",
+    "judge_name": "Ranjeet Jha",
+    "scores": {
+      "c1": 3,
+      "c2": 3,
+      "c3": 4,
+      "c4": 2,
+      "c5": 3
+    },
+    "total": 15,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:15:24.359531"
+  },
+  {
+    "id": "sc-ba8fd89d",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-63",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 0,
+      "c2": 0,
+      "c3": 0,
+      "c4": 0,
+      "c5": 7,
+      "c6": 8
+    },
+    "total": 15,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:15:43.396566"
+  },
+  {
+    "id": "sc-786d93a9",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-49",
+    "judge_id": "j2",
+    "judge_name": "Aswani",
+    "scores": {
+      "c1": 2,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 2
+    },
+    "total": 10,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:15:46.344151"
+  },
+  {
+    "id": "sc-4521ac1f",
+    "event_id": "evt-group-song",
+    "tag_no": "S-43",
+    "judge_id": "j2",
+    "judge_name": "Dr Jagdish",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 6,
+      "c5": 6
+    },
+    "total": 24,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:17:07.488587"
+  },
+  {
+    "id": "sc-6a7d8afd",
+    "event_id": "evt-group-song",
+    "tag_no": "S-43",
+    "judge_id": "j1",
+    "judge_name": "Rajkumar Ji",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 8,
+      "c4": 8,
+      "c5": 6
+    },
+    "total": 34,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:17:56.539102"
+  },
+  {
+    "id": "sc-352083b5",
+    "event_id": "evt-science-exhibition",
+    "tag_no": "SE-79",
+    "judge_id": "j1",
+    "judge_name": "Dr Kirti",
+    "scores": {
+      "c1": 5,
+      "c2": 5,
+      "c3": 4,
+      "c4": 4,
+      "c5": 6
+    },
+    "total": 24,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:19:13.864215"
+  },
+  {
+    "id": "sc-e673fbdf",
+    "event_id": "evt-science-exhibition",
+    "tag_no": "SE-69",
+    "judge_id": "j2",
+    "judge_name": "Dr Meenu Gupta",
+    "scores": {
+      "c1": 9,
+      "c2": 8,
+      "c3": 8,
+      "c4": 7,
+      "c5": 7
+    },
+    "total": 39,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:21:21.192611"
+  },
+  {
+    "id": "sc-88434f72",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-30",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 9,
+      "c2": 0,
+      "c3": 0,
+      "c4": 10,
+      "c5": 9,
+      "c6": 8
+    },
+    "total": 36,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:23:31.615277"
+  },
+  {
+    "id": "sc-967fa066",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-30",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 8,
+      "c2": 6,
+      "c3": 4,
+      "c4": 4,
+      "c5": 6,
+      "c6": 8
+    },
+    "total": 36,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:22:51.972780"
+  },
+  {
+    "id": "sc-edcc8e98",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-53",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 6
+    },
+    "total": 22,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:25:24.673625"
+  },
+  {
+    "id": "sc-dd24fed5",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-53",
+    "judge_id": "j3",
+    "judge_name": "Ranjeet Jha",
+    "scores": {
+      "c1": 7,
+      "c2": 5,
+      "c3": 8,
+      "c4": 7,
+      "c5": 8
+    },
+    "total": 35,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:25:44.587221"
+  },
+  {
+    "id": "sc-e6a2d09f",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-53",
+    "judge_id": "j2",
+    "judge_name": "Aswani",
+    "scores": {
+      "c1": 3,
+      "c2": 2,
+      "c3": 3,
+      "c4": 2,
+      "c5": 3
+    },
+    "total": 13,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:25:49.283209"
+  },
+  {
+    "id": "sc-498d8d97",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-54",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 0,
+      "c2": 9,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 41,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:27:12.715029"
+  },
+  {
+    "id": "sc-f59e845a",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-54",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 4,
+      "c2": 2,
+      "c3": 4,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 34,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:29:43.325309"
+  },
+  {
+    "id": "sc-ace563a6",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-41",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 9,
+      "c2": 9,
+      "c3": 9,
+      "c4": 9,
+      "c5": 9,
+      "c6": 8
+    },
+    "total": 53,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.515443"
+  },
+  {
+    "id": "sc-1c51027e",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-86",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 8,
+      "c2": 8,
+      "c3": 8,
+      "c4": 7,
+      "c5": 7,
+      "c6": 7
+    },
+    "total": 45,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.515871"
+  },
+  {
+    "id": "sc-9ca8351c",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-21",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 8,
+      "c2": 8,
+      "c3": 8,
+      "c4": 7,
+      "c5": 7,
+      "c6": 7
+    },
+    "total": 45,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.516130"
+  },
+  {
+    "id": "sc-4d4d22d5",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-40",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 7,
+      "c2": 7,
+      "c3": 7,
+      "c4": 7,
+      "c5": 7,
+      "c6": 7
+    },
+    "total": 42,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.516237"
+  },
+  {
+    "id": "sc-bd178da1",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-24",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 8,
+      "c2": 8,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 48,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.516373"
+  },
+  {
+    "id": "sc-ca5517df",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-65",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 6,
+      "c4": 6,
+      "c5": 6,
+      "c6": 5
+    },
+    "total": 35.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.516865"
+  },
+  {
+    "id": "sc-a19c2ccc",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-25",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 6,
+      "c4": 6,
+      "c5": 6,
+      "c6": 6
+    },
+    "total": 36,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.517428"
+  },
+  {
+    "id": "sc-514516b6",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-63",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 3,
+      "c4": 3,
+      "c5": 3,
+      "c6": 3
+    },
+    "total": 20,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T14:03:24.517581"
+  },
+  {
+    "id": "sc-57b12d11",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-51",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 7,
+      "c2": 7,
+      "c3": 6,
+      "c4": 6,
+      "c5": 6
+    },
+    "total": 32.0,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T14:03:25.488732"
+  },
+  {
+    "id": "sc-fa91665a",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-60",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 3,
+      "c2": 3,
+      "c3": 2,
+      "c4": 2,
+      "c5": 2
+    },
+    "total": 12,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T14:03:25.490011"
+  },
+  {
+    "id": "sc-219dd5ee",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-60",
+    "judge_id": "j2",
+    "judge_name": "Aswani",
+    "scores": {
+      "c1": 2,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 2
+    },
+    "total": 10,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T14:03:25.490127"
+  },
+  {
+    "id": "sc-55e63e8e",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-60",
+    "judge_id": "j3",
+    "judge_name": "Ranjeet Jha",
+    "scores": {
+      "c1": 3,
+      "c2": 3,
+      "c3": 3,
+      "c4": 3,
+      "c5": 2
+    },
+    "total": 14,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T14:03:25.490221"
+  },
+  {
+    "id": "sc-75fca7c3",
+    "event_id": "evt-science-exhibition",
+    "tag_no": "SE-39",
+    "judge_id": "j2",
+    "judge_name": "Dr Meenu Gupta",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4
+    },
+    "total": 20,
+    "remarks": "Synced from Sheet Science Result",
+    "updated_at": "2026-10-12T14:03:26.629823"
+  },
+  {
+    "id": "sc-636fcd29",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-58",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 6,
+      "c2": 8,
+      "c3": 8,
+      "c4": 8,
+      "c5": 8,
+      "c6": 8
+    },
+    "total": 46,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:34:03.899061"
+  },
+  {
+    "id": "sc-db1833f8",
+    "event_id": "evt-science-exhibition",
+    "tag_no": "SE-64",
+    "judge_id": "j2",
+    "judge_name": "Dr Meenu Gupta",
+    "scores": {
+      "c1": 7,
+      "c2": 5,
+      "c3": 6,
+      "c4": 7,
+      "c5": 6
+    },
+    "total": 31,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:34:28.633506"
+  },
+  {
+    "id": "sc-52c56643",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-35",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 2,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 4
+    },
+    "total": 12,
+    "remarks": "",
+    "updated_at": "2026-10-12T08:36:20.680352"
   }
 ]
