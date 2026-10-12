@@ -87,16 +87,38 @@
     ],
     "sequence": [
       {
-        "tag_no": "D-21",
+        "approved_at": "12:53 AM",
         "notes": "Delhi Public School DPS Kathua [Room: F-501]",
-        "school_name": "Delhi Public School DPS Kathua",
         "room_no": "F-501",
-        "approved_at": "12:53 AM"
+        "school_name": "Delhi Public School DPS Kathua",
+        "tag_no": "D-21"
+      },
+      {
+        "approved_at": "07:38 AM",
+        "notes": "SMR International School Safidon [Room: F-502]",
+        "room_no": "F-502",
+        "school_name": "SMR International School Safidon",
+        "tag_no": "D-22"
+      },
+      {
+        "approved_at": "07:38 AM",
+        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
+        "room_no": "F-504",
+        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
+        "tag_no": "D-24"
+      },
+      {
+        "notes": "Added by Stage Coordinator",
+        "tag_no": "D-33"
+      },
+      {
+        "tag_no": "D-04",
+        "notes": "Added by Stage Coordinator"
       }
     ],
     "completed_tags": [],
     "current_index": 0,
-    "next_transition_time": 1791737471.707511,
+    "next_transition_time": 1791771709.009938,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbyr_3MfnGGtZp4qUKEJ1-afuVPpSrOeD0U6wZ2HLAP3QHwTflRLJ-34fhDQRL3SaA88BA/exec"
@@ -289,7 +311,22 @@
         "description": "Audience engagement; originality in interpretation; memorable performance."
       }
     ],
-    "sequence": [],
+    "sequence": [
+      {
+        "tag_no": "DC-21",
+        "notes": "Delhi Public School DPS Kathua [Room: F-501]",
+        "school_name": "Delhi Public School DPS Kathua",
+        "room_no": "F-501",
+        "approved_at": "07:37 AM"
+      },
+      {
+        "tag_no": "DC-22",
+        "notes": "SMR International School Safidon [Room: F-502]",
+        "school_name": "SMR International School Safidon",
+        "room_no": "F-502",
+        "approved_at": "07:38 AM"
+      }
+    ],
     "completed_tags": [],
     "current_index": 0,
     "next_transition_time": 1791737471.7115362,
@@ -385,7 +422,15 @@
         "description": "Ability to answer questions and explain the scientific principles involved."
       }
     ],
-    "sequence": [],
+    "sequence": [
+      {
+        "tag_no": "SE-21",
+        "notes": "Delhi Public School DPS Kathua [Room: F-501]",
+        "school_name": "Delhi Public School DPS Kathua",
+        "room_no": "F-501",
+        "approved_at": "07:37 AM"
+      }
+    ],
     "completed_tags": [],
     "current_index": 0,
     "next_transition_time": 1791737471.7096808,

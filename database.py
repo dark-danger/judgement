@@ -228,12 +228,6 @@ class DB:
         return load_json(EVENTS_FILE, [])
 
     def get_event(self, event_id):
-        # 1. Dynamically sync stage sequence from approved attendance records
-        try:
-            self.sync_event_sequence_from_attendance(event_id)
-        except Exception:
-            pass
-
         events = self.get_events()
         matched = None
         for e in events:
@@ -509,12 +503,12 @@ class DB:
                             "approved_at": approved_at or datetime.now().strftime("%I:%M %p")
                         })
                         existing_tags.append(tag_no)
-                else:
-                    # If NOT present, remove from active queue ONLY IF unscored and not completed
+                elif status == "ABSENT":
+                    # Only remove if explicitly marked ABSENT at registration and not added by coordinator
                     if tag_no in existing_tags:
                         tag_scores = [sc for sc in self.get_scores(ev["id"], tag_no)]
                         if not tag_scores and tag_no not in completed_tag_set:
-                            current_seq = [item for item in current_seq if item.get("tag_no") != tag_no]
+                            current_seq = [item for item in current_seq if item.get("tag_no") != tag_no or "Added by Stage" in item.get("notes", "")]
                             existing_tags = [item.get("tag_no") for item in current_seq]
 
             ev["sequence"] = current_seq
@@ -522,20 +516,6 @@ class DB:
 
         save_json(EVENTS_FILE, events)
         return updated_events
-
-    def get_scores(self, event_id=None, tag_no=None):
-        if self.is_supabase_connected and self.supabase:
-            try:
-                query = self.supabase.table("scores").select("*")
-                if event_id:
-                    query = query.eq("event_id", event_id)
-                if tag_no:
-                    query = query.eq("tag_no", tag_no)
-                res = query.execute()
-                if res.data is not None:
-                    return res.data
-            except Exception as e:
-                print(f"⚠️ [Supabase] get_scores error: {e}")
 
     def _sync_cloud_scores(self, local_scores=None):
         """Fetches cloud-backed scores from Google Apps Script and merges with local container scores"""
@@ -574,7 +554,7 @@ class DB:
             pass
         return scores
 
-    def get_scores(self, event_id=None, tag_no=None):
+    def get_scores(self, event_id=None, tag_no=None, sync_cloud=False):
         if self.is_supabase_connected and self.supabase:
             try:
                 query = self.supabase.table("scores").select("*")
@@ -588,7 +568,10 @@ class DB:
             except Exception as e:
                 print(f"⚠️ [Supabase] get_scores error: {e}")
 
-        scores = self._sync_cloud_scores()
+        if sync_cloud:
+            scores = self._sync_cloud_scores()
+        else:
+            scores = load_json(SCORES_FILE, [])
 
         if event_id:
             scores = [s for s in scores if s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))]

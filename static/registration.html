@@ -114,10 +114,16 @@
         <span id="showingCountText" style="font-size: 0.85rem; color: var(--text-dim); font-weight: 600;">
           Showing 58 Participating Schools
         </span>
-        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--text-dim);">
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Present
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; margin-left: 0.5rem;"></span> Absent
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; margin-left: 0.5rem;"></span> Pending
+        <div style="display: flex; align-items: center; gap: 0.85rem; font-size: 0.8rem; color: var(--text-dim); flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; color: #f87171; font-weight: 700;">
+            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);"></span> Red: Not Registered / Absent
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; color: #34d399; font-weight: 700;">
+            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span> Green: Registered (Present)
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 0.35rem; color: #c084fc; font-weight: 700;">
+            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.6);"></span> Purple: Partial / Mixed
+          </span>
         </div>
       </div>
 

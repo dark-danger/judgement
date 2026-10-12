@@ -131,9 +131,18 @@ function initSortable() {
   });
 }
 
+let lastRenderedSeqJson = '';
+let lastRenderedCompJson = '';
+
 function renderSequenceList(sequence) {
   const container = document.getElementById('sequenceList');
   if (!container) return;
+
+  const currentSeqJson = JSON.stringify(sequence || []);
+  if (currentSeqJson === lastRenderedSeqJson) {
+    return; // Data has not changed: avoid wiping DOM, lucide re-creation, or destroying Sortable!
+  }
+  lastRenderedSeqJson = currentSeqJson;
 
   if (!sequence || sequence.length === 0) {
     container.innerHTML = `
@@ -240,6 +249,12 @@ function renderCompletedList(completedTags) {
   if (!container) return;
 
   if (countBadge) countBadge.textContent = `${completedTags.length} Completed`;
+
+  const compJson = JSON.stringify(completedTags || []);
+  if (compJson === lastRenderedCompJson) {
+    return;
+  }
+  lastRenderedCompJson = compJson;
 
   if (!completedTags || completedTags.length === 0) {
     container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.82rem; padding: 0.5rem 0;">No completed teams yet.</div>`;

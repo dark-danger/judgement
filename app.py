@@ -233,19 +233,11 @@ def sync_supabase():
 
 @app.route("/api/events", methods=["GET"])
 def get_all_events():
-    try:
-        db.sync_event_sequence_from_attendance()
-    except Exception:
-        pass
     events = db.get_events()
     return jsonify({"success": True, "events": events})
 
 @app.route("/api/events/<event_id>", methods=["GET"])
 def get_single_event(event_id):
-    try:
-        db.sync_event_sequence_from_attendance(event_id)
-    except Exception:
-        pass
     event = db.get_event(event_id)
     if not event:
         return jsonify({"success": False, "error": "Event not found"}), 404

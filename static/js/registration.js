@@ -72,6 +72,9 @@ async function loadStats() {
   } catch (e) {}
 }
 
+// Tracking active requests to eliminate double-click race conditions
+const inFlightOps = new Set();
+
 function renderSchools(schools) {
   const container = document.getElementById('schoolsGrid');
   const countText = document.getElementById('showingCountText');
@@ -95,16 +98,59 @@ function renderSchools(schools) {
 
   container.innerHTML = '';
   schools.forEach((s) => {
+    const events = s.events || [];
+    const presentEvents = events.filter(e => e.status === 'PRESENT');
+    const absentEvents = events.filter(e => e.status === 'ABSENT');
+
+    // Color logic:
+    // 1. Initially / Not registered / All Absent -> RED
+    // 2. All registered / Present -> GREEN
+    // 3. Mixed (Present in some, Absent in others) -> PURPLE
+    let statusType = 'red';
+    let statusLabel = 'Not Registered';
+    let statusBadgeColor = '#f87171';
+    let statusBadgeBg = 'rgba(239, 68, 68, 0.18)';
+    let statusBadgeBorder = 'rgba(239, 68, 68, 0.35)';
+    let statusIcon = 'clock';
+    let seqBadgeStyle = 'color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1);';
+
+    if (presentEvents.length > 0 && absentEvents.length > 0) {
+      statusType = 'purple';
+      statusLabel = 'Partial / Mixed';
+      statusBadgeColor = '#c084fc';
+      statusBadgeBg = 'rgba(168, 85, 247, 0.2)';
+      statusBadgeBorder = 'rgba(168, 85, 247, 0.45)';
+      statusIcon = 'alert-circle';
+      seqBadgeStyle = 'color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.45); background: rgba(168, 85, 247, 0.12);';
+    } else if (presentEvents.length > 0 && absentEvents.length === 0) {
+      statusType = 'green';
+      statusLabel = 'Registered';
+      statusBadgeColor = '#34d399';
+      statusBadgeBg = 'rgba(16, 185, 129, 0.2)';
+      statusBadgeBorder = 'rgba(16, 185, 129, 0.45)';
+      statusIcon = 'check-check';
+      seqBadgeStyle = 'color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12);';
+    } else if (absentEvents.length > 0 && presentEvents.length === 0) {
+      statusType = 'red';
+      statusLabel = 'Absent';
+      statusBadgeColor = '#ef4444';
+      statusBadgeBg = 'rgba(239, 68, 68, 0.22)';
+      statusBadgeBorder = 'rgba(239, 68, 68, 0.4)';
+      statusIcon = 'x-circle';
+      seqBadgeStyle = 'color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.12);';
+    }
+
     const card = document.createElement('div');
-    card.className = `school-reg-card ${s.is_arrived ? 'is-arrived' : ''}`;
+    card.className = `school-reg-card card-status-${statusType} ${s.is_arrived ? 'is-arrived' : ''}`;
     card.id = `school-card-${s.id}`;
 
     // Category chips HTML
     let eventsHtml = '';
-    s.events.forEach((ev) => {
+    events.forEach((ev) => {
       const isPresent = ev.status === 'PRESENT';
       const isAbsent = ev.status === 'ABSENT';
-      const boxClass = isPresent ? 'status-present' : (isAbsent ? 'status-absent' : '');
+      const isPending = !isPresent && !isAbsent;
+      const boxClass = isPresent ? 'status-present' : (isAbsent ? 'status-absent' : 'status-pending');
 
       eventsHtml += `
         <div class="cat-tag-box ${boxClass}" id="cat-box-${s.id}-${ev.tag_no}">
@@ -116,10 +162,10 @@ function renderSchools(schools) {
           </div>
           
           <div style="display: flex; gap: 0.4rem; margin-top: 0.25rem;">
-            <button class="btn-att-toggle btn-att-present ${isPresent ? 'active' : ''}" onclick="markCategoryAttendance('${s.id}', '${ev.category}', '${ev.tag_no}', 'PRESENT')">
+            <button class="btn-att-toggle btn-att-present ${isPresent ? 'active' : ''}" onclick="markCategoryAttendance('${s.id}', '${escapeHtml(ev.category)}', '${escapeHtml(ev.tag_no)}', 'PRESENT')">
               <i data-lucide="check"></i> Present
             </button>
-            <button class="btn-att-toggle btn-att-absent ${isAbsent ? 'active' : ''}" onclick="markCategoryAttendance('${s.id}', '${ev.category}', '${ev.tag_no}', 'ABSENT')">
+            <button class="btn-att-toggle btn-att-absent ${isAbsent ? 'active' : ''}" onclick="markCategoryAttendance('${s.id}', '${escapeHtml(ev.category)}', '${escapeHtml(ev.tag_no)}', 'ABSENT')">
               <i data-lucide="x"></i> Absent
             </button>
           </div>
@@ -127,22 +173,28 @@ function renderSchools(schools) {
       `;
     });
 
+    const isFullyRegistered = (statusType === 'green');
+
     card.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 900; color: #fbbf24; background: rgba(7,10,17,0.7); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">
+          <span style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 900; padding: 0.25rem 0.6rem; border-radius: 6px; ${seqBadgeStyle}">
             #${s.seq_no}
           </span>
           <div>
             <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; line-height: 1.3;">
               ${escapeHtml(s.school_name)}
             </h3>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; font-size: 0.78rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; font-size: 0.78rem; flex-wrap: wrap;">
               <span class="badge" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                 Desk ${s.desk_no}
               </span>
               <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
                 Room: ${escapeHtml(s.room_no)}
+              </span>
+              <span class="badge" style="background: ${statusBadgeBg}; color: ${statusBadgeColor}; border: 1px solid ${statusBadgeBorder}; font-weight: 700; display: inline-flex; align-items: center; gap: 0.3rem;">
+                <i data-lucide="${statusIcon}" style="width: 13px; height: 13px;"></i>
+                ${statusLabel}
               </span>
               ${s.arrived_at ? `<span style="color: #10b981; font-weight: 600;">Checked in at ${s.arrived_at}</span>` : ''}
             </div>
@@ -150,9 +202,15 @@ function renderSchools(schools) {
         </div>
 
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <button class="btn btn-emerald btn-sm" onclick="checkInAllCategories('${s.id}')" title="Mark all registered categories of this school as Present">
-            <i data-lucide="check-check"></i> Check-In All
-          </button>
+          ${isFullyRegistered ? `
+            <button class="btn btn-sm" style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); cursor: default; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;" onclick="event.stopPropagation(); showToast('✅ ${escapeHtml(s.school_name)} is already registered!', 'info');" title="All categories registered Present">
+              <i data-lucide="check-circle-2"></i> Registered
+            </button>
+          ` : `
+            <button class="btn btn-emerald btn-sm" onclick="checkInAllCategories('${s.id}')" title="Mark all registered categories of this school as Present">
+              <i data-lucide="check-check"></i> Check-In All
+            </button>
+          `}
         </div>
       </div>
 
@@ -169,24 +227,36 @@ function renderSchools(schools) {
 }
 
 async function markCategoryAttendance(schoolId, category, tagNo, status) {
-  // 1. Optimistic Instant UI Update (0 ms feedback)
+  // Prevent duplicate concurrent clicks
+  const opKey = `${schoolId}_${tagNo}_${status}`;
+  if (inFlightOps.has(opKey)) return;
+
   const schIdx = allSchoolsData.findIndex(s => s.id === schoolId);
-  let backupSchool = null;
-  if (schIdx !== -1) {
-    backupSchool = JSON.parse(JSON.stringify(allSchoolsData[schIdx]));
-    const sch = allSchoolsData[schIdx];
-    const ev = (sch.events || []).find(e => e.tag_no === tagNo || e.category.toLowerCase() === category.toLowerCase());
-    if (ev) {
-      ev.status = status;
-    }
-    const hasPresent = (sch.events || []).some(e => e.status === 'PRESENT');
-    sch.is_arrived = hasPresent;
-    if (hasPresent && !sch.arrived_at) {
-      sch.arrived_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    }
-    renderSchools(allSchoolsData);
-    loadStats();
+  if (schIdx === -1) return;
+
+  const sch = allSchoolsData[schIdx];
+  const ev = (sch.events || []).find(e => e.tag_no === tagNo || e.category.toLowerCase() === category.toLowerCase());
+  
+  // If already in this status, ignore click (prevents any accidental toggling)
+  if (ev && ev.status === status) return;
+
+  inFlightOps.add(opKey);
+
+  // 1. Instant 0ms Optimistic UI Update
+  if (ev) {
+    ev.status = status;
+    ev.marked_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
   }
+  const hasPresent = (sch.events || []).some(e => e.status === 'PRESENT');
+  sch.is_arrived = hasPresent;
+  if (hasPresent && !sch.arrived_at) {
+    sch.arrived_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+  renderSchools(allSchoolsData);
+  loadStats();
+
+  // Instant 0ms Notification (NO DELAY!)
+  showToast(`${tagNo} (${category}) marked ${status}!`, status === 'PRESENT' ? 'success' : 'info');
 
   try {
     const res = await fetch('/api/registration/attendance', {
@@ -202,7 +272,6 @@ async function markCategoryAttendance(schoolId, category, tagNo, status) {
 
     const data = await res.json();
     if (data.success && data.school) {
-      showToast(`${tagNo} (${category}) marked ${status}! Google Sheet updated.`, status === 'PRESENT' ? 'success' : 'info');
       if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
       renderSchools(allSchoolsData);
       loadStats();
@@ -217,38 +286,48 @@ async function markCategoryAttendance(schoolId, category, tagNo, status) {
       localStorage.setItem('stage_sequence_last_update', Date.now().toString());
       localStorage.setItem('agrash_sync_ping', Date.now().toString());
     } else {
-      if (backupSchool && schIdx !== -1) {
-        allSchoolsData[schIdx] = backupSchool;
-        renderSchools(allSchoolsData);
-        loadStats();
-      }
-      showToast(`Error: ${data.error}`, 'error');
+      showToast(`Notice: ${data.error || 'Server sync warning'}`, 'info');
     }
   } catch (err) {
-    if (backupSchool && schIdx !== -1) {
-      allSchoolsData[schIdx] = backupSchool;
-      renderSchools(allSchoolsData);
-      loadStats();
-    }
-    showToast('Failed to mark attendance. Check server.', 'error');
+    console.error('Attendance error:', err);
+  } finally {
+    setTimeout(() => {
+      inFlightOps.delete(opKey);
+    }, 350);
   }
 }
 
 async function checkInAllCategories(schoolId) {
-  // 1. Optimistic Instant UI Update (0 ms feedback)
+  // Prevent duplicate concurrent clicks
+  if (inFlightOps.has(schoolId)) return;
+
   const schIdx = allSchoolsData.findIndex(s => s.id === schoolId);
-  let backupSchool = null;
-  if (schIdx !== -1) {
-    backupSchool = JSON.parse(JSON.stringify(allSchoolsData[schIdx]));
-    const sch = allSchoolsData[schIdx];
-    (sch.events || []).forEach(e => e.status = 'PRESENT');
-    sch.is_arrived = true;
-    if (!sch.arrived_at) {
-      sch.arrived_at = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    }
-    renderSchools(allSchoolsData);
-    loadStats();
+  if (schIdx === -1) return;
+
+  const sch = allSchoolsData[schIdx];
+  const allAlreadyPresent = (sch.events || []).every(e => e.status === 'PRESENT');
+  if (allAlreadyPresent) {
+    showToast(`✅ ${sch.school_name} is already registered!`, 'info');
+    return;
   }
+
+  inFlightOps.add(schoolId);
+
+  // 1. Instant 0ms Optimistic UI Update
+  const nowStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  (sch.events || []).forEach(e => {
+    e.status = 'PRESENT';
+    e.marked_at = nowStr;
+  });
+  sch.is_arrived = true;
+  if (!sch.arrived_at) {
+    sch.arrived_at = nowStr;
+  }
+  renderSchools(allSchoolsData);
+  loadStats();
+
+  // Instant 0ms Notification (NO DELAY!)
+  showToast(`✅ ${sch.school_name} - All categories registered Present!`, 'success');
 
   try {
     const res = await fetch('/api/registration/attendance', {
@@ -263,7 +342,6 @@ async function checkInAllCategories(schoolId) {
 
     const data = await res.json();
     if (data.success && data.school) {
-      showToast(`✅ ${data.school.school_name} - All categories checked in Present!`, 'success');
       if (schIdx !== -1) allSchoolsData[schIdx] = data.school;
       renderSchools(allSchoolsData);
       loadStats();
@@ -278,20 +356,14 @@ async function checkInAllCategories(schoolId) {
       localStorage.setItem('stage_sequence_last_update', Date.now().toString());
       localStorage.setItem('agrash_sync_ping', Date.now().toString());
     } else {
-      if (backupSchool && schIdx !== -1) {
-        allSchoolsData[schIdx] = backupSchool;
-        renderSchools(allSchoolsData);
-        loadStats();
-      }
-      showToast(`Error: ${data.error}`, 'error');
+      showToast(`Notice: ${data.error || 'Server sync warning'}`, 'info');
     }
   } catch (err) {
-    if (backupSchool && schIdx !== -1) {
-      allSchoolsData[schIdx] = backupSchool;
-      renderSchools(allSchoolsData);
-      loadStats();
-    }
-    showToast('Check-in failed. Check server.', 'error');
+    console.error('Check-in error:', err);
+  } finally {
+    setTimeout(() => {
+      inFlightOps.delete(schoolId);
+    }, 350);
   }
 }
 

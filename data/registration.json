@@ -16,19 +16,21 @@
         "event_id": "evt-group-dance",
         "tag_no": "D-21",
         "status": "PRESENT",
-        "marked_at": "12:53 AM"
+        "marked_at": "07:37 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-21",
-        "status": "PENDING"
+        "status": "PRESENT",
+        "marked_at": "07:37 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-21",
-        "status": "PENDING"
+        "status": "PRESENT",
+        "marked_at": "07:37 AM"
       }
     ]
   },
@@ -38,8 +40,8 @@
     "school_name": "SMR International School Safidon",
     "desk_no": 1,
     "room_no": "F-502",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "07:38 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -48,13 +50,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-22",
-        "status": "PENDING"
+        "status": "PRESENT",
+        "marked_at": "07:38 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-22",
-        "status": "PENDING"
+        "status": "PRESENT",
+        "marked_at": "07:38 AM"
       }
     ]
   },
@@ -84,8 +88,8 @@
     "school_name": "Sant Nikka Singh Public School Model Town Karnal",
     "desk_no": 1,
     "room_no": "F-504",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "07:38 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -94,13 +98,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-24",
-        "status": "PENDING"
+        "status": "PRESENT",
+        "marked_at": "07:38 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-24",
-        "status": "PENDING"
+        "status": "ABSENT",
+        "marked_at": "07:38 AM"
       },
       {
         "category": "Declamation",

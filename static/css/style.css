@@ -1113,22 +1113,58 @@ body {
 
 .school-reg-card {
   background: rgba(15, 23, 42, 0.7);
-  border: 1px solid var(--border-glass);
+  border: 1.5px solid var(--border-glass);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   backdrop-filter: blur(16px);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 .school-reg-card:hover {
-  border-color: rgba(56, 189, 248, 0.35);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
 }
-.school-reg-card.is-arrived {
-  border-left: 4px solid #10b981;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(15, 23, 42, 0.8));
+
+/* 🔴 1. RED STATE (Not Registered / Pending / All Absent) */
+.school-reg-card.card-status-red {
+  border-left: 6px solid #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1);
+}
+.school-reg-card.card-status-red:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.22);
+}
+
+/* 🟢 2. GREEN STATE (Fully Registered / Checked In) */
+.school-reg-card.card-status-green {
+  border-left: 6px solid #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.45);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 4px 25px rgba(16, 185, 129, 0.16);
+}
+.school-reg-card.card-status-green:hover {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.28);
+}
+
+/* 🟣 3. PURPLE STATE (Partial / Mixed: Present in some, Absent in others) */
+.school-reg-card.card-status-purple {
+  border-left: 6px solid #a855f7 !important;
+  border-color: rgba(168, 85, 247, 0.45);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 4px 25px rgba(168, 85, 247, 0.16);
+}
+.school-reg-card.card-status-purple:hover {
+  border-color: rgba(168, 85, 247, 0.7);
+  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.28);
+}
+
+/* Legacy fallback */
+.school-reg-card.is-arrived:not(.card-status-red):not(.card-status-purple) {
+  border-left: 6px solid #10b981;
 }
 
 .category-chip-row {
@@ -1138,22 +1174,29 @@ body {
 }
 
 .cat-tag-box {
-  background: rgba(7, 10, 17, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(7, 10, 17, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 0.6rem;
+  transition: all 0.2s ease;
+}
+.cat-tag-box.status-pending {
+  border-color: rgba(239, 68, 68, 0.22);
+  background: rgba(239, 68, 68, 0.04);
 }
 .cat-tag-box.status-present {
-  border-color: rgba(16, 185, 129, 0.4);
-  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.12);
+  box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.08);
 }
 .cat-tag-box.status-absent {
-  border-color: rgba(244, 63, 94, 0.4);
-  background: rgba(244, 63, 94, 0.08);
+  border-color: rgba(244, 63, 94, 0.5);
+  background: rgba(244, 63, 94, 0.12);
+  box-shadow: inset 0 0 12px rgba(244, 63, 94, 0.08);
 }
 
 .btn-att-toggle {
