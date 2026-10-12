@@ -83,7 +83,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:09.609784"
+    "updated_at": "2026-10-12T16:01:11.196502"
   },
   {
     "id": "sc-c56fa634",
@@ -101,7 +101,7 @@
     },
     "total": 50,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:50.245287"
+    "updated_at": "2026-10-12T16:01:11.195811"
   },
   {
     "id": "sc-3944e64b",
@@ -119,7 +119,7 @@
     },
     "total": 27.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:35.835598"
+    "updated_at": "2026-10-12T16:01:11.195836"
   },
   {
     "id": "sc-fe67980c",
@@ -212,7 +212,7 @@
     },
     "total": 47.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:26.443687"
+    "updated_at": "2026-10-12T16:01:11.195841"
   },
   {
     "id": "sc-cc0a7ced",
@@ -400,7 +400,7 @@
     },
     "total": 52.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:22.113577"
+    "updated_at": "2026-10-12T16:01:11.195833"
   },
   {
     "id": "sc-8e0506b4",
@@ -503,7 +503,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:11.509795"
+    "updated_at": "2026-10-12T16:01:11.195827"
   },
   {
     "id": "sc-d672c93c",
@@ -606,7 +606,7 @@
     },
     "total": 47.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:38.285483"
+    "updated_at": "2026-10-12T16:01:11.195846"
   },
   {
     "id": "sc-f2aba0e9",
@@ -624,7 +624,7 @@
     },
     "total": 46,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:05.161505"
+    "updated_at": "2026-10-12T16:01:11.195964"
   },
   {
     "id": "sc-25de4485",
@@ -659,7 +659,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:23.650591"
+    "updated_at": "2026-10-12T16:01:11.195934"
   },
   {
     "id": "sc-2a5df30d",
@@ -745,7 +745,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:44.637847"
+    "updated_at": "2026-10-12T16:01:11.195959"
   },
   {
     "id": "sc-1b08a397",
@@ -780,7 +780,7 @@
     },
     "total": 47.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:08.641853"
+    "updated_at": "2026-10-12T16:01:11.195970"
   },
   {
     "id": "sc-bfbfa32d",
@@ -798,7 +798,7 @@
     },
     "total": 37.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:23.466215"
+    "updated_at": "2026-10-12T16:01:11.195977"
   },
   {
     "id": "sc-414748f5",
@@ -867,7 +867,7 @@
     },
     "total": 50,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:12.816250"
+    "updated_at": "2026-10-12T16:01:11.196206"
   },
   {
     "id": "sc-9f0cb404",
@@ -936,7 +936,7 @@
     },
     "total": 55,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:00.691348"
+    "updated_at": "2026-10-12T16:01:11.196220"
   },
   {
     "id": "sc-a0596196",
@@ -954,7 +954,7 @@
     },
     "total": 50,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:39.655831"
+    "updated_at": "2026-10-12T16:01:11.196213"
   },
   {
     "id": "sc-7898b809",
@@ -1057,7 +1057,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:16.194493"
+    "updated_at": "2026-10-12T16:01:11.196236"
   },
   {
     "id": "sc-75177343",
@@ -1075,7 +1075,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:53.560292"
+    "updated_at": "2026-10-12T16:01:11.196228"
   },
   {
     "id": "sc-c01182a4",
@@ -1127,7 +1127,7 @@
     },
     "total": 35,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:26.168742"
+    "updated_at": "2026-10-12T16:01:11.196251"
   },
   {
     "id": "sc-6836eb9a",
@@ -1145,7 +1145,7 @@
     },
     "total": 47.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:11.536834"
+    "updated_at": "2026-10-12T16:01:11.196244"
   },
   {
     "id": "sc-7044847f",
@@ -1263,9 +1263,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 45,
+    "total": 45.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:14.745374"
+    "updated_at": "2026-10-12T16:01:11.196260"
   },
   {
     "id": "sc-5d654491",
@@ -1300,7 +1300,7 @@
     },
     "total": 35,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:28.276902"
+    "updated_at": "2026-10-12T16:01:11.196269"
   },
   {
     "id": "sc-ef205fda",
@@ -1420,7 +1420,7 @@
     },
     "total": 40,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:20.749192"
+    "updated_at": "2026-10-12T16:01:11.196278"
   },
   {
     "id": "sc-0f9c395a",
@@ -1438,7 +1438,7 @@
     },
     "total": 37.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:34.775472"
+    "updated_at": "2026-10-12T16:01:11.196287"
   },
   {
     "id": "sc-6d7e1092",
@@ -1524,7 +1524,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:52.226538"
+    "updated_at": "2026-10-12T16:01:11.196297"
   },
   {
     "id": "sc-5d42aca3",
@@ -1593,7 +1593,7 @@
     },
     "total": 56,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:02.000797"
+    "updated_at": "2026-10-12T16:01:11.196335"
   },
   {
     "id": "sc-2c3cf22c",
@@ -1611,7 +1611,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:40.846089"
+    "updated_at": "2026-10-12T16:01:11.196325"
   },
   {
     "id": "sc-1e68ba2d",
@@ -1646,7 +1646,7 @@
     },
     "total": 50,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:45.565148"
+    "updated_at": "2026-10-12T16:01:11.196346"
   },
   {
     "id": "sc-f0c41d60",
@@ -1749,7 +1749,7 @@
     },
     "total": 37.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:03.510748"
+    "updated_at": "2026-10-12T16:01:11.196374"
   },
   {
     "id": "sc-aa04eeb2",
@@ -1801,7 +1801,7 @@
     },
     "total": 45,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:24.536804"
+    "updated_at": "2026-10-12T16:01:11.196385"
   },
   {
     "id": "sc-aab89743",
@@ -1904,7 +1904,7 @@
     },
     "total": 30,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:45.166151"
+    "updated_at": "2026-10-12T16:01:11.196408"
   },
   {
     "id": "sc-d6dd9900",
@@ -1922,7 +1922,7 @@
     },
     "total": 40,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:31.945700"
+    "updated_at": "2026-10-12T16:01:11.196396"
   },
   {
     "id": "sc-cb29510e",
@@ -2025,7 +2025,7 @@
     },
     "total": 30,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:18.686261"
+    "updated_at": "2026-10-12T16:01:11.196420"
   },
   {
     "id": "sc-99050756",
@@ -2043,7 +2043,7 @@
     },
     "total": 48.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:32.721865"
+    "updated_at": "2026-10-12T16:01:11.196432"
   },
   {
     "id": "sc-e73e5cf6",
@@ -2078,7 +2078,7 @@
     },
     "total": 32.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:34.833000"
+    "updated_at": "2026-10-12T16:01:11.196444"
   },
   {
     "id": "sc-5536c181",
@@ -2096,7 +2096,7 @@
     },
     "total": 32.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:48.935996"
+    "updated_at": "2026-10-12T16:01:11.196456"
   },
   {
     "id": "sc-e5bdb674",
@@ -2148,7 +2148,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:25.079678"
+    "updated_at": "2026-10-12T16:01:11.196469"
   },
   {
     "id": "sc-8c034916",
@@ -2183,7 +2183,7 @@
     },
     "total": 35,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:37.038671"
+    "updated_at": "2026-10-12T16:01:11.196482"
   },
   {
     "id": "sc-6e192f6c",
@@ -2267,9 +2267,9 @@
       "c5": 4,
       "c6": 4
     },
-    "total": 25,
+    "total": 25.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:40.675475"
+    "updated_at": "2026-10-12T16:01:11.196530"
   },
   {
     "id": "sc-b5e2c0d4",
@@ -2285,9 +2285,9 @@
       "c5": 4,
       "c6": 4
     },
-    "total": 25,
+    "total": 25.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:28.568809"
+    "updated_at": "2026-10-12T16:01:11.196516"
   },
   {
     "id": "sc-2877c94f",
@@ -2330,16 +2330,16 @@
     "judge_id": "j2",
     "judge_name": "Ms Muskan",
     "scores": {
-      "c1": 2,
-      "c2": 2,
-      "c3": 2,
-      "c4": 2,
-      "c5": 2,
-      "c6": 2
+      "c1": 5,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4,
+      "c6": 4
     },
-    "total": 12.5,
+    "total": 25.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:35.821043"
+    "updated_at": "2026-10-12T16:01:11.196543"
   },
   {
     "id": "sc-43e8cc9e",
@@ -2355,9 +2355,9 @@
       "c5": 6,
       "c6": 5
     },
-    "total": 35,
+    "total": 35.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:50.210396"
+    "updated_at": "2026-10-12T16:01:11.196557"
   },
   {
     "id": "sc-b7331462",
@@ -2407,9 +2407,9 @@
       "c5": 5,
       "c6": 5
     },
-    "total": 30,
+    "total": 30.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:46.374912"
+    "updated_at": "2026-10-12T16:01:11.196589"
   },
   {
     "id": "sc-5dab6f83",
@@ -2493,9 +2493,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 42,
+    "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:00.829935"
+    "updated_at": "2026-10-12T16:01:11.196604"
   },
   {
     "id": "sc-750a7ab1",
@@ -2530,7 +2530,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:22.328770"
+    "updated_at": "2026-10-12T16:01:11.196618"
   },
   {
     "id": "sc-11d993ea",
@@ -2563,9 +2563,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 45,
+    "total": 45.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:46.786223"
+    "updated_at": "2026-10-12T16:01:11.196633"
   },
   {
     "id": "sc-4f87bd68",
@@ -2615,9 +2615,9 @@
       "c5": 8,
       "c6": 8
     },
-    "total": 50,
+    "total": 50.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:08.658156"
+    "updated_at": "2026-10-12T16:01:11.196648"
   },
   {
     "id": "sc-f3dd643f",
@@ -2667,9 +2667,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 43,
+    "total": 43.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:58.318200"
+    "updated_at": "2026-10-12T16:01:11.196663"
   },
   {
     "id": "sc-ec7f25bf",
@@ -2687,7 +2687,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:19.956913"
+    "updated_at": "2026-10-12T16:01:11.196679"
   },
   {
     "id": "sc-f0af7106",
@@ -2737,9 +2737,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 46,
+    "total": 46.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:42.115863"
+    "updated_at": "2026-10-12T16:01:11.196694"
   },
   {
     "id": "sc-6b63e26b",
@@ -2791,7 +2791,7 @@
     },
     "total": 15.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:37.023615"
+    "updated_at": "2026-10-12T16:01:11.196730"
   },
   {
     "id": "sc-786d93a9",
@@ -2892,9 +2892,9 @@
       "c5": 6,
       "c6": 6
     },
-    "total": 36,
+    "total": 36.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:29.475735"
+    "updated_at": "2026-10-12T16:01:11.196764"
   },
   {
     "id": "sc-967fa066",
@@ -2910,9 +2910,9 @@
       "c5": 6,
       "c6": 5
     },
-    "total": 35,
+    "total": 35.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:41.836057"
+    "updated_at": "2026-10-12T16:01:11.196781"
   },
   {
     "id": "sc-edcc8e98",
@@ -2981,7 +2981,7 @@
     },
     "total": 40.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:27.674597"
+    "updated_at": "2026-10-12T16:01:11.196798"
   },
   {
     "id": "sc-f59e845a",
@@ -2999,7 +2999,7 @@
     },
     "total": 32.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:39.323145"
+    "updated_at": "2026-10-12T16:01:11.196815"
   },
   {
     "id": "sc-ace563a6",
@@ -3017,7 +3017,7 @@
     },
     "total": 52.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T15:55:19.036490"
+    "updated_at": "2026-10-12T16:01:11.196713"
   },
   {
     "id": "sc-1c51027e",
@@ -3035,7 +3035,7 @@
     },
     "total": 47.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T15:55:20.784341"
+    "updated_at": "2026-10-12T16:01:11.196363"
   },
   {
     "id": "sc-9ca8351c",
@@ -3051,9 +3051,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 45,
+    "total": 45.0,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T14:03:24.516130"
+    "updated_at": "2026-10-12T16:01:11.196499"
   },
   {
     "id": "sc-4d4d22d5",
@@ -3071,7 +3071,7 @@
     },
     "total": 42.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T15:55:22.410920"
+    "updated_at": "2026-10-12T16:01:11.196198"
   },
   {
     "id": "sc-bd178da1",
@@ -3089,7 +3089,7 @@
     },
     "total": 47.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T15:55:24.086457"
+    "updated_at": "2026-10-12T16:01:11.196315"
   },
   {
     "id": "sc-ca5517df",
@@ -3107,7 +3107,7 @@
     },
     "total": 35.0,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T14:03:24.516865"
+    "updated_at": "2026-10-12T16:01:11.195952"
   },
   {
     "id": "sc-a19c2ccc",
@@ -3125,7 +3125,7 @@
     },
     "total": 37.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T15:55:25.546000"
+    "updated_at": "2026-10-12T16:01:11.196575"
   },
   {
     "id": "sc-514516b6",
@@ -3141,9 +3141,9 @@
       "c5": 3,
       "c6": 3
     },
-    "total": 20,
+    "total": 20.0,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T14:03:24.517581"
+    "updated_at": "2026-10-12T16:01:11.196748"
   },
   {
     "id": "sc-57b12d11",
@@ -3246,7 +3246,7 @@
     },
     "total": 45.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:49.119731"
+    "updated_at": "2026-10-12T16:01:11.196834"
   },
   {
     "id": "sc-db1833f8",
@@ -3289,16 +3289,16 @@
     "judge_id": "j2",
     "judge_name": "Ms Muskan",
     "scores": {
-      "c1": 4,
-      "c2": 4,
-      "c3": 3,
-      "c4": 3,
-      "c5": 3,
-      "c6": 3
+      "c1": 7,
+      "c2": 7,
+      "c3": 7,
+      "c4": 6,
+      "c5": 6,
+      "c6": 6
     },
-    "total": 19.5,
+    "total": 39.0,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T10:06:19.691205"
+    "updated_at": "2026-10-12T16:01:11.196872"
   },
   {
     "id": "sc-92097683",
@@ -3316,7 +3316,7 @@
     },
     "total": 46.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:10.563993"
+    "updated_at": "2026-10-12T16:01:11.196853"
   },
   {
     "id": "sc-28fceaaa",
@@ -3366,9 +3366,9 @@
       "c5": 6,
       "c6": 6
     },
-    "total": 39,
+    "total": 39.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:33.759277"
+    "updated_at": "2026-10-12T16:01:11.196892"
   },
   {
     "id": "sc-ad208e6d",
@@ -3418,9 +3418,9 @@
       "c5": 2,
       "c6": 2
     },
-    "total": 15,
+    "total": 15.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:38.223969"
+    "updated_at": "2026-10-12T16:01:11.196912"
   },
   {
     "id": "sc-c3ddb4ef",
@@ -3572,9 +3572,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 43,
+    "total": 43.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:12.523826"
+    "updated_at": "2026-10-12T16:01:11.196957"
   },
   {
     "id": "sc-af49e2f7",
@@ -3624,9 +3624,9 @@
       "c5": 6,
       "c6": 6
     },
-    "total": 39,
+    "total": 39.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:27.229917"
+    "updated_at": "2026-10-12T16:01:11.196978"
   },
   {
     "id": "sc-d5070ac2",
@@ -3990,7 +3990,7 @@
     },
     "total": 52.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:43.410475"
+    "updated_at": "2026-10-12T16:01:11.195999"
   },
   {
     "id": "sc-6999c423",
@@ -4057,9 +4057,9 @@
       "c5": 6,
       "c6": 6
     },
-    "total": 40,
+    "total": 40.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:06:17.090891"
+    "updated_at": "2026-10-12T16:01:11.196109"
   },
   {
     "id": "sc-e3783ad3",
@@ -4075,9 +4075,9 @@
       "c5": 7,
       "c6": 7
     },
-    "total": 45,
+    "total": 45.0,
     "remarks": "",
-    "updated_at": "2026-10-12T10:05:54.697848"
+    "updated_at": "2026-10-12T16:01:11.196156"
   },
   {
     "id": "sc-efc09c17",
@@ -4095,7 +4095,7 @@
     },
     "total": 42.5,
     "remarks": "",
-    "updated_at": "2026-10-12T10:04:04.205378"
+    "updated_at": "2026-10-12T16:01:11.196022"
   },
   {
     "id": "sc-c3259d4a",
@@ -4317,7 +4317,7 @@
     },
     "total": 37.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T10:04:17.619587"
+    "updated_at": "2026-10-12T16:01:11.196179"
   },
   {
     "id": "sc-f89b2a3e",
@@ -4335,7 +4335,7 @@
     },
     "total": 31.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T10:04:28.683572"
+    "updated_at": "2026-10-12T16:01:11.196133"
   },
   {
     "id": "sc-b1770f78",
@@ -4473,7 +4473,7 @@
     },
     "total": 23.5,
     "remarks": "Synced from Sheet Declamation Result",
-    "updated_at": "2026-10-12T10:04:51.362578"
+    "updated_at": "2026-10-12T16:01:11.196936"
   },
   {
     "id": "sc-0920de95",
@@ -5189,5 +5189,289 @@
     "total": 25,
     "remarks": "",
     "updated_at": "2026-10-12T10:24:26.208013"
+  },
+  {
+    "id": "sc-b5c9908f",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-33",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 7,
+      "c2": 7,
+      "c3": 7,
+      "c4": 7,
+      "c5": 6,
+      "c6": 6
+    },
+    "total": 40.0,
+    "remarks": "Official Declamation Sheet",
+    "updated_at": "2026-10-12T16:01:11.195893"
+  },
+  {
+    "id": "sc-579ac3b3",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-33",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 5,
+      "c4": 5,
+      "c5": 5,
+      "c6": 5
+    },
+    "total": 32.5,
+    "remarks": "Official Declamation Sheet",
+    "updated_at": "2026-10-12T16:01:11.195926"
+  },
+  {
+    "id": "sc-e82b4fa1",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-49",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 6,
+      "c4": 6,
+      "c5": 6,
+      "c6": 5
+    },
+    "total": 35.0,
+    "remarks": "Official Declamation Sheet",
+    "updated_at": "2026-10-12T16:01:11.196054"
+  },
+  {
+    "id": "sc-6ea70897",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-49",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 5,
+      "c4": 5,
+      "c5": 5,
+      "c6": 5
+    },
+    "total": 32.5,
+    "remarks": "Official Declamation Sheet",
+    "updated_at": "2026-10-12T16:01:11.196085"
+  },
+  {
+    "id": "sc-d95ca676",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-58",
+    "judge_id": "j2",
+    "judge_name": "Aswani",
+    "scores": {
+      "c1": 3,
+      "c2": 3,
+      "c3": 3,
+      "c4": 3,
+      "c5": 4
+    },
+    "total": 16,
+    "remarks": "",
+    "updated_at": "2026-10-12T10:28:09.246088"
+  },
+  {
+    "id": "sc-278d8f26",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-58",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 6,
+      "c2": 6,
+      "c3": 6,
+      "c4": 6,
+      "c5": 6
+    },
+    "total": 30,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T10:31:52.195111"
+  },
+  {
+    "id": "sc-e20a9780",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-58",
+    "judge_id": "j3",
+    "judge_name": "Ranjeet Jha",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4
+    },
+    "total": 20,
+    "remarks": "Synced from Sheet Dance Result",
+    "updated_at": "2026-10-12T10:31:54.345358"
+  },
+  {
+    "id": "sc-65d095bb",
+    "event_id": "evt-group-dance",
+    "tag_no": "D-43",
+    "judge_id": "j1",
+    "judge_name": "Vishnu Khatri",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4
+    },
+    "total": 20,
+    "remarks": "",
+    "updated_at": "2026-10-12T10:34:37.151376"
+  },
+  {
+    "id": "sc-12688cba",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-42",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 7,
+      "c2": 7,
+      "c3": 7,
+      "c4": 7,
+      "c5": 6,
+      "c6": 6
+    },
+    "total": 40.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:38.535382"
+  },
+  {
+    "id": "sc-8890e9f0",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-42",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 8,
+      "c2": 8,
+      "c3": 8,
+      "c4": 7,
+      "c5": 7,
+      "c6": 7
+    },
+    "total": 45.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:41.057491"
+  },
+  {
+    "id": "sc-89fb789e",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-68",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 7,
+      "c2": 7,
+      "c3": 7,
+      "c4": 7,
+      "c5": 7,
+      "c6": 6
+    },
+    "total": 41.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:42.946651"
+  },
+  {
+    "id": "sc-f42601fa",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-68",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 5,
+      "c2": 5,
+      "c3": 5,
+      "c4": 5,
+      "c5": 5,
+      "c6": 5
+    },
+    "total": 30.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:44.733017"
+  },
+  {
+    "id": "sc-a9c9bb1b",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-60",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 3,
+      "c6": 3
+    },
+    "total": 22.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:46.706536"
+  },
+  {
+    "id": "sc-e1b1c7e4",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-60",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 4,
+      "c2": 4,
+      "c3": 4,
+      "c4": 4,
+      "c5": 4,
+      "c6": 4
+    },
+    "total": 24.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:48.636832"
+  },
+  {
+    "id": "sc-e349513d",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-62",
+    "judge_id": "j1",
+    "judge_name": "Dr Ayaz",
+    "scores": {
+      "c1": 2,
+      "c2": 2,
+      "c3": 2,
+      "c4": 2,
+      "c5": 1,
+      "c6": 1
+    },
+    "total": 10.0,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:50.590697"
+  },
+  {
+    "id": "sc-82894d08",
+    "event_id": "evt-declamation",
+    "tag_no": "DC-62",
+    "judge_id": "j2",
+    "judge_name": "Ms Muskan",
+    "scores": {
+      "c1": 1,
+      "c2": 1,
+      "c3": 1,
+      "c4": 1,
+      "c5": 1,
+      "c6": 0
+    },
+    "total": 5,
+    "remarks": "Synced from Sheet Declamation Result",
+    "updated_at": "2026-10-12T16:05:52.163647"
   }
 ]

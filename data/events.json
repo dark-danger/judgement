@@ -747,166 +747,6 @@
     ],
     "sequence": [
       {
-        "tag_no": "DC-44",
-        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
-        "school_name": "Mothers Pride School Pataudi Gurugram",
-        "room_no": "F-304",
-        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-22",
-        "notes": "SMR International School Safidon [Room: F-502]",
-        "school_name": "SMR International School Safidon",
-        "room_no": "F-502",
-        "approved_at": "07:38 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-27",
-        "notes": "Delhi Public School DPS Panipat City [Room: TBD]",
-        "school_name": "Delhi Public School DPS Panipat City",
-        "room_no": "TBD",
-        "approved_at": "9:25 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-39",
-        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
-        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
-        "room_no": "F-410",
-        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-41",
-        "notes": "Pratap Singh Memorial Sr Sec School Sonipat [Room: TBD]",
-        "school_name": "Pratap Singh Memorial Sr Sec School Sonipat",
-        "room_no": "TBD",
-        "approved_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-48",
-        "notes": "Mahavati Sports Sr Sec School Pawti Samalkha [Room: TBD]",
-        "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
-        "room_no": "TBD",
-        "approved_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-65",
-        "notes": "Silver Bells Public School Shamli [Room: B-304]",
-        "school_name": "Silver Bells Public School Shamli",
-        "room_no": "B-304",
-        "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-24",
-        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
-        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
-        "room_no": "F-504",
-        "approved_at": "7:38 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-28",
-        "notes": "Doon Public School Gohana [Room: F-509]",
-        "school_name": "Doon Public School Gohana",
-        "room_no": "F-509",
-        "approved_at": "9:56 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-31",
-        "notes": "Pratap Public School Sector 6 Karnal [Room: D-204]",
-        "school_name": "Pratap Public School Sector 6 Karnal",
-        "room_no": "D-204",
-        "approved_at": "10:03 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-40",
-        "notes": "Shiv Shakti Sr Sec School Sonipat [Room: TBD]",
-        "school_name": "Shiv Shakti Sr Sec School Sonipat",
-        "room_no": "TBD",
-        "approved_at": "10:06 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-51",
-        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
-        "school_name": "Sant Nischal Singh Public School Yamunanagar",
-        "room_no": "F-313",
-        "approved_at": "9:54 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-54",
-        "notes": "Dayanand Public School Gohana [Room: TBD]",
-        "school_name": "Dayanand Public School Gohana",
-        "room_no": "TBD",
-        "approved_at": "9:56 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-61",
-        "notes": "Sant Nikka Singh Public School Zarifa Farm Karnal [Room: B-202]",
-        "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
-        "room_no": "B-202",
-        "approved_at": "9:53 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-70",
-        "notes": "Global Public School Gohana [Room: TBD]",
-        "school_name": "Global Public School Gohana",
-        "room_no": "TBD",
-        "approved_at": "9:42 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-73",
-        "notes": "OM Public School Gohana [Room: C-201]",
-        "school_name": "OM Public School Gohana",
-        "room_no": "C-201",
-        "approved_at": "10:09 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-81",
-        "notes": "DAV Police Public School Police Lines Panipat [Room: TBD]",
-        "school_name": "DAV Police Public School Police Lines Panipat",
-        "room_no": "TBD",
-        "approved_at": "10:04 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-53",
-        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
-        "school_name": "Geeta Vidya Mandir Public School Nimbari",
-        "room_no": "F-203",
-        "approved_at": "9:49 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "DC-25",
-        "notes": "JP Jain Sr Sec School Sonipat [Room: F-505]",
-        "school_name": "JP Jain Sr Sec School Sonipat",
-        "room_no": "F-505",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-30",
-        "notes": "Arya Kanya Gurukul Sr Sec School Karnal [Room: F-510]",
-        "school_name": "Arya Kanya Gurukul Sr Sec School Karnal",
-        "room_no": "F-510",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "DC-34",
         "notes": "Guru Teg Bhadur Public School Karnal [Room: F-514]",
         "school_name": "Guru Teg Bhadur Public School Karnal",
@@ -915,34 +755,10 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "DC-37",
-        "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
-        "school_name": "DAV Police Public School Police Line Karnal",
-        "room_no": "F-406",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-38",
-        "notes": "Sarv Vidya Public School Indri [Room: F-407]",
-        "school_name": "Sarv Vidya Public School Indri",
-        "room_no": "F-407",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "DC-42",
         "notes": "Babu Ram ( BR ) Global School Gannaur [Room: F-302]",
         "school_name": "Babu Ram ( BR ) Global School Gannaur",
         "room_no": "F-302",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-43",
-        "notes": "MM Public School Assandh [Room: F-303]",
-        "school_name": "MM Public School Assandh",
-        "room_no": "F-303",
         "status": "PRESENT",
         "approved_at": "-"
       },
@@ -955,50 +771,10 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "DC-47",
-        "notes": "Holy Family Convent School Gohana [Room: TBD]",
-        "school_name": "Holy Family Convent School Gohana",
-        "room_no": "TBD",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-49",
-        "notes": "Lakshay International School Naultha Panipat [Room: F-310]",
-        "school_name": "Lakshay International School Naultha Panipat",
-        "room_no": "F-310",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-52",
-        "notes": "SD Sr Sec School Panipat [Room: F-202]",
-        "school_name": "SD Sr Sec School Panipat",
-        "room_no": "F-202",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "DC-55",
         "notes": "Saraswati Public School Jagadhri Yamunanagar [Room: F-204]",
         "school_name": "Saraswati Public School Jagadhri Yamunanagar",
         "room_no": "F-204",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-57",
-        "notes": "JPS Academy Assandh [Room: F-206]",
-        "school_name": "JPS Academy Assandh",
-        "room_no": "F-206",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-58",
-        "notes": "Delhi Public School Jind [Room: F-207]",
-        "school_name": "Delhi Public School Jind",
-        "room_no": "F-207",
         "status": "PRESENT",
         "approved_at": "-"
       },
@@ -1019,30 +795,6 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "DC-63",
-        "notes": "Shaheed Bhagat Singh Sr Sec School Karnal [Room: B-302]",
-        "school_name": "Shaheed Bhagat Singh Sr Sec School Karnal",
-        "room_no": "B-302",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-64",
-        "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
-        "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
-        "room_no": "B-303",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-67",
-        "notes": "MASD Public School Panipat [Room: TBD]",
-        "school_name": "MASD Public School Panipat",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "DC-68",
         "notes": "SD Modern Sr Sec School Panipat [Room: C-102]",
         "school_name": "SD Modern Sr Sec School Panipat",
@@ -1051,97 +803,9 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "DC-69",
-        "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
-        "school_name": "DR MKK Arya Model Sr Sec School Panipat",
-        "room_no": "C-103",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-71",
-        "notes": "Sunrise Public School Panipat [Room: C-104]",
-        "school_name": "Sunrise Public School Panipat",
-        "room_no": "C-104",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-72",
-        "notes": "Gyandeep Sr Sec School Gannaur [Room: C-105]",
-        "school_name": "Gyandeep Sr Sec School Gannaur",
-        "room_no": "C-105",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-76",
-        "notes": "North Valley Public School [Room: C-204]",
-        "school_name": "North Valley Public School",
-        "room_no": "C-204",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-78",
-        "notes": "DAV Police Public School Kurukshetra [Room: C-207]",
-        "school_name": "DAV Police Public School Kurukshetra",
-        "room_no": "C-207",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-82",
-        "notes": "SDVM City Panipat [Room: TBD]",
-        "school_name": "SDVM City Panipat",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-85",
-        "notes": "Swami Chetna Sr Sec School Gannaur [Room: TBD]",
-        "school_name": "Swami Chetna Sr Sec School Gannaur",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-86",
-        "notes": "Arya Sr Sec School Shahabad Markanda [Room: TBD]",
-        "school_name": "Arya Sr Sec School Shahabad Markanda",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-33",
-        "notes": "DAV Police Public Sr Sec School Police Line Sonipat [Room: F-513]",
-        "school_name": "DAV Police Public Sr Sec School Police Line Sonipat",
-        "room_no": "F-513",
-        "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-87",
-        "notes": "Dyal Singh Public School Panipat [Room: TBD]",
-        "school_name": "Dyal Singh Public School Panipat",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "DC-89",
         "notes": "GN Vidya Mandir Panipat [Room: TBD]",
         "school_name": "GN Vidya Mandir Panipat",
-        "room_no": "TBD",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "DC-90",
-        "notes": "Yaduvanshi Shiksha Niketan Bibipur Jind [Room: TBD]",
-        "school_name": "Yaduvanshi Shiksha Niketan Bibipur Jind",
         "room_no": "TBD",
         "status": "PRESENT",
         "approved_at": "-"
@@ -1161,6 +825,216 @@
         "school_name": "Motilal Nehru Public School Urban Estate Jind",
         "room_no": "F-405",
         "completed_at": "10:20 AM"
+      },
+      {
+        "tag_no": "DC-44",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-39",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-22",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-65",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-70",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-40",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-27",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-53",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-28",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-67",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-85",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-24",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-48",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-86",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-51",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-90",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-31",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-76",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-81",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-64",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-71",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-25",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-43",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-87",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-38",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-41",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-63",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-30",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-54",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-58",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-61",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-52",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-73",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-72",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-37",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-82",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-78",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-47",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-69",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-57",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-33",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
+      },
+      {
+        "tag_no": "DC-49",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "04:05 PM"
       }
     ],
     "current_index": 0,
@@ -1170,7 +1044,7 @@
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
     "current_tag": "DC-44",
     "next_tag": "DC-22",
-    "seq_version": 1791791255017
+    "seq_version": 1791801332834
   },
   {
     "id": "evt-science-exhibition",
