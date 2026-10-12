@@ -465,10 +465,49 @@ class DB:
             matched = events[0]
 
         if matched:
+            def clean_norm_tag(t):
+                return str(t or "").upper().replace(" ", "").replace("-", "")
+
             comp_tags = matched.get("completed_tags", [])
-            comp_set = {c.get("tag_no") for c in comp_tags if isinstance(c, dict) and c.get("tag_no")}
+            comp_set = {clean_norm_tag(c.get("tag_no")) for c in comp_tags if isinstance(c, dict) and c.get("tag_no")}
             if comp_set and matched.get("sequence"):
-                matched["sequence"] = [item for item in matched["sequence"] if item.get("tag_no") not in comp_set]
+                matched["sequence"] = [item for item in matched["sequence"] if clean_norm_tag(item.get("tag_no")) not in comp_set]
+
+            # Dynamically ensure ALL registered schools are in the sequence queue (so no teams are missing)
+            category = EVENT_CATEGORY_MAP.get(matched.get("id"))
+            if category:
+                try:
+                    from registration_service import registration_service
+                    schools = registration_service.get_all()
+                    seq = list(matched.get("sequence", []))
+                    existing_tags = {clean_norm_tag(s.get("tag_no")) for s in seq if isinstance(s, dict)}
+                    changed = False
+                    for s in schools:
+                        ev_entry = next((e for e in s.get("events", []) if e.get("category") == category), None)
+                        if not ev_entry or not ev_entry.get("tag_no"):
+                            continue
+                        tag_no = ev_entry.get("tag_no")
+                        t_norm = clean_norm_tag(tag_no)
+                        if t_norm not in comp_set and t_norm not in existing_tags:
+                            school_name = s.get("school_name", "")
+                            room_no = s.get("room_no") or "TBD"
+                            seq.append({
+                                "tag_no": tag_no,
+                                "notes": f"{school_name} [Room: {room_no}]",
+                                "school_name": school_name,
+                                "room_no": room_no,
+                                "status": ev_entry.get("status", "PENDING"),
+                                "approved_at": ev_entry.get("marked_at") or "-"
+                            })
+                            existing_tags.add(t_norm)
+                            changed = True
+                    if changed:
+                        matched["sequence"] = seq
+                        matched["seq_version"] = int(time.time() * 1000)
+                        self.update_event(matched["id"], matched)
+                        self._backup_sequence_to_cloud(matched["id"], seq, comp_tags, seq_version=matched["seq_version"])
+                except Exception:
+                    pass
 
         return matched
 
