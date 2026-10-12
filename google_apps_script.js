@@ -932,11 +932,56 @@ function syncAllSequenceTabsFromAttendance(ss, attendanceSheet) {
     if (items.length === 0) {
       rows.push(["-", "-", "No teams registered present yet", "-", "WAITING FOR DESK APPROVAL", "-", nowStr]);
     } else {
-      for (var i = 0; i < items.length; i++) {
-        var it = items[i];
-        var stageStatus = (i === 0) ? "🔴 LIVE ON STAGE" : "⏳ IN QUEUE (WAITING #" + (i + 1) + ")";
+      var existingData = sheet.getDataRange().getValues();
+      var existingTags = [];
+      var existingRowsMap = {};
+      if (existingData.length > 1) {
+        for (var er = 1; er < existingData.length; er++) {
+          var eTag = (existingData[er][1] || "").toString().trim();
+          if (eTag && eTag !== "-") {
+            existingTags.push(eTag);
+            existingRowsMap[eTag.toUpperCase().replace(/\s+/g, '').replace(/-/g, '')] = existingData[er];
+          }
+        }
+      }
+
+      var itemsMap = {};
+      for (var k = 0; k < items.length; k++) {
+        var normK = (items[k].tag || "").toString().toUpperCase().replace(/\s+/g, '').replace(/-/g, '');
+        itemsMap[normK] = items[k];
+      }
+
+      var finalSequenceItems = [];
+      // 1. Preserve existing queue order (keeps current on-stage team intact!)
+      for (var et = 0; et < existingTags.length; et++) {
+        var normTag = existingTags[et].toUpperCase().replace(/\s+/g, '').replace(/-/g, '');
+        if (itemsMap[normTag]) {
+          finalSequenceItems.push(itemsMap[normTag]);
+          delete itemsMap[normTag];
+        } else if (existingRowsMap[normTag]) {
+          var exRow = existingRowsMap[normTag];
+          finalSequenceItems.push({
+            tag: existingTags[et],
+            school: exRow[2] || "",
+            room: exRow[3] || "TBD",
+            time: exRow[5] || nowStr,
+            isCompleted: (exRow[4] || "").toString().indexOf("COMPLETED") !== -1
+          });
+        }
+      }
+
+      // 2. Append any newly approved present teams to the bottom
+      for (var remKey in itemsMap) {
+        finalSequenceItems.push(itemsMap[remKey]);
+      }
+
+      for (var i = 0; i < finalSequenceItems.length; i++) {
+        var it = finalSequenceItems[i];
+        var isComp = it.isCompleted || false;
+        var stageStatus = isComp ? "✅ COMPLETED" : ((i === 0) ? "🔴 LIVE ON STAGE" : "⏳ IN QUEUE (WAITING #" + (i + 1) + ")");
+        var seqOrder = isComp ? "DONE" : ("#" + (i + 1));
         rows.push([
-          "#" + (i + 1),
+          seqOrder,
           it.tag,
           it.school,
           it.room,

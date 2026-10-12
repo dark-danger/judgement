@@ -39,8 +39,8 @@
       "Any form of vulgarity (audible or visual) will result in immediate disqualification."
     ],
     "themes": [
-      "‘हर राज्य कुछ कहता है’ / ‘Unity in Diversity’ (Indian Folk)",
-      "‘Around the World’ (Dance representing cultures of other countries)",
+      "\u2018\u0939\u0930 \u0930\u093e\u091c\u094d\u092f \u0915\u0941\u091b \u0915\u0939\u0924\u093e \u0939\u0948\u2019 / \u2018Unity in Diversity\u2019 (Indian Folk)",
+      "\u2018Around the World\u2019 (Dance representing cultures of other countries)",
       "Women Empowerment"
     ],
     "criteria": [
@@ -239,7 +239,7 @@
       "Any form of vulgarity will result in immediate disqualification."
     ],
     "themes": [
-      "‘Peace through Melody’: Patriotic Theme",
+      "\u2018Peace through Melody\u2019: Patriotic Theme",
       "Classical Music",
       "Harmony in Diversity: Music representing cultures"
     ],
@@ -394,13 +394,13 @@
       "The decision of the judges shall be final and binding on all participants."
     ],
     "themes": [
-      "Leadership Lessons from the Bhagavad Gita (भगवद गीता से नेतृत्व के पाठ)",
-      "Duty and Responsibility: Teachings of the Bhagavad Gita (कर्तव्य और जिम्मेदारी: भगवद गीता की शिक्षाएँ)",
-      "Detachment and Inner Peace: Lessons from the Gita (वैराग्य और आत्मिक शांति: गीता से सीख)",
-      "Bhagavad Gita and Moral Decision Making (नैतिक निर्णय लेने में भगवद गीता का मार्गदर्शन)",
-      "Bhagavad Gita: A Guide to Overcoming Challenges (संकटों से निपटने में भगवद गीता मार्गदर्शक है)",
-      "Stress Management and Gita (तनाव प्रबंधन एवं गीता)",
-      "Gita is the path to World Peace (गीता विश्व शांति का मार्ग है)"
+      "Leadership Lessons from the Bhagavad Gita (\u092d\u0917\u0935\u0926 \u0917\u0940\u0924\u093e \u0938\u0947 \u0928\u0947\u0924\u0943\u0924\u094d\u0935 \u0915\u0947 \u092a\u093e\u0920)",
+      "Duty and Responsibility: Teachings of the Bhagavad Gita (\u0915\u0930\u094d\u0924\u0935\u094d\u092f \u0914\u0930 \u091c\u093f\u092e\u094d\u092e\u0947\u0926\u093e\u0930\u0940: \u092d\u0917\u0935\u0926 \u0917\u0940\u0924\u093e \u0915\u0940 \u0936\u093f\u0915\u094d\u0937\u093e\u090f\u0901)",
+      "Detachment and Inner Peace: Lessons from the Gita (\u0935\u0948\u0930\u093e\u0917\u094d\u092f \u0914\u0930 \u0906\u0924\u094d\u092e\u093f\u0915 \u0936\u093e\u0902\u0924\u093f: \u0917\u0940\u0924\u093e \u0938\u0947 \u0938\u0940\u0916)",
+      "Bhagavad Gita and Moral Decision Making (\u0928\u0948\u0924\u093f\u0915 \u0928\u093f\u0930\u094d\u0923\u092f \u0932\u0947\u0928\u0947 \u092e\u0947\u0902 \u092d\u0917\u0935\u0926 \u0917\u0940\u0924\u093e \u0915\u093e \u092e\u093e\u0930\u094d\u0917\u0926\u0930\u094d\u0936\u0928)",
+      "Bhagavad Gita: A Guide to Overcoming Challenges (\u0938\u0902\u0915\u091f\u094b\u0902 \u0938\u0947 \u0928\u093f\u092a\u091f\u0928\u0947 \u092e\u0947\u0902 \u092d\u0917\u0935\u0926 \u0917\u0940\u0924\u093e \u092e\u093e\u0930\u094d\u0917\u0926\u0930\u094d\u0936\u0915 \u0939\u0948)",
+      "Stress Management and Gita (\u0924\u0928\u093e\u0935 \u092a\u094d\u0930\u092c\u0902\u0927\u0928 \u090f\u0935\u0902 \u0917\u0940\u0924\u093e)",
+      "Gita is the path to World Peace (\u0917\u0940\u0924\u093e \u0935\u093f\u0936\u094d\u0935 \u0936\u093e\u0902\u0924\u093f \u0915\u093e \u092e\u093e\u0930\u094d\u0917 \u0939\u0948)"
     ],
     "criteria": [
       {
@@ -442,11 +442,11 @@
     ],
     "sequence": [
       {
-        "tag_no": "DC-21",
-        "notes": "Delhi Public School DPS Kathua [Room: F-501]",
-        "school_name": "Delhi Public School DPS Kathua",
-        "room_no": "F-501",
-        "approved_at": "07:37 AM"
+        "tag_no": "DC-44",
+        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
+        "school_name": "Mothers Pride School Pataudi Gurugram",
+        "room_no": "F-304",
+        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
       },
       {
         "tag_no": "DC-22",
@@ -463,13 +463,6 @@
         "approved_at": "9:25 AM"
       },
       {
-        "tag_no": "DC-36",
-        "notes": "Motilal Nehru Public School Urban Estate Jind [Room: F-405]",
-        "school_name": "Motilal Nehru Public School Urban Estate Jind",
-        "room_no": "F-405",
-        "approved_at": "9:24 AM"
-      },
-      {
         "tag_no": "DC-39",
         "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
         "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
@@ -482,13 +475,6 @@
         "school_name": "Pratap Singh Memorial Sr Sec School Sonipat",
         "room_no": "TBD",
         "approved_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)"
-      },
-      {
-        "tag_no": "DC-44",
-        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
-        "school_name": "Mothers Pride School Pataudi Gurugram",
-        "room_no": "F-304",
-        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
       },
       {
         "tag_no": "DC-48",
@@ -582,12 +568,29 @@
         "approved_at": "9:49 AM"
       }
     ],
-    "completed_tags": [],
+    "completed_tags": [
+      {
+        "tag_no": "DC-21",
+        "notes": "Delhi Public School DPS Kathua [Room: F-501]",
+        "school_name": "Delhi Public School DPS Kathua",
+        "room_no": "F-501",
+        "completed_at": "10:15 AM"
+      },
+      {
+        "tag_no": "DC-36",
+        "notes": "Motilal Nehru Public School Urban Estate Jind [Room: F-405]",
+        "school_name": "Motilal Nehru Public School Urban Estate Jind",
+        "room_no": "F-405",
+        "completed_at": "10:20 AM"
+      }
+    ],
     "current_index": 0,
     "next_transition_time": 1791737471.7115362,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
-    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
+    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
+    "current_tag": "DC-44",
+    "next_tag": "DC-22"
   },
   {
     "id": "evt-science-exhibition",

@@ -199,6 +199,54 @@ class DB:
         else:
             threading.Thread(target=_do_backup, daemon=True).start()
 
+    def _backup_sequence_to_cloud(self, event_id, sequence, completed_tags=None):
+        """Asynchronously persists the live stage sequence to cloud storage so all Vercel instances share exact state"""
+        def _do_seq_backup():
+            try:
+                from seed_events import GSHEET_WEBHOOK_URL
+                webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+                if webhook and webhook.startswith("http"):
+                    import requests
+                    clean_seq = []
+                    for item in (sequence or []):
+                        if isinstance(item, dict):
+                            clean_seq.append({
+                                "tag_no": item.get("tag_no", ""),
+                                "notes": item.get("notes", ""),
+                                "school_name": item.get("school_name", ""),
+                                "room_no": item.get("room_no", ""),
+                                "approved_at": item.get("approved_at", "")
+                            })
+                    clean_comp = []
+                    for c in (completed_tags or []):
+                        if isinstance(c, dict):
+                            clean_comp.append({
+                                "tag_no": c.get("tag_no", ""),
+                                "notes": c.get("notes", ""),
+                                "school_name": c.get("school_name", ""),
+                                "room_no": c.get("room_no", ""),
+                                "completed_at": c.get("completed_at", "")
+                            })
+                    payload = {
+                        "action": "save_score",
+                        "score": {
+                            "event_id": event_id,
+                            "tag_no": "__STAGE_SEQUENCE__",
+                            "judge_id": "__SYSTEM__",
+                            "sequence": clean_seq,
+                            "completed_tags": clean_comp,
+                            "updated_at": datetime.now().isoformat()
+                        }
+                    }
+                    requests.post(webhook, json=payload, timeout=6)
+            except Exception:
+                pass
+
+        if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+            _do_seq_backup()
+        else:
+            threading.Thread(target=_do_seq_backup, daemon=True).start()
+
     def _sync_cloud_events(self, local_events=None):
         """Fetches cloud-backed events and active judges from Google Apps Script and merges with local events"""
         events = local_events if local_events is not None else load_json(EVENTS_FILE, [])
@@ -341,8 +389,9 @@ class DB:
 
         is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
         now = time.time()
-        if (is_serverless or sync_cloud) and (now - getattr(self, "_last_cloud_event_sync", 0) > 15):
+        if (is_serverless or sync_cloud) and (now - getattr(self, "_last_cloud_event_sync", 0) > 6):
             self._last_cloud_event_sync = now
+            self._sync_cloud_scores()
             return self._sync_cloud_events()
 
         return load_json(EVENTS_FILE, [])
@@ -529,7 +578,9 @@ class DB:
         event["sequence"] = new_sequence
         event["current_index"] = 0
         event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
-        return self.update_event(event["id"], event)
+        updated = self.update_event(event["id"], event)
+        self._backup_sequence_to_cloud(event["id"], new_sequence, event.get("completed_tags", []))
+        return updated
 
     def set_current_tag(self, event_id, target_index):
         """Brings the selected tag to the top of the queue (index 0) so it becomes live on stage"""
@@ -543,7 +594,9 @@ class DB:
             event["sequence"] = seq
             event["current_index"] = 0
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
-            return self.update_event(event["id"], event)
+            updated = self.update_event(event["id"], event)
+            self._backup_sequence_to_cloud(event["id"], seq, event.get("completed_tags", []))
+            return updated
         return None
 
     def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None):
@@ -587,6 +640,7 @@ class DB:
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
 
             updated = self.update_event(event["id"], event)
+            self._backup_sequence_to_cloud(event["id"], seq, completed_list)
             new_stage_tag = seq[0]["tag_no"] if seq else "None (Queue Finished)"
             return updated, f"Tag '{actual_tag}' completed. Next on stage: '{new_stage_tag}'"
         
@@ -614,7 +668,9 @@ class DB:
             seq.append({"tag_no": matched["tag_no"], "notes": matched.get("notes", "")})
             event["sequence"] = seq
             event["completed_tags"] = completed_list
-            return self.update_event(event["id"], event)
+            updated = self.update_event(event["id"], event)
+            self._backup_sequence_to_cloud(event["id"], seq, completed_list)
+            return updated
         return None
 
     def sync_event_sequence_from_attendance(self, target_event_id=None):
@@ -705,13 +761,40 @@ class DB:
                     data = resp.json()
                     cloud_scores = data.get("scores", [])
                     if cloud_scores:
+                        # 1. Check for cloud-backed stage sequences and update local event state
+                        seq_entries = [cs for cs in cloud_scores if cs.get("tag_no") == "__STAGE_SEQUENCE__"]
+                        if seq_entries:
+                            try:
+                                cur_events = load_json(EVENTS_FILE, [])
+                                ev_updated = False
+                                for se in seq_entries:
+                                    se_ev_id = se.get("event_id")
+                                    se_seq = se.get("sequence")
+                                    se_comp = se.get("completed_tags")
+                                    for ev in cur_events:
+                                        if ev.get("id") == se_ev_id:
+                                            if se_seq and isinstance(se_seq, list):
+                                                ev["sequence"] = se_seq
+                                                ev_updated = True
+                                            if se_comp is not None and isinstance(se_comp, list):
+                                                ev["completed_tags"] = se_comp
+                                                ev_updated = True
+                                if ev_updated:
+                                    save_json(EVENTS_FILE, cur_events)
+                            except Exception:
+                                pass
+
+                        # 2. Filter out __STAGE_SEQUENCE__ from judge scores
+                        real_cloud_scores = [cs for cs in cloud_scores if cs.get("tag_no") != "__STAGE_SEQUENCE__"]
                         merged_map = {}
                         for s in scores:
+                            if s.get("tag_no") == "__STAGE_SEQUENCE__":
+                                continue
                             ev = str(s.get("event_id", "")).strip().lower()
                             t = str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "")
                             j = str(s.get("judge_id", "")).strip().lower()
                             merged_map[f"{ev}_{t}_{j}"] = s
-                        for s in cloud_scores:
+                        for s in real_cloud_scores:
                             ev = str(s.get("event_id", "")).strip().lower()
                             t = str(s.get("tag_no", "")).upper().replace(" ", "").replace("-", "")
                             j = str(s.get("judge_id", "")).strip().lower()
@@ -727,7 +810,7 @@ class DB:
                         save_json(SCORES_FILE, scores)
         except Exception:
             pass
-        return scores
+        return [s for s in scores if s.get("tag_no") != "__STAGE_SEQUENCE__"]
 
     def get_scores(self, event_id=None, tag_no=None, sync_cloud=False):
         if self.is_supabase_connected and self.supabase:
@@ -739,7 +822,7 @@ class DB:
                     query = query.eq("tag_no", tag_no)
                 res = query.execute()
                 if res.data is not None:
-                    return res.data
+                    return [s for s in res.data if s.get("tag_no") != "__STAGE_SEQUENCE__"]
             except Exception as e:
                 print(f"⚠️ [Supabase] get_scores error: {e}")
 
@@ -747,6 +830,8 @@ class DB:
             scores = self._sync_cloud_scores()
         else:
             scores = load_json(SCORES_FILE, [])
+
+        scores = [s for s in scores if s.get("tag_no") != "__STAGE_SEQUENCE__"]
 
         if event_id:
             scores = [s for s in scores if s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))]
