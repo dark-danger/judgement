@@ -507,94 +507,6 @@
     ],
     "sequence": [
       {
-        "tag_no": "S-39",
-        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
-        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
-        "room_no": "F-410",
-        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-77",
-        "notes": "RKSD Public School Kaithal [Room: C-206]",
-        "school_name": "RKSD Public School Kaithal",
-        "room_no": "C-206",
-        "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-65",
-        "notes": "Silver Bells Public School Shamli [Room: B-304]",
-        "school_name": "Silver Bells Public School Shamli",
-        "room_no": "B-304",
-        "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-23",
-        "notes": "ST Andrews World School Kundli [Room: F-503]",
-        "school_name": "ST Andrews World School Kundli",
-        "room_no": "F-503",
-        "approved_at": "9:52 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-24",
-        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
-        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
-        "room_no": "F-504",
-        "approved_at": "07:38 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-50",
-        "notes": "Rishikul Vidyapeeth Sonipat [Room: F-311]",
-        "school_name": "Rishikul Vidyapeeth Sonipat",
-        "room_no": "F-311",
-        "approved_at": "10:11 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-51",
-        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
-        "school_name": "Sant Nischal Singh Public School Yamunanagar",
-        "room_no": "F-313",
-        "approved_at": "9:54 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-53",
-        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
-        "school_name": "Geeta Vidya Mandir Public School Nimbari",
-        "room_no": "F-203",
-        "approved_at": "9:49 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-56",
-        "notes": "DAV Centenary Public School Samalkha [Room: F-205]",
-        "school_name": "DAV Centenary Public School Samalkha",
-        "room_no": "F-205",
-        "approved_at": "10:05 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-61",
-        "notes": "Sant Nikka Singh Public School Zarifa Farm Karnal [Room: B-202]",
-        "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
-        "room_no": "B-202",
-        "approved_at": "9:53 AM",
-        "status": "PRESENT"
-      },
-      {
-        "tag_no": "S-73",
-        "notes": "OM Public School Gohana [Room: C-201]",
-        "school_name": "OM Public School Gohana",
-        "room_no": "C-201",
-        "approved_at": "10:09 AM",
-        "status": "PRESENT"
-      },
-      {
         "tag_no": "S-30",
         "notes": "Arya Kanya Gurukul Sr Sec School Karnal [Room: F-510]",
         "school_name": "Arya Kanya Gurukul Sr Sec School Karnal",
@@ -611,43 +523,11 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "S-37",
-        "notes": "DAV Police Public School Police Line Karnal [Room: F-406]",
-        "school_name": "DAV Police Public School Police Line Karnal",
-        "room_no": "F-406",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "S-42",
-        "notes": "Babu Ram ( BR ) Global School Gannaur [Room: F-302]",
-        "school_name": "Babu Ram ( BR ) Global School Gannaur",
-        "room_no": "F-302",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "S-43",
-        "notes": "MM Public School Assandh [Room: F-303]",
-        "school_name": "MM Public School Assandh",
-        "room_no": "F-303",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "S-45",
         "notes": "BR International Public School Kurukshetra [Room: F-305]",
         "school_name": "BR International Public School Kurukshetra",
         "room_no": "F-305",
         "status": "PENDING",
-        "approved_at": "-"
-      },
-      {
-        "tag_no": "S-52",
-        "notes": "SD Sr Sec School Panipat [Room: F-202]",
-        "school_name": "SD Sr Sec School Panipat",
-        "room_no": "F-202",
-        "status": "PRESENT",
         "approved_at": "-"
       },
       {
@@ -659,69 +539,132 @@
         "approved_at": "-"
       },
       {
-        "tag_no": "S-57",
-        "notes": "JPS Academy Assandh [Room: F-206]",
-        "school_name": "JPS Academy Assandh",
-        "room_no": "F-206",
-        "status": "PRESENT",
-        "approved_at": "-"
-      },
-      {
         "tag_no": "S-58",
         "notes": "Delhi Public School Jind [Room: F-207]",
         "school_name": "Delhi Public School Jind",
         "room_no": "F-207",
         "status": "PENDING",
         "approved_at": "-"
+      }
+    ],
+    "completed_tags": [
+      {
+        "tag_no": "S-23",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       },
       {
-        "tag_no": "S-62",
-        "notes": "Geeta Vidya Mandir Public School NHBC Panipat [Room: B-203]",
-        "school_name": "Geeta Vidya Mandir Public School NHBC Panipat",
-        "room_no": "B-203",
-        "status": "PRESENT",
-        "approved_at": "-"
+        "tag_no": "S-39",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       },
       {
-        "tag_no": "S-64",
-        "notes": "Swastik Bal Vikas Sr Sec School Panipat [Room: B-303]",
-        "school_name": "Swastik Bal Vikas Sr Sec School Panipat",
-        "room_no": "B-303",
-        "status": "PRESENT",
-        "approved_at": "-"
+        "tag_no": "S-82",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       },
       {
-        "tag_no": "S-69",
-        "notes": "DR MKK Arya Model Sr Sec School Panipat [Room: C-103]",
-        "school_name": "DR MKK Arya Model Sr Sec School Panipat",
-        "room_no": "C-103",
-        "status": "PRESENT",
-        "approved_at": "-"
+        "tag_no": "S-24",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-51",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       },
       {
         "tag_no": "S-76",
-        "notes": "North Valley Public School [Room: C-204]",
-        "school_name": "North Valley Public School",
-        "room_no": "C-204",
-        "status": "PRESENT",
-        "approved_at": "-"
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-53",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-77",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-57",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-37",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-65",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-64",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-69",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-56",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-50",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-61",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-62",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-52",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-42",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-73",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       },
       {
         "tag_no": "S-78",
-        "notes": "DAV Police Public School Kurukshetra [Room: C-207]",
-        "school_name": "DAV Police Public School Kurukshetra",
-        "room_no": "C-207",
-        "status": "PRESENT",
-        "approved_at": "-"
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
+      },
+      {
+        "tag_no": "S-43",
+        "notes": "Completed via judge evaluation",
+        "completed_at": "03:55 PM"
       }
     ],
-    "completed_tags": [],
     "current_index": 0,
     "next_transition_time": null,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
-    "seq_version": 1791791253554
+    "seq_version": 1791800715639
   },
   {
     "id": "evt-declamation",
