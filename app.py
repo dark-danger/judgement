@@ -286,6 +286,7 @@ def get_single_event(event_id):
         "next_notes": next_notes,
         "current_index": 0,
         "completed_tags": event.get("completed_tags", []),
+        "seq_version": event.get("seq_version", 0),
         "remaining_transition_seconds": remaining_secs
     })
 
@@ -474,16 +475,17 @@ def update_sequence(event_id):
         data = request.get_json(silent=True) or {}
         new_sequence = data.get("sequence", [])
         current_index = data.get("current_index")
+        seq_version = data.get("seq_version")
 
         if new_sequence is None:
             return jsonify({"success": False, "error": "Sequence is required"}), 400
 
-        updated = db.update_sequence(event_id, new_sequence, current_index)
+        updated = db.update_sequence(event_id, new_sequence, current_index, seq_version=seq_version)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
 
-        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
-        return jsonify({"success": True, "event": updated})
+        sheets_service.trigger_sequence_only_sync(event_id)
+        return jsonify({"success": True, "event": updated, "seq_version": updated.get("seq_version")})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -492,16 +494,17 @@ def set_current_tag(event_id):
     try:
         data = request.get_json(silent=True) or {}
         target_index = data.get("index")
+        seq_version = data.get("seq_version")
 
         if target_index is None:
             return jsonify({"success": False, "error": "Index required"}), 400
 
-        updated = db.set_current_tag(event_id, int(target_index))
+        updated = db.set_current_tag(event_id, int(target_index), seq_version=seq_version)
         if not updated:
             return jsonify({"success": False, "error": "Invalid index or event not found"}), 400
 
-        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
-        return jsonify({"success": True, "event": updated})
+        sheets_service.trigger_sequence_only_sync(event_id)
+        return jsonify({"success": True, "event": updated, "seq_version": updated.get("seq_version")})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -511,18 +514,20 @@ def complete_tag(event_id):
         data = request.get_json(silent=True) or {}
         tag_index = data.get("index")
         tag_no = data.get("tag_no")
+        seq_version = data.get("seq_version")
 
         updated, msg = db.complete_and_remove_tag(
             event_id=event_id,
             tag_index=int(tag_index) if tag_index is not None and str(tag_index).isdigit() else None,
-            tag_no=tag_no
+            tag_no=tag_no,
+            seq_version=seq_version
         )
 
         if not updated:
             return jsonify({"success": False, "error": msg}), 400
 
-        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
-        return jsonify({"success": True, "message": msg, "event": updated})
+        sheets_service.trigger_sequence_only_sync(event_id)
+        return jsonify({"success": True, "message": msg, "event": updated, "seq_version": updated.get("seq_version")})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -531,15 +536,16 @@ def restore_tag(event_id):
     try:
         data = request.get_json(silent=True) or {}
         tag_no = data.get("tag_no")
+        seq_version = data.get("seq_version")
         if not tag_no:
             return jsonify({"success": False, "error": "Tag Number required"}), 400
 
-        updated = db.restore_completed_tag(event_id, tag_no)
+        updated = db.restore_completed_tag(event_id, tag_no, seq_version=seq_version)
         if not updated:
             return jsonify({"success": False, "error": "Could not restore tag"}), 400
 
-        sheets_service.trigger_background_sync(event_id, sync_sequence=True)
-        return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated})
+        sheets_service.trigger_sequence_only_sync(event_id)
+        return jsonify({"success": True, "message": f"Tag '{tag_no}' restored to queue", "event": updated, "seq_version": updated.get("seq_version")})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

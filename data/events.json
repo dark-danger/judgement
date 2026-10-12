@@ -202,7 +202,8 @@
     "next_transition_time": 1791775387.3163068,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
-    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
+    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
+    "seq_version": 1791783982544
   },
   {
     "id": "evt-group-song",
@@ -359,7 +360,8 @@
     "next_transition_time": null,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
-    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
+    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
+    "seq_version": 1791783982544
   },
   {
     "id": "evt-declamation",
@@ -585,12 +587,13 @@
       }
     ],
     "current_index": 0,
-    "next_transition_time": 1791737471.7115362,
+    "next_transition_time": 1791784109.10537,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
     "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
     "current_tag": "DC-44",
-    "next_tag": "DC-22"
+    "next_tag": "DC-22",
+    "seq_version": 1791783989105
   },
   {
     "id": "evt-science-exhibition",
@@ -784,6 +787,7 @@
     "next_transition_time": 1791737471.7096808,
     "transition_seconds": 120,
     "google_sheet_url": "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/edit?usp=sharing",
-    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec"
+    "google_sheet_webhook_url": "https://script.google.com/macros/s/AKfycbzoBc97g5lXtoQ9hwLjXboDjwzMpTE_OgRWMcCi9BGJBeum_vhcJnITIkdP-J1gPyeJeA/exec",
+    "seq_version": 1791783982544
   }
 ]

@@ -118,19 +118,46 @@ function doGet(e) {
     }
   }
 
-  // 2. Cloud Backup Query
+  // 2. Cloud Backup Query & Dedicated Sequence Query
+  if (action === "get_sequence") {
+    var props = PropertiesService.getScriptProperties();
+    var evId = (e.parameter.event_id || "").toString().trim();
+    if (evId) {
+      var sData = props.getProperty("agrash_seq_" + evId);
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        data: sData ? JSON.parse(sData) : null
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    var allSeq = {};
+    ["evt-group-dance", "evt-group-song", "evt-declamation", "evt-science-exhibition"].forEach(function(eid) {
+      var s = props.getProperty("agrash_seq_" + eid);
+      if (s) allSeq[eid] = JSON.parse(s);
+    });
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      sequences: allSeq
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === "get_state" || action === "get_scores" || action === "get_events") {
     var props = PropertiesService.getScriptProperties();
     var scoresJson = props.getProperty("agrash_scores") || "[]";
     var compJson = props.getProperty("agrash_completed_tags") || "{}";
     var attJson = props.getProperty("agrash_attendance_data") || "{}";
     var eventsJson = props.getProperty("agrash_events") || "[]";
+    var allSeqMap = {};
+    ["evt-group-dance", "evt-group-song", "evt-declamation", "evt-science-exhibition"].forEach(function(eid) {
+      var s = props.getProperty("agrash_seq_" + eid);
+      if (s) allSeqMap[eid] = JSON.parse(s);
+    });
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       scores: JSON.parse(scoresJson),
       completed_tags: JSON.parse(compJson),
       attendance: JSON.parse(attJson),
-      events: JSON.parse(eventsJson)
+      events: JSON.parse(eventsJson),
+      sequences: allSeqMap
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
@@ -171,6 +198,37 @@ function doPost(e) {
         count: payload.events.length,
         timestamp: new Date().toISOString()
       })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 0.1 Dedicated Cloud Sequence Backup (Version Protected)
+    if (payload.action === "save_sequence" && payload.event_id) {
+      var props = PropertiesService.getScriptProperties();
+      var key = "agrash_seq_" + payload.event_id;
+      var curStr = props.getProperty(key);
+      var curObj = curStr ? JSON.parse(curStr) : null;
+      var inVer = Number(payload.seq_version) || Date.now();
+
+      if (!curObj || !curObj.seq_version || inVer >= Number(curObj.seq_version)) {
+        var toSave = {
+          event_id: payload.event_id,
+          sequence: payload.sequence || [],
+          completed_tags: payload.completed_tags || [],
+          seq_version: inVer,
+          updated_at: payload.updated_at || new Date().toISOString()
+        };
+        props.setProperty(key, JSON.stringify(toSave));
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "success",
+          event_id: payload.event_id,
+          seq_version: inVer
+        })).setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "ignored",
+          reason: "stale_version",
+          current_version: curObj.seq_version
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
     }
 
     // 1. Cloud Score Backup

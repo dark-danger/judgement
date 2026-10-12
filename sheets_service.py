@@ -61,7 +61,20 @@ class SheetsService:
             _worker()
         else:
             thread = threading.Thread(target=_worker, daemon=True)
-            thread.start()
+    def trigger_sequence_only_sync(self, event_id):
+        """Ultra-fast sequence sync targeting ONLY the dedicated sequence sheet tab without touching scores or championship"""
+        def _seq_worker():
+            try:
+                if event_id:
+                    self.sync_event_sequence(event_id)
+            except Exception as ex:
+                logger.error(f"Sequence sync error: {ex}")
+
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        if is_serverless:
+            _seq_worker()
+        else:
+            threading.Thread(target=_seq_worker, daemon=True).start()
 
     def trigger_background_sync(self, event_id=None, sync_registration=False, sync_sequence=True):
         """Spawns non-blocking background thread to update connected Google Sheet result, sequence, and championship tabs"""

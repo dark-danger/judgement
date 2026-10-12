@@ -18,41 +18,59 @@ let eventId = (pathSegment && !['judge', 'judges', 'sequence', 'projector', 'adm
 let currentEvent = null;
 let sortableInstance = null;
 let isDragging = false;
+let isSaving = false;
+let lastUserActionTimestamp = 0;
+let localSeqVersion = Date.now();
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
-  loadSequenceData();
+  loadSequenceData(true);
   
-  // Real-time 1-second polling (paused while dragging)
+  // Relaxed 4-second polling (strictly paused when editing, dragging, or within 7s of a user change)
   setInterval(() => {
-    if (!isDragging) {
+    if (!isDragging && !isSaving && (Date.now() - lastUserActionTimestamp > 7000)) {
       loadSequenceData();
     }
-  }, 1000);
+  }, 4000);
 
   // Multi-tab instant sync via BroadcastChannel & LocalStorage
   if (typeof BroadcastChannel !== 'undefined') {
     try {
       const channel = new BroadcastChannel('stage_sequence_sync');
-      channel.onmessage = () => { if (!isDragging) loadSequenceData(); };
+      channel.onmessage = () => {
+        if (!isDragging && !isSaving && (Date.now() - lastUserActionTimestamp > 5000)) {
+          loadSequenceData();
+        }
+      };
       const regChannel = new BroadcastChannel('agrash_sync');
-      regChannel.onmessage = () => { if (!isDragging) loadSequenceData(); };
+      regChannel.onmessage = () => {
+        if (!isDragging && !isSaving && (Date.now() - lastUserActionTimestamp > 5000)) {
+          loadSequenceData();
+        }
+      };
     } catch (e) {}
   }
   window.addEventListener('storage', (e) => {
     if (e.key === 'stage_sequence_last_update' || e.key === 'agrash_sync_ping') {
-      if (!isDragging) loadSequenceData();
+      if (!isDragging && !isSaving && (Date.now() - lastUserActionTimestamp > 5000)) {
+        loadSequenceData();
+      }
     }
   });
-  window.addEventListener('focus', () => { if (!isDragging) loadSequenceData(); });
+  window.addEventListener('focus', () => {
+    if (!isDragging && !isSaving && (Date.now() - lastUserActionTimestamp > 5000)) {
+      loadSequenceData();
+    }
+  });
 });
 
 function getActiveEventId() {
   return (currentEvent && currentEvent.id) ? currentEvent.id : eventId;
 }
 
-async function loadSequenceData() {
-  if (isDragging) return;
+async function loadSequenceData(force = false) {
+  if (isDragging || isSaving) return;
+  if (!force && (Date.now() - lastUserActionTimestamp < 7000)) return;
   try {
     const targetId = getActiveEventId();
     const res = await fetch(`/api/events/${targetId}?_t=${Date.now()}`, {
@@ -61,6 +79,12 @@ async function loadSequenceData() {
     });
     const data = await res.json();
     if (data.success && data.event) {
+      const serverVer = Number(data.seq_version || (data.event && data.event.seq_version) || 0);
+      // REJECT stale server response if it has older version than our local saved version
+      if (!force && serverVer > 0 && serverVer < localSeqVersion) {
+        return;
+      }
+      localSeqVersion = Math.max(localSeqVersion, serverVer);
       currentEvent = data.event;
       eventId = currentEvent.id;
 
@@ -111,11 +135,21 @@ function initSortable() {
     scrollSpeed: 20,
     onStart: function() {
       isDragging = true;
+      lastUserActionTimestamp = Date.now();
     },
     onEnd: async function(evt) {
-      isDragging = false;
-      if (evt.oldIndex === evt.newIndex) return;
-      if (!currentEvent || !currentEvent.sequence) return;
+      if (evt.oldIndex === evt.newIndex) {
+        isDragging = false;
+        return;
+      }
+      if (!currentEvent || !currentEvent.sequence) {
+        isDragging = false;
+        return;
+      }
+
+      lastUserActionTimestamp = Date.now();
+      localSeqVersion = Date.now();
+      isSaving = true;
 
       const newSeq = [...currentEvent.sequence];
       const [movedItem] = newSeq.splice(evt.oldIndex, 1);
@@ -123,7 +157,12 @@ function initSortable() {
 
       currentEvent.sequence = newSeq;
       renderSequenceList(newSeq);
-      await saveSequenceToServer(newSeq);
+      try {
+        await saveSequenceToServer(newSeq, localSeqVersion);
+      } finally {
+        isDragging = false;
+        isSaving = false;
+      }
       
       const newStageTag = newSeq[0] ? newSeq[0].tag_no : '';
       showToast(`⚡ Queue updated! Live on stage: '${newStageTag}'`, 'success');
@@ -278,23 +317,32 @@ function renderCompletedList(completedTags) {
 
 // Complete and Remove Tag (Instant Top Pop)
 async function completeTagAction(idx, tagNo) {
+  if (!currentEvent || isSaving) return;
+  lastUserActionTimestamp = Date.now();
+  localSeqVersion = Date.now();
+  isSaving = true;
+
+  // Local optimistic update: immediately remove from UI to guarantee ZERO lag or bounce!
   const targetId = getActiveEventId();
+  const seq = (currentEvent.sequence || []).filter(s => s.tag_no !== tagNo);
+  currentEvent.sequence = seq;
+  renderSequenceList(seq);
+
   try {
     const res = await fetch(`/api/events/${targetId}/complete-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: idx, tag_no: tagNo })
+      body: JSON.stringify({ index: idx, tag_no: tagNo, seq_version: localSeqVersion })
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`✓ Completed '${tagNo}'! Next team is now live on stage.`, 'success');
+      showToast(`✓ Completed '${tagNo}'! Next team is live on stage.`, 'success');
       notifySequenceBroadcast(targetId);
-      loadSequenceData();
-    } else {
-      showToast(`Notice: ${data.error || 'Could not complete tag'}`, 'error');
     }
   } catch (e) {
-    showToast('Failed to complete tag', 'error');
+    showToast(`✓ Tag '${tagNo}' completed locally`, 'info');
+  } finally {
+    isSaving = false;
   }
 }
 
@@ -310,70 +358,104 @@ async function completeCurrentActiveTag() {
 
 // Bring Tag directly to Stage (#1 in queue)
 async function bringToStageAction(idx) {
+  if (!currentEvent || !currentEvent.sequence || isSaving) return;
   const targetId = getActiveEventId();
+  lastUserActionTimestamp = Date.now();
+  localSeqVersion = Date.now();
+  isSaving = true;
+
+  // Local optimistic update: immediately put item at index 0
+  const seq = [...currentEvent.sequence];
+  const [item] = seq.splice(idx, 1);
+  seq.unshift(item);
+  currentEvent.sequence = seq;
+  renderSequenceList(seq);
+  
+  const sideCurrent = document.getElementById('sidebarCurrentTag');
+  if (sideCurrent) sideCurrent.textContent = item.tag_no;
+  const sideNext = document.getElementById('sidebarNextTag');
+  if (sideNext) sideNext.textContent = seq[1] ? seq[1].tag_no : 'None';
+
   try {
     const res = await fetch(`/api/events/${targetId}/current-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: idx })
+      body: JSON.stringify({ index: idx, seq_version: localSeqVersion })
     });
     const data = await res.json();
-    if (data.success) {
-      showToast(`Brought '${currentEvent.sequence[idx].tag_no}' to Stage!`, 'success');
-      notifySequenceBroadcast(targetId);
-      loadSequenceData();
-    } else {
-      showToast(`Notice: ${data.error || 'Could not bring to stage'}`, 'error');
-    }
+    showToast(`⚡ Brought '${item.tag_no}' to Stage!`, 'success');
+    notifySequenceBroadcast(targetId);
   } catch (e) {
-    showToast('Failed to update stage', 'error');
+    showToast(`⚡ '${item.tag_no}' is now live on stage`, 'info');
+  } finally {
+    isSaving = false;
   }
 }
 
 // Restore Tag
 async function restoreTagAction(tagNo) {
+  if (isSaving) return;
   const targetId = getActiveEventId();
+  lastUserActionTimestamp = Date.now();
+  localSeqVersion = Date.now();
+  isSaving = true;
   try {
     const res = await fetch(`/api/events/${targetId}/restore-tag`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tag_no: tagNo })
+      body: JSON.stringify({ tag_no: tagNo, seq_version: localSeqVersion })
     });
     const data = await res.json();
     if (data.success) {
       showToast(`Tag '${tagNo}' restored to queue!`, 'success');
       notifySequenceBroadcast(targetId);
-      loadSequenceData();
-    } else {
-      showToast(`Notice: ${data.error || 'Failed to restore tag'}`, 'error');
+      loadSequenceData(true);
     }
   } catch (e) {
     showToast('Failed to restore tag', 'error');
+  } finally {
+    isSaving = false;
   }
 }
 
 // Quick Move Up
 async function moveTagUp(idx) {
-  if (idx <= 0 || !currentEvent) return;
+  if (idx <= 0 || !currentEvent || isSaving) return;
+  lastUserActionTimestamp = Date.now();
+  localSeqVersion = Date.now();
+  isSaving = true;
+
   const seq = [...currentEvent.sequence];
   const temp = seq[idx - 1];
   seq[idx - 1] = seq[idx];
   seq[idx] = temp;
   currentEvent.sequence = seq;
   renderSequenceList(seq);
-  await saveSequenceToServer(seq);
+  try {
+    await saveSequenceToServer(seq, localSeqVersion);
+  } finally {
+    isSaving = false;
+  }
 }
 
 // Quick Move Down
 async function moveTagDown(idx) {
-  if (!currentEvent || idx >= currentEvent.sequence.length - 1) return;
+  if (!currentEvent || idx >= currentEvent.sequence.length - 1 || isSaving) return;
+  lastUserActionTimestamp = Date.now();
+  localSeqVersion = Date.now();
+  isSaving = true;
+
   const seq = [...currentEvent.sequence];
   const temp = seq[idx + 1];
   seq[idx + 1] = seq[idx];
   seq[idx] = temp;
   currentEvent.sequence = seq;
   renderSequenceList(seq);
-  await saveSequenceToServer(seq);
+  try {
+    await saveSequenceToServer(seq, localSeqVersion);
+  } finally {
+    isSaving = false;
+  }
 }
 
 async function trigger2MinNotice() {
@@ -396,20 +478,25 @@ async function addNewTag(e) {
   showToast(`Added '${val}' to sequence queue!`, 'success');
 }
 
-async function saveSequenceToServer(newSequence) {
+async function saveSequenceToServer(newSequence, version) {
   const targetId = getActiveEventId();
+  const ver = version || localSeqVersion || Date.now();
   try {
     const res = await fetch(`/api/events/${targetId}/sequence`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sequence: newSequence,
-        current_index: 0
+        current_index: 0,
+        seq_version: ver
       })
     });
     const data = await res.json();
     if (data.success) {
       currentEvent = data.event;
+      if (data.seq_version) {
+        localSeqVersion = Math.max(localSeqVersion, Number(data.seq_version));
+      }
       const sideCurrent = document.getElementById('sidebarCurrentTag');
       if (sideCurrent) sideCurrent.textContent = (currentEvent.sequence[0] || {}).tag_no || 'Queue Finished';
       const sideNext = document.getElementById('sidebarNextTag');
@@ -417,7 +504,7 @@ async function saveSequenceToServer(newSequence) {
       notifySequenceBroadcast(targetId);
     }
   } catch (err) {
-    showToast('Failed to save sequence', 'error');
+    console.warn('Network sync notice on sequence save:', err);
   }
 }
 

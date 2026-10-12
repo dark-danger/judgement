@@ -199,8 +199,9 @@ class DB:
         else:
             threading.Thread(target=_do_backup, daemon=True).start()
 
-    def _backup_sequence_to_cloud(self, event_id, sequence, completed_tags=None):
-        """Asynchronously persists the live stage sequence to cloud storage so all Vercel instances share exact state"""
+    def _backup_sequence_to_cloud(self, event_id, sequence, completed_tags=None, seq_version=None):
+        """Persists the live stage sequence to cloud storage with version locking so all instances stay in sync"""
+        ver = int(seq_version or time.time() * 1000)
         def _do_seq_backup():
             try:
                 from seed_events import GSHEET_WEBHOOK_URL
@@ -227,7 +228,20 @@ class DB:
                                 "room_no": c.get("room_no", ""),
                                 "completed_at": c.get("completed_at", "")
                             })
-                    payload = {
+                    
+                    # 1. Primary dedicated sequence backup with monotonic versioning
+                    seq_payload = {
+                        "action": "save_sequence",
+                        "event_id": event_id,
+                        "sequence": clean_seq,
+                        "completed_tags": clean_comp,
+                        "seq_version": ver,
+                        "updated_at": datetime.now().isoformat()
+                    }
+                    requests.post(webhook, json=seq_payload, timeout=6)
+
+                    # 2. Backward-compatible fallback
+                    score_payload = {
                         "action": "save_score",
                         "score": {
                             "event_id": event_id,
@@ -235,10 +249,11 @@ class DB:
                             "judge_id": "__SYSTEM__",
                             "sequence": clean_seq,
                             "completed_tags": clean_comp,
+                            "seq_version": ver,
                             "updated_at": datetime.now().isoformat()
                         }
                     }
-                    requests.post(webhook, json=payload, timeout=6)
+                    requests.post(webhook, json=score_payload, timeout=6)
             except Exception:
                 pass
 
@@ -246,6 +261,46 @@ class DB:
             _do_seq_backup()
         else:
             threading.Thread(target=_do_seq_backup, daemon=True).start()
+
+    def _sync_cloud_sequence(self, event_id=None):
+        """Fetches cloud-backed sequence and updates local event ONLY if cloud version is strictly newer"""
+        try:
+            from seed_events import GSHEET_WEBHOOK_URL
+            webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+            if not webhook or not webhook.startswith("http"):
+                return
+            import requests
+            url = f"{webhook}?action=get_state"
+            resp = requests.get(url, timeout=3)
+            if resp.status_code != 200:
+                return
+            data = resp.json()
+            sequences_map = data.get("sequences", {})
+            cloud_scores = data.get("scores", [])
+            legacy_seq_entries = {cs.get("event_id"): cs for cs in cloud_scores if cs.get("tag_no") == "__STAGE_SEQUENCE__"}
+
+            cur_events = load_json(EVENTS_FILE, [])
+            changed = False
+            for ev in cur_events:
+                eid = ev.get("id")
+                if event_id and eid != event_id:
+                    continue
+                cloud_data = sequences_map.get(eid) or legacy_seq_entries.get(eid)
+                if not cloud_data:
+                    continue
+                c_ver = int(cloud_data.get("seq_version") or 0)
+                l_ver = int(ev.get("seq_version") or 0)
+                # STRICT MONOTONIC CHECK: only apply if cloud is STRICTLY newer!
+                if c_ver > l_ver and cloud_data.get("sequence"):
+                    ev["sequence"] = cloud_data["sequence"]
+                    if cloud_data.get("completed_tags") is not None:
+                        ev["completed_tags"] = cloud_data["completed_tags"]
+                    ev["seq_version"] = c_ver
+                    changed = True
+            if changed:
+                save_json(EVENTS_FILE, cur_events)
+        except Exception:
+            pass
 
     def _sync_cloud_events(self, local_events=None):
         """Fetches cloud-backed events and active judges from Google Apps Script and merges with local events"""
@@ -571,18 +626,20 @@ class DB:
 
         return True
 
-    def update_sequence(self, event_id, new_sequence, current_index=0):
+    def update_sequence(self, event_id, new_sequence, current_index=0, seq_version=None):
         event = self.get_event(event_id)
         if not event:
             return None
+        ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
         event["sequence"] = new_sequence
         event["current_index"] = 0
+        event["seq_version"] = ver
         event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
         updated = self.update_event(event["id"], event)
-        self._backup_sequence_to_cloud(event["id"], new_sequence, event.get("completed_tags", []))
+        self._backup_sequence_to_cloud(event["id"], new_sequence, event.get("completed_tags", []), seq_version=ver)
         return updated
 
-    def set_current_tag(self, event_id, target_index):
+    def set_current_tag(self, event_id, target_index, seq_version=None):
         """Brings the selected tag to the top of the queue (index 0) so it becomes live on stage"""
         event = self.get_event(event_id)
         if not event or not event.get("sequence"):
@@ -591,15 +648,17 @@ class DB:
         if 0 <= target_index < len(seq):
             item = seq.pop(target_index)
             seq.insert(0, item)
+            ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
             event["sequence"] = seq
             event["current_index"] = 0
+            event["seq_version"] = ver
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
             updated = self.update_event(event["id"], event)
-            self._backup_sequence_to_cloud(event["id"], seq, event.get("completed_tags", []))
+            self._backup_sequence_to_cloud(event["id"], seq, event.get("completed_tags", []), seq_version=ver)
             return updated
         return None
 
-    def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None):
+    def complete_and_remove_tag(self, event_id, tag_index=None, tag_no=None, seq_version=None):
         """Marks tag as completed, removes it permanently from sequence, and next team becomes stage team"""
         event = self.get_event(event_id)
         if not event:
@@ -634,19 +693,21 @@ class DB:
                     "completed_at": datetime.now().strftime("%I:%M %p")
                 })
             
+            ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
             event["sequence"] = seq
             event["completed_tags"] = completed_list
             event["current_index"] = 0
+            event["seq_version"] = ver
             event["next_transition_time"] = time.time() + event.get("transition_seconds", 120)
 
             updated = self.update_event(event["id"], event)
-            self._backup_sequence_to_cloud(event["id"], seq, completed_list)
+            self._backup_sequence_to_cloud(event["id"], seq, completed_list, seq_version=ver)
             new_stage_tag = seq[0]["tag_no"] if seq else "None (Queue Finished)"
             return updated, f"Tag '{actual_tag}' completed. Next on stage: '{new_stage_tag}'"
         
         return None, "Could not find tag to complete"
 
-    def restore_completed_tag(self, event_id, tag_no):
+    def restore_completed_tag(self, event_id, tag_no, seq_version=None):
         """Restores a completed tag back to the active sequence queue"""
         event = self.get_event(event_id)
         if not event:
@@ -666,10 +727,12 @@ class DB:
         if matched:
             seq = list(event.get("sequence", []))
             seq.append({"tag_no": matched["tag_no"], "notes": matched.get("notes", "")})
+            ver = max(int(seq_version or 0), int(event.get("seq_version") or 0) + 1, int(time.time() * 1000))
             event["sequence"] = seq
             event["completed_tags"] = completed_list
+            event["seq_version"] = ver
             updated = self.update_event(event["id"], event)
-            self._backup_sequence_to_cloud(event["id"], seq, completed_list)
+            self._backup_sequence_to_cloud(event["id"], seq, completed_list, seq_version=ver)
             return updated
         return None
 
@@ -761,30 +824,7 @@ class DB:
                     data = resp.json()
                     cloud_scores = data.get("scores", [])
                     if cloud_scores:
-                        # 1. Check for cloud-backed stage sequences and update local event state
-                        seq_entries = [cs for cs in cloud_scores if cs.get("tag_no") == "__STAGE_SEQUENCE__"]
-                        if seq_entries:
-                            try:
-                                cur_events = load_json(EVENTS_FILE, [])
-                                ev_updated = False
-                                for se in seq_entries:
-                                    se_ev_id = se.get("event_id")
-                                    se_seq = se.get("sequence")
-                                    se_comp = se.get("completed_tags")
-                                    for ev in cur_events:
-                                        if ev.get("id") == se_ev_id:
-                                            if se_seq and isinstance(se_seq, list):
-                                                ev["sequence"] = se_seq
-                                                ev_updated = True
-                                            if se_comp is not None and isinstance(se_comp, list):
-                                                ev["completed_tags"] = se_comp
-                                                ev_updated = True
-                                if ev_updated:
-                                    save_json(EVENTS_FILE, cur_events)
-                            except Exception:
-                                pass
-
-                        # 2. Filter out __STAGE_SEQUENCE__ from judge scores
+                        # Filter out __STAGE_SEQUENCE__ from judge scores so it never interferes with judging
                         real_cloud_scores = [cs for cs in cloud_scores if cs.get("tag_no") != "__STAGE_SEQUENCE__"]
                         merged_map = {}
                         for s in scores:
