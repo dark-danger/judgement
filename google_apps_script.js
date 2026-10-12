@@ -117,16 +117,18 @@ function doGet(e) {
   }
 
   // 2. Cloud Backup Query
-  if (action === "get_state" || action === "get_scores") {
+  if (action === "get_state" || action === "get_scores" || action === "get_events") {
     var props = PropertiesService.getScriptProperties();
     var scoresJson = props.getProperty("agrash_scores") || "[]";
     var compJson = props.getProperty("agrash_completed_tags") || "{}";
     var attJson = props.getProperty("agrash_attendance_data") || "{}";
+    var eventsJson = props.getProperty("agrash_events") || "[]";
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       scores: JSON.parse(scoresJson),
       completed_tags: JSON.parse(compJson),
-      attendance: JSON.parse(attJson)
+      attendance: JSON.parse(attJson),
+      events: JSON.parse(eventsJson)
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
@@ -157,6 +159,17 @@ function doPost(e) {
 
     // Always purge forbidden legacy tabs on every write
     purgeForbiddenSheets(ss);
+
+    // 0. Cloud Events & Active Judges Backup
+    if (payload.action === "save_events" && payload.events) {
+      var props = PropertiesService.getScriptProperties();
+      props.setProperty("agrash_events", JSON.stringify(payload.events));
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        count: payload.events.length,
+        timestamp: new Date().toISOString()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
 
     // 1. Cloud Score Backup
     if (payload.action === "save_score" && payload.score) {
@@ -473,6 +486,12 @@ function doPost(e) {
 
     for (var c = 1; c <= numCols; c++) {
       sheet.autoResizeColumn(c);
+    }
+
+    if (sheet.getMaxColumns() > numCols) {
+      try {
+        sheet.deleteColumns(numCols + 1, sheet.getMaxColumns() - numCols);
+      } catch (eDelCols) {}
     }
 
     return ContentService.createTextOutput(JSON.stringify({

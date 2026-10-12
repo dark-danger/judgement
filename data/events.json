@@ -4,7 +4,7 @@
     "name": "Group Dance",
     "description": "Agrash 2026 - Inter-School Group Dance Championship (43 Teams)",
     "created_at": "2026-10-11T22:08:26.789076",
-    "judge_count": 5,
+    "judge_count": 4,
     "judges": [
       {
         "id": "j1",
@@ -24,11 +24,6 @@
       {
         "id": "j4",
         "name": "Judge 4",
-        "is_active": true
-      },
-      {
-        "id": "j5",
-        "name": "Judge 5",
         "is_active": true
       }
     ],
@@ -114,6 +109,34 @@
       {
         "tag_no": "D-04",
         "notes": "Added by Stage Coordinator"
+      },
+      {
+        "tag_no": "D-36",
+        "notes": "Motilal Nehru Public School Urban Estate Jind [Room: F-405]",
+        "school_name": "Motilal Nehru Public School Urban Estate Jind",
+        "room_no": "F-405",
+        "approved_at": "9:24 AM"
+      },
+      {
+        "tag_no": "D-39",
+        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
+        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
+        "room_no": "F-410",
+        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "D-44",
+        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
+        "school_name": "Mothers Pride School Pataudi Gurugram",
+        "room_no": "F-304",
+        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "D-77",
+        "notes": "RKSD Public School Kaithal [Room: C-206]",
+        "school_name": "RKSD Public School Kaithal",
+        "room_no": "C-206",
+        "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
       }
     ],
     "completed_tags": [],
@@ -209,7 +232,22 @@
         "description": "Interpretation, creativity, style and overall musical impact."
       }
     ],
-    "sequence": [],
+    "sequence": [
+      {
+        "tag_no": "S-39",
+        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
+        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
+        "room_no": "F-410",
+        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "S-77",
+        "notes": "RKSD Public School Kaithal [Room: C-206]",
+        "school_name": "RKSD Public School Kaithal",
+        "room_no": "C-206",
+        "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
+      }
+    ],
     "completed_tags": [],
     "current_index": 0,
     "next_transition_time": null,
@@ -325,6 +363,48 @@
         "school_name": "SMR International School Safidon",
         "room_no": "F-502",
         "approved_at": "07:38 AM"
+      },
+      {
+        "tag_no": "DC-27",
+        "notes": "Delhi Public School DPS Panipat City [Room: TBD]",
+        "school_name": "Delhi Public School DPS Panipat City",
+        "room_no": "TBD",
+        "approved_at": "9:25 AM"
+      },
+      {
+        "tag_no": "DC-36",
+        "notes": "Motilal Nehru Public School Urban Estate Jind [Room: F-405]",
+        "school_name": "Motilal Nehru Public School Urban Estate Jind",
+        "room_no": "F-405",
+        "approved_at": "9:24 AM"
+      },
+      {
+        "tag_no": "DC-39",
+        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
+        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
+        "room_no": "F-410",
+        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "DC-41",
+        "notes": "Pratap Singh Memorial Sr Sec School Sonipat [Room: TBD]",
+        "school_name": "Pratap Singh Memorial Sr Sec School Sonipat",
+        "room_no": "TBD",
+        "approved_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "DC-44",
+        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
+        "school_name": "Mothers Pride School Pataudi Gurugram",
+        "room_no": "F-304",
+        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "DC-48",
+        "notes": "Mahavati Sports Sr Sec School Pawti Samalkha [Room: TBD]",
+        "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
+        "room_no": "TBD",
+        "approved_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
       }
     ],
     "completed_tags": [],
@@ -429,6 +509,62 @@
         "school_name": "Delhi Public School DPS Kathua",
         "room_no": "F-501",
         "approved_at": "07:37 AM"
+      },
+      {
+        "tag_no": "SE-27",
+        "notes": "Delhi Public School DPS Panipat City [Room: TBD]",
+        "school_name": "Delhi Public School DPS Panipat City",
+        "room_no": "TBD",
+        "approved_at": "9:25 AM"
+      },
+      {
+        "tag_no": "SE-32",
+        "notes": "DAV Public School Thermal Colony Panipat [Room: F-511]",
+        "school_name": "DAV Public School Thermal Colony Panipat",
+        "room_no": "F-511",
+        "approved_at": "9:30 AM"
+      },
+      {
+        "tag_no": "SE-36",
+        "notes": "Motilal Nehru Public School Urban Estate Jind [Room: F-405]",
+        "school_name": "Motilal Nehru Public School Urban Estate Jind",
+        "room_no": "F-405",
+        "approved_at": "9:24 AM"
+      },
+      {
+        "tag_no": "SE-39",
+        "notes": "Halwasiya Vidya Vihar Sr Sec School Bhiwani [Room: F-410]",
+        "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
+        "room_no": "F-410",
+        "approved_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "SE-41",
+        "notes": "Pratap Singh Memorial Sr Sec School Sonipat [Room: TBD]",
+        "school_name": "Pratap Singh Memorial Sr Sec School Sonipat",
+        "room_no": "TBD",
+        "approved_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "SE-44",
+        "notes": "Mothers Pride School Pataudi Gurugram [Room: F-304]",
+        "school_name": "Mothers Pride School Pataudi Gurugram",
+        "room_no": "F-304",
+        "approved_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "SE-46",
+        "notes": "RPS International School Sector 50 Gurgaon [Room: TBD]",
+        "school_name": "RPS International School Sector 50 Gurgaon",
+        "room_no": "TBD",
+        "approved_at": "Sat Dec 30 1899 22:03:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "SE-48",
+        "notes": "Mahavati Sports Sr Sec School Pawti Samalkha [Room: TBD]",
+        "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
+        "room_no": "TBD",
+        "approved_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
       }
     ],
     "completed_tags": [],

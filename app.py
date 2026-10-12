@@ -100,6 +100,7 @@ def trigger_auto_sheet_pull_if_needed(interval_seconds=30):
                 _LAST_SHEET_PULL_TIME = now
                 def _bg_pull():
                     try:
+                        sheets_service.pull_attendance_from_sheet()
                         sheets_service.pull_from_agrash_sheet()
                     except Exception as err:
                         pass
@@ -164,8 +165,10 @@ def update_attendance_api():
 @app.route("/api/registration/pull-from-sheet", methods=["GET", "POST"])
 def pull_registration_from_sheet_api():
     try:
+        ok_att, msg_att = sheets_service.pull_attendance_from_sheet()
         ok, msg = sheets_service.pull_from_agrash_sheet()
-        return jsonify({"success": ok, "message": msg})
+        db.sync_event_sequence_from_attendance()
+        return jsonify({"success": ok or ok_att, "message": f"{msg} | {msg_att}"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -258,6 +261,7 @@ def get_all_events():
 
 @app.route("/api/events/<event_id>", methods=["GET"])
 def get_single_event(event_id):
+    trigger_auto_sheet_pull_if_needed(interval_seconds=15)
     event = db.get_event(event_id)
     if not event:
         return jsonify({"success": False, "error": "Event not found"}), 404
@@ -369,6 +373,12 @@ def update_event(event_id):
             update_dict["google_sheet_webhook_url"] = data["google_sheet_webhook_url"]
 
         updated = db.update_event(event_id, update_dict)
+        # Immediately push updated marksheet to Google Sheet if judges or criteria changed
+        if "judges" in update_dict or "criteria" in update_dict:
+            try:
+                sheets_service.trigger_background_sync(event_id, sync_sequence=False)
+            except Exception as se:
+                print(f"⚠️ Error triggering sheet sync on event update: {se}")
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -381,6 +391,11 @@ def add_judge_route(event_id):
         updated = db.add_judge(event_id, judge_name)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
+        # Immediately push updated marksheet to Google Sheet so new judge column is added
+        try:
+            sheets_service.trigger_background_sync(event_id, sync_sequence=False)
+        except Exception as se:
+            print(f"⚠️ Error triggering sheet sync on judge add: {se}")
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -397,6 +412,11 @@ def remove_judge_route(event_id, judge_id=None):
         updated = db.remove_judge(event_id, judge_id)
         if not updated:
             return jsonify({"success": False, "error": "Event not found"}), 404
+        # Immediately push updated marksheet to Google Sheet so deleted judge column is removed
+        try:
+            sheets_service.trigger_background_sync(event_id, sync_sequence=False)
+        except Exception as se:
+            print(f"⚠️ Error triggering sheet sync on judge remove: {se}")
         return jsonify({"success": True, "event": updated})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

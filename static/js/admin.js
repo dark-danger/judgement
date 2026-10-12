@@ -250,6 +250,12 @@ async function loadAdminData() {
 
     if (evtData.success) {
       currentEventData = evtData.event;
+      const evMatch = allEvents.find(e => e.id === activeEventId);
+      if (evMatch) {
+        evMatch.judges = evtData.event.judges;
+        evMatch.judge_count = evtData.event.judge_count;
+        evMatch.name = evtData.event.name;
+      }
       currentScoresData = scData.scores || [];
       updateShareableLinks();
       renderJudgesPanel();

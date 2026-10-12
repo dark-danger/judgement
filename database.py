@@ -3,6 +3,9 @@ import json
 import uuid
 import time
 import shutil
+import copy
+import tempfile
+import threading
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -42,6 +45,7 @@ CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
 SUPABASE_CONFIG_FILE = os.path.join(DATA_DIR, "supabase_config.json")
 
 _IN_MEMORY_CACHE = {}
+_CACHE_LOCK = threading.Lock()
 
 DEFAULT_CRITERIA = [
     {"id": "c1", "name": "Innovation & Concept", "max_marks": 10},
@@ -58,6 +62,10 @@ except Exception:
     pass
 
 def load_json(filepath, default):
+    with _CACHE_LOCK:
+        if filepath in _IN_MEMORY_CACHE:
+            return copy.deepcopy(_IN_MEMORY_CACHE[filepath])
+
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
@@ -65,7 +73,10 @@ def load_json(filepath, default):
     if os.path.exists(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                with _CACHE_LOCK:
+                    _IN_MEMORY_CACHE[filepath] = copy.deepcopy(data)
+                return data
         except Exception:
             pass
 
@@ -73,7 +84,10 @@ def load_json(filepath, default):
     if os.path.exists(tmp_path):
         try:
             with open(tmp_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                with _CACHE_LOCK:
+                    _IN_MEMORY_CACHE[filepath] = copy.deepcopy(data)
+                return data
         except Exception:
             pass
 
@@ -82,29 +96,55 @@ def load_json(filepath, default):
     if os.path.exists(fallback_path):
         try:
             with open(fallback_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                with _CACHE_LOCK:
+                    _IN_MEMORY_CACHE[filepath] = copy.deepcopy(data)
+                return data
         except Exception:
             pass
 
     return default
 
 def save_json(filepath, data):
+    with _CACHE_LOCK:
+        _IN_MEMORY_CACHE[filepath] = copy.deepcopy(data)
+
     base_name = os.path.basename(filepath)
     tmp_path = os.path.join(TMP_DATA_DIR, base_name)
 
-    # 1. Primary write to local data directory
+    # 1. Atomic write to local file
     try:
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        with open(filepath, "w", encoding="utf-8") as f:
+        dir_name = os.path.dirname(filepath)
+        os.makedirs(dir_name, exist_ok=True)
+        temp_fd, temp_file = tempfile.mkstemp(dir=dir_name, prefix=f"{base_name}.tmp")
+        with os.fdopen(temp_fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        pass
+        os.replace(temp_file, filepath)
+    except Exception:
+        try:
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
 
-    # 2. Also keep /tmp in sync for serverless
+    # 2. Also keep initial data folder updated if different and writable
+    initial_file = os.path.join(INITIAL_DATA_DIR, base_name)
+    if os.path.abspath(filepath) != os.path.abspath(initial_file):
+        try:
+            temp_fd, temp_file = tempfile.mkstemp(dir=INITIAL_DATA_DIR, prefix=f"{base_name}.tmp")
+            with os.fdopen(temp_fd, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            os.replace(temp_file, initial_file)
+        except Exception:
+            pass
+
+    # 3. Keep /tmp in sync for serverless
     try:
         os.makedirs(TMP_DATA_DIR, exist_ok=True)
-        with open(tmp_path, "w", encoding="utf-8") as f:
+        temp_fd, temp_file = tempfile.mkstemp(dir=TMP_DATA_DIR, prefix=f"{base_name}.tmp")
+        with os.fdopen(temp_fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+        os.replace(temp_file, tmp_path)
     except Exception:
         pass
 
@@ -128,11 +168,82 @@ class DB:
         self.is_supabase_connected = False
         self.supabase_url = ""
         self.supabase_key = ""
+        self._last_cloud_event_sync = 0
         self._init_defaults()
         self._init_supabase()
 
+    def _backup_events_to_cloud(self, events):
+        """Asynchronously backs up event configurations and judges to Google Apps Script Properties"""
+        def _do_backup():
+            try:
+                from seed_events import GSHEET_WEBHOOK_URL
+                webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+                if webhook and webhook.startswith("http"):
+                    import requests
+                    clean_events = []
+                    for e in events:
+                        clean_events.append({
+                            "id": e.get("id"),
+                            "name": e.get("name"),
+                            "description": e.get("description"),
+                            "judge_count": len(e.get("judges", [])),
+                            "judges": e.get("judges", []),
+                            "criteria": e.get("criteria", [])
+                        })
+                    requests.post(webhook, json={"action": "save_events", "events": clean_events}, timeout=8)
+            except Exception:
+                pass
+
+        if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+            _do_backup()
+        else:
+            threading.Thread(target=_do_backup, daemon=True).start()
+
+    def _sync_cloud_events(self, local_events=None):
+        """Fetches cloud-backed events and active judges from Google Apps Script and merges with local events"""
+        events = local_events if local_events is not None else load_json(EVENTS_FILE, [])
+        try:
+            from seed_events import GSHEET_WEBHOOK_URL
+            webhook = os.environ.get("GOOGLE_SHEET_WEBHOOK_URL") or GSHEET_WEBHOOK_URL
+            if webhook and webhook.startswith("http"):
+                import requests
+                resp = requests.get(f"{webhook}?action=get_events", timeout=4)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    cloud_events = data.get("events", [])
+                    if cloud_events and isinstance(cloud_events, list) and len(cloud_events) > 0:
+                        cloud_ev_map = {e["id"]: e for e in cloud_events if isinstance(e, dict) and "id" in e}
+                        merged_events = []
+                        for loc_e in events:
+                            e_id = loc_e.get("id")
+                            if e_id in cloud_ev_map:
+                                c_e = cloud_ev_map[e_id]
+                                if "judges" in c_e and isinstance(c_e["judges"], list) and len(c_e["judges"]) > 0:
+                                    loc_e["judges"] = c_e["judges"]
+                                    loc_e["judge_count"] = len(c_e["judges"])
+                                if "criteria" in c_e and c_e["criteria"]:
+                                    loc_e["criteria"] = c_e["criteria"]
+                                if "name" in c_e and c_e["name"]:
+                                    loc_e["name"] = c_e["name"]
+                                merged_events.append(loc_e)
+                            else:
+                                merged_events.append(loc_e)
+                        loc_ids = {e.get("id") for e in events}
+                        for c_id, c_e in cloud_ev_map.items():
+                            if c_id not in loc_ids:
+                                merged_events.append(c_e)
+                        events = merged_events
+                        save_json(EVENTS_FILE, events)
+        except Exception:
+            pass
+        return events
+
     def _init_defaults(self):
         events = load_json(EVENTS_FILE, [])
+        try:
+            events = self._sync_cloud_events(events)
+        except Exception:
+            pass
         try:
             from seed_events import build_category_events
             default_events = build_category_events()
@@ -218,7 +329,7 @@ class DB:
         except Exception as e:
             return False, f"Sync error: {str(e)}"
 
-    def get_events(self):
+    def get_events(self, sync_cloud=False):
         if self.is_supabase_connected and self.supabase:
             try:
                 res = self.supabase.table("events").select("*").order("created_at", desc=True).execute()
@@ -227,6 +338,13 @@ class DB:
                     return res.data
             except Exception as e:
                 print(f"⚠️ [Supabase] get_events error: {e}")
+
+        is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        now = time.time()
+        if (is_serverless or sync_cloud) and (now - getattr(self, "_last_cloud_event_sync", 0) > 15):
+            self._last_cloud_event_sync = now
+            return self._sync_cloud_events()
+
         return load_json(EVENTS_FILE, [])
 
     def get_event(self, event_id):
@@ -285,6 +403,7 @@ class DB:
 
         events.insert(0, new_event)
         save_json(EVENTS_FILE, events)
+        self._backup_events_to_cloud(events)
 
         if self.is_supabase_connected and self.supabase:
             try:
@@ -313,7 +432,24 @@ class DB:
             target_id = events[0]["id"]
 
         if updated_event:
+            # If judges were updated, also update judge names in existing scores if renamed
+            if "judges" in update_dict and isinstance(update_dict["judges"], list):
+                try:
+                    scores = load_json(SCORES_FILE, [])
+                    j_map = {j["id"]: j["name"] for j in update_dict["judges"] if isinstance(j, dict) and "id" in j and "name" in j}
+                    score_changed = False
+                    for sc in scores:
+                        if (sc.get("event_id") == target_id or target_id in str(sc.get("event_id", ""))) and sc.get("judge_id") in j_map:
+                            if sc.get("judge_name") != j_map[sc["judge_id"]]:
+                                sc["judge_name"] = j_map[sc["judge_id"]]
+                                score_changed = True
+                    if score_changed:
+                        save_json(SCORES_FILE, scores)
+                except Exception as ex:
+                    print(f"Error syncing renamed judge names to scores: {ex}")
+
             save_json(EVENTS_FILE, events)
+            self._backup_events_to_cloud(events)
 
         if self.is_supabase_connected and self.supabase:
             try:
@@ -338,10 +474,12 @@ class DB:
             "name": judge_name.strip() if judge_name.strip() else f"Judge {len(judges) + 1}",
             "is_active": True
         })
-        return self.update_event(event["id"], {
+        updated = self.update_event(event["id"], {
             "judges": judges,
             "judge_count": len(judges)
         })
+        self._backup_events_to_cloud(self.get_events())
+        return updated
 
     def remove_judge(self, event_id, judge_id):
         event = self.get_event(event_id)
@@ -350,10 +488,25 @@ class DB:
         judges = [j for j in event.get("judges", []) if j.get("id") != judge_id]
         if not judges:
             return event  # Keep at least one judge
-        return self.update_event(event["id"], {
+
+        # Clean up scores submitted by this deleted judge for this event
+        try:
+            scores = load_json(SCORES_FILE, [])
+            filtered_scores = [
+                s for s in scores 
+                if not ((s.get("event_id") == event_id or event_id in str(s.get("event_id", ""))) and s.get("judge_id") == judge_id)
+            ]
+            if len(filtered_scores) != len(scores):
+                save_json(SCORES_FILE, filtered_scores)
+        except Exception as e:
+            print(f"Error cleaning deleted judge scores: {e}")
+
+        updated = self.update_event(event["id"], {
             "judges": judges,
             "judge_count": len(judges)
         })
+        self._backup_events_to_cloud(self.get_events())
+        return updated
 
     def delete_event(self, event_id):
         events = load_json(EVENTS_FILE, [])
@@ -478,10 +631,13 @@ class DB:
             if not category:
                 continue
 
+            def clean_norm_tag(t):
+                return str(t or "").upper().replace(" ", "").replace("-", "")
+
             current_seq = list(ev.get("sequence", []))
             completed_list = list(ev.get("completed_tags", []))
-            completed_tag_set = {c.get("tag_no") for c in completed_list if isinstance(c, dict)}
-            existing_tags = [item.get("tag_no") for item in current_seq]
+            completed_tag_set = {clean_norm_tag(c.get("tag_no")) for c in completed_list if isinstance(c, dict)}
+            existing_tag_set = {clean_norm_tag(item.get("tag_no")) for item in current_seq if isinstance(item, dict)}
 
             # 1. Add any school event that is PRESENT and not in queue or completed
             for s in schools:
@@ -494,9 +650,10 @@ class DB:
                 room_no = s.get("room_no") or "TBD"
                 notes = f"{school_name} [Room: {room_no}]"
                 approved_at = ev_entry.get("marked_at") or s.get("arrived_at")
+                t_norm = clean_norm_tag(tag_no)
 
                 if status == "PRESENT":
-                    if tag_no not in completed_tag_set and tag_no not in existing_tags:
+                    if t_norm not in completed_tag_set and t_norm not in existing_tag_set:
                         current_seq.append({
                             "tag_no": tag_no,
                             "notes": notes,
@@ -504,14 +661,14 @@ class DB:
                             "room_no": room_no,
                             "approved_at": approved_at or datetime.now().strftime("%I:%M %p")
                         })
-                        existing_tags.append(tag_no)
+                        existing_tag_set.add(t_norm)
                 elif status == "ABSENT":
                     # Only remove if explicitly marked ABSENT at registration and not added by coordinator
-                    if tag_no in existing_tags:
+                    if t_norm in existing_tag_set:
                         tag_scores = [sc for sc in self.get_scores(ev["id"], tag_no)]
-                        if not tag_scores and tag_no not in completed_tag_set:
-                            current_seq = [item for item in current_seq if item.get("tag_no") != tag_no or "Added by Stage" in item.get("notes", "")]
-                            existing_tags = [item.get("tag_no") for item in current_seq]
+                        if not tag_scores and t_norm not in completed_tag_set:
+                            current_seq = [item for item in current_seq if clean_norm_tag(item.get("tag_no")) != t_norm or "Added by Stage" in item.get("notes", "")]
+                            existing_tag_set.discard(t_norm)
 
             ev["sequence"] = current_seq
             updated_events.append(ev)

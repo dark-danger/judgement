@@ -850,6 +850,7 @@ class SheetsService:
                     if rec:
                         updated_count += 1
                 try:
+                    self.pull_attendance_from_sheet()
                     db.sync_event_sequence_from_attendance()
                 except Exception:
                     pass
@@ -857,6 +858,91 @@ class SheetsService:
             return False, "No schools returned from 'Agrash Registrations' sheet"
         except Exception as e:
             logger.error(f"Error pulling from Agrash Registrations sheet: {e}")
+            return False, str(e)
+
+    def pull_attendance_from_sheet(self, webhook_url=None):
+        """Pulls live PRESENT / ABSENT attendance and arrival check-ins from Google Sheet 'Attendance' tab and syncs event sequences"""
+        try:
+            import urllib.request
+            import csv
+            import io
+            from database import db
+            from registration_service import registration_service
+
+            def parse_category_cell(cell_val):
+                val = str(cell_val or "").strip()
+                if not val or val == "-":
+                    return None, "PENDING"
+                status = "PENDING"
+                val_upper = val.upper()
+                if "PRESENT" in val_upper:
+                    status = "PRESENT"
+                elif "ABSENT" in val_upper:
+                    status = "ABSENT"
+                tag = val.split("(")[0].strip()
+                if tag.upper() in ["PRESENT", "ABSENT", "PENDING", "-"]:
+                    tag = ""
+                return tag, status
+
+            sheet_csv_url = "https://docs.google.com/spreadsheets/d/1_qSs9kB62ajDImY2-WwufeFpRM1TJZp7ocKFdcKZguk/gviz/tq?tqx=out:csv&sheet=Attendance"
+            req = urllib.request.Request(sheet_csv_url, headers={"User-Agent": "Mozilla/5.0 (AgrashPortal/2.0)"})
+            rows = []
+            try:
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    if resp.status == 200:
+                        content = resp.read().decode("utf-8")
+                        reader = csv.reader(io.StringIO(content))
+                        rows = list(reader)
+            except Exception as e_csv:
+                logger.warning(f"Direct Attendance CSV fetch notice: {e_csv}")
+
+            if not rows:
+                return False, "Could not fetch Attendance sheet"
+
+            data = registration_service.get_all()
+            sch_map = {s["school_name"].strip().lower(): s for s in data}
+
+            updated_schools = 0
+            for r in rows[1:]:
+                if len(r) < 8:
+                    continue
+                sch_name = r[1].strip()
+                matched = sch_map.get(sch_name.lower())
+                if not matched:
+                    for k, v in sch_map.items():
+                        if sch_name.lower() in k or k in sch_name.lower():
+                            matched = v
+                            break
+                if not matched:
+                    continue
+
+                cat_cols = [
+                    ("Group Dance", r[4]),
+                    ("Group Song", r[5]),
+                    ("Declamation", r[6]),
+                    ("Science Exhibition", r[7])
+                ]
+                for cat_name, cell_val in cat_cols:
+                    tag, status = parse_category_cell(cell_val)
+                    ev = next((e for e in matched.get("events", []) if e.get("category") == cat_name), None)
+                    if ev:
+                        ev["status"] = status
+                        if status == "PRESENT" and not ev.get("marked_at"):
+                            ev["marked_at"] = r[9].strip() if len(r) > 9 and r[9].strip() else get_ist_time_str()
+
+                arr_val = r[8].strip() if len(r) > 8 else ""
+                if "ARRIVED" in arr_val.upper() or any(e.get("status") == "PRESENT" for e in matched.get("events", [])):
+                    matched["is_arrived"] = True
+                    if not matched.get("arrived_at"):
+                        matched["arrived_at"] = r[9].strip() if len(r) > 9 and r[9].strip() else get_ist_time_str()
+                updated_schools += 1
+
+            registration_service._save(data)
+            db.sync_event_sequence_from_attendance()
+            logger.info(f"⚡ [Attendance Sync] Updated attendance for {updated_schools} schools and refreshed event sequences.")
+            return True, f"Successfully synced attendance for {updated_schools} schools"
+        except Exception as e:
+            logger.error(f"Error pulling from Attendance sheet: {e}")
             return False, str(e)
 
     def sync_all_events(self):

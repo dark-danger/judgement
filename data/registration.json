@@ -173,8 +173,8 @@
     "school_name": "Delhi Public School DPS Panipat City",
     "desk_no": 1,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:25 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -183,15 +183,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-27",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:25 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-27",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:25 AM"
       }
     ]
   },
@@ -327,8 +327,8 @@
     "school_name": "DAV Public School Thermal Colony Panipat",
     "desk_no": 2,
     "room_no": "F-511",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:30 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -344,8 +344,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-32",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:30 AM"
       }
     ]
   },
@@ -446,8 +446,8 @@
     "school_name": "Motilal Nehru Public School Urban Estate Jind",
     "desk_no": 2,
     "room_no": "F-405",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:24 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -456,22 +456,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-36",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:24 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-36",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:24 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-36",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:24 AM"
       }
     ]
   },
@@ -551,8 +551,8 @@
     "school_name": "Halwasiya Vidya Vihar Sr Sec School Bhiwani",
     "desk_no": 2,
     "room_no": "F-410",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -561,29 +561,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-39",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-39",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-39",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-39",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:18:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -614,8 +614,8 @@
     "school_name": "Pratap Singh Memorial Sr Sec School Sonipat",
     "desk_no": 3,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -624,15 +624,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-41",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-41",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:11:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -719,8 +719,8 @@
     "school_name": "Mothers Pride School Pataudi Gurugram",
     "desk_no": 3,
     "room_no": "F-304",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -729,8 +729,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-44",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
@@ -743,15 +743,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-44",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-44",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -803,8 +803,8 @@
     "school_name": "RPS International School Sector 50 Gurgaon",
     "desk_no": 3,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:03:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -813,8 +813,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-46",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:03:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -845,8 +845,8 @@
     "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
     "desk_no": 3,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -855,15 +855,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-48",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-48",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
@@ -1769,8 +1769,8 @@
     "school_name": "RKSD Public School Kaithal",
     "desk_no": 6,
     "room_no": "C-206",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1779,15 +1779,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-77",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-77",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
       }
     ]
   },
