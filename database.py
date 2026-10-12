@@ -783,17 +783,33 @@ class DB:
                 approved_at = ev_entry.get("marked_at") or s.get("arrived_at")
                 t_norm = clean_norm_tag(tag_no)
 
-                if status == "PRESENT":
+                if status != "ABSENT":
                     if t_norm not in completed_tag_set and t_norm not in existing_tag_set:
                         current_seq.append({
                             "tag_no": tag_no,
                             "notes": notes,
                             "school_name": school_name,
                             "room_no": room_no,
-                            "approved_at": approved_at or datetime.now().strftime("%I:%M %p")
+                            "status": status,
+                            "approved_at": approved_at or "-"
                         })
                         existing_tag_set.add(t_norm)
                         ev_changed = True
+                    elif t_norm in existing_tag_set:
+                        for item in current_seq:
+                            if clean_norm_tag(item.get("tag_no")) == t_norm:
+                                if not item.get("school_name") and school_name:
+                                    item["school_name"] = school_name
+                                    ev_changed = True
+                                if not item.get("room_no") and room_no:
+                                    item["room_no"] = room_no
+                                    ev_changed = True
+                                if not item.get("notes") and notes:
+                                    item["notes"] = notes
+                                    ev_changed = True
+                                if status == "PRESENT" and item.get("status") != "PRESENT":
+                                    item["status"] = "PRESENT"
+                                    ev_changed = True
                 elif status == "ABSENT":
                     # Only remove if explicitly marked ABSENT at registration and not added by coordinator
                     if t_norm in existing_tag_set:
@@ -805,6 +821,8 @@ class DB:
 
             if ev_changed:
                 ev["sequence"] = current_seq
+                ev["seq_version"] = int(time.time() * 1000)
+                self._backup_sequence_to_cloud(ev["id"], current_seq, completed_list, seq_version=ev["seq_version"])
                 any_change = True
             updated_events.append(ev)
 

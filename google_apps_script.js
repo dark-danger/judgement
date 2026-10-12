@@ -962,21 +962,21 @@ function syncAllSequenceTabsFromAttendance(ss, attendanceSheet) {
     var dcCell = (row[6] || "").toString().toUpperCase();
     var seCell = (row[7] || "").toString().toUpperCase();
 
-    if (dCell.indexOf("PRESENT") !== -1) {
-      var dTag = extractTag(row[4]);
-      if (dTag) danceItems.push({ tag: dTag, school: school, room: room, time: checkIn });
+    var dTag = extractTag(row[4]);
+    if (dTag && dCell.indexOf("ABSENT") === -1) {
+      danceItems.push({ tag: dTag, school: school, room: room, time: checkIn, isPresent: (dCell.indexOf("PRESENT") !== -1) });
     }
-    if (sCell.indexOf("PRESENT") !== -1) {
-      var sTag = extractTag(row[5]);
-      if (sTag) songItems.push({ tag: sTag, school: school, room: room, time: checkIn });
+    var sTag = extractTag(row[5]);
+    if (sTag && sCell.indexOf("ABSENT") === -1) {
+      songItems.push({ tag: sTag, school: school, room: room, time: checkIn, isPresent: (sCell.indexOf("PRESENT") !== -1) });
     }
-    if (dcCell.indexOf("PRESENT") !== -1) {
-      var dcTag = extractTag(row[6]);
-      if (dcTag) decItems.push({ tag: dcTag, school: school, room: room, time: checkIn });
+    var dcTag = extractTag(row[6]);
+    if (dcTag && dcCell.indexOf("ABSENT") === -1) {
+      decItems.push({ tag: dcTag, school: school, room: room, time: checkIn, isPresent: (dcCell.indexOf("PRESENT") !== -1) });
     }
-    if (seCell.indexOf("PRESENT") !== -1) {
-      var seTag = extractTag(row[7]);
-      if (seTag) sciItems.push({ tag: seTag, school: school, room: room, time: checkIn });
+    var seTag = extractTag(row[7]);
+    if (seTag && seCell.indexOf("ABSENT") === -1) {
+      sciItems.push({ tag: seTag, school: school, room: room, time: checkIn, isPresent: (seCell.indexOf("PRESENT") !== -1) });
     }
   }
 

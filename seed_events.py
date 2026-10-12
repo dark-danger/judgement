@@ -47,7 +47,7 @@ def build_category_events():
             school_name = s.get("school_name", "")
             room = f" [Room: {s.get('room_no')}]" if s.get("room_no") else ""
             for ev in s.get("events", []):
-                if ev.get("status") == "PRESENT" and ev.get("tag_no"):
+                if ev.get("status") != "ABSENT" and ev.get("tag_no"):
                     item = {
                         "tag_no": ev["tag_no"],
                         "notes": f"{school_name}{room}",
