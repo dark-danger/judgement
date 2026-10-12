@@ -561,17 +561,22 @@ class DB:
         elif not target_tag and seq:
             target_tag = seq[0].get("tag_no")
 
+        def clean_norm_tag(t):
+            return str(t or "").upper().replace(" ", "").replace("-", "")
+
         if target_tag:
-            matched_item = next((item for item in seq if item.get("tag_no") == target_tag), None)
+            t_norm = clean_norm_tag(target_tag)
+            matched_item = next((item for item in seq if clean_norm_tag(item.get("tag_no")) == t_norm), None)
             notes = matched_item.get("notes", "") if matched_item else ""
+            actual_tag = matched_item.get("tag_no", target_tag) if matched_item else target_tag
 
             # Remove ALL instances of target_tag from sequence
-            seq = [item for item in seq if item.get("tag_no") != target_tag]
+            seq = [item for item in seq if clean_norm_tag(item.get("tag_no")) != t_norm]
 
             # Add to completed list
-            if not any(c.get("tag_no") == target_tag for c in completed_list):
+            if not any(clean_norm_tag(c.get("tag_no")) == t_norm for c in completed_list):
                 completed_list.append({
-                    "tag_no": target_tag,
+                    "tag_no": actual_tag,
                     "notes": notes,
                     "completed_at": datetime.now().strftime("%I:%M %p")
                 })
@@ -583,7 +588,7 @@ class DB:
 
             updated = self.update_event(event["id"], event)
             new_stage_tag = seq[0]["tag_no"] if seq else "None (Queue Finished)"
-            return updated, f"Tag '{target_tag}' completed. Next on stage: '{new_stage_tag}'"
+            return updated, f"Tag '{actual_tag}' completed. Next on stage: '{new_stage_tag}'"
         
         return None, "Could not find tag to complete"
 
@@ -593,10 +598,14 @@ class DB:
         if not event:
             return None
         
+        def clean_norm_tag(t):
+            return str(t or "").upper().replace(" ", "").replace("-", "")
+
         completed_list = list(event.get("completed_tags", []))
         matched = None
+        t_norm = clean_norm_tag(tag_no)
         for i, c in enumerate(completed_list):
-            if c.get("tag_no") == tag_no:
+            if clean_norm_tag(c.get("tag_no")) == t_norm:
                 matched = completed_list.pop(i)
                 break
         

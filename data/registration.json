@@ -334,13 +334,6 @@
     "notes": "",
     "events": [
       {
-        "category": "Group Dance",
-        "event_id": "evt-group-dance",
-        "tag_no": "D-32",
-        "status": "PENDING",
-        "marked_at": null
-      },
-      {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-32",
@@ -731,13 +724,6 @@
         "tag_no": "D-44",
         "status": "PRESENT",
         "marked_at": "Sat Dec 30 1899 22:13:10 GMT+0521 (India Standard Time)"
-      },
-      {
-        "category": "Group Song",
-        "event_id": "evt-group-song",
-        "tag_no": "S-44",
-        "status": "PENDING",
-        "marked_at": null
       },
       {
         "category": "Declamation",
@@ -1426,8 +1412,8 @@
     "school_name": "Silver Bells Public School Shamli",
     "desk_no": 5,
     "room_no": "B-304",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1436,15 +1422,15 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-65",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-65",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
       }
     ]
   },

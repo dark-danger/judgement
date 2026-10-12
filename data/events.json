@@ -246,6 +246,13 @@
         "school_name": "RKSD Public School Kaithal",
         "room_no": "C-206",
         "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "S-65",
+        "notes": "Silver Bells Public School Shamli [Room: B-304]",
+        "school_name": "Silver Bells Public School Shamli",
+        "room_no": "B-304",
+        "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
       }
     ],
     "completed_tags": [],
@@ -405,6 +412,13 @@
         "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
         "room_no": "TBD",
         "approved_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "DC-65",
+        "notes": "Silver Bells Public School Shamli [Room: B-304]",
+        "school_name": "Silver Bells Public School Shamli",
+        "room_no": "B-304",
+        "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
       }
     ],
     "completed_tags": [],
