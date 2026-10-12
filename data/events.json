@@ -4,26 +4,21 @@
     "name": "Group Dance",
     "description": "Agrash 2026 - Inter-School Group Dance Championship (43 Teams)",
     "created_at": "2026-10-11T22:08:26.789076",
-    "judge_count": 4,
+    "judge_count": 3,
     "judges": [
       {
         "id": "j1",
-        "name": "Judge 1",
+        "name": "Vishnu Khatri",
         "is_active": true
       },
       {
         "id": "j2",
-        "name": "Judge 2",
+        "name": "Aswani",
         "is_active": true
       },
       {
         "id": "j3",
-        "name": "Judge 3",
-        "is_active": true
-      },
-      {
-        "id": "j4",
-        "name": "Judge 4",
+        "name": "Ranjeet Jha",
         "is_active": true
       }
     ],
@@ -151,31 +146,16 @@
     "name": "Group Song",
     "description": "Agrash 2026 (12 October 2026) - Group Song & Choir Competition (27 Teams)",
     "created_at": "2026-10-11T22:08:26.789104",
-    "judge_count": 5,
+    "judge_count": 2,
     "judges": [
       {
         "id": "j1",
-        "name": "Judge 1",
+        "name": "Rajkumar Ji",
         "is_active": true
       },
       {
         "id": "j2",
-        "name": "Judge 2",
-        "is_active": true
-      },
-      {
-        "id": "j3",
-        "name": "Judge 3",
-        "is_active": true
-      },
-      {
-        "id": "j4",
-        "name": "Judge 4",
-        "is_active": true
-      },
-      {
-        "id": "j5",
-        "name": "Judge 5",
+        "name": "Dr Jagdish",
         "is_active": true
       }
     ],
@@ -267,31 +247,16 @@
     "name": "Declamation",
     "description": "Agrash 2026 (12 October 2026) - Declamation & Oratory Contest (44 Teams)",
     "created_at": "2026-10-11T22:08:26.789110",
-    "judge_count": 5,
+    "judge_count": 2,
     "judges": [
       {
         "id": "j1",
-        "name": "Judge 1",
+        "name": "Dr Ayaz",
         "is_active": true
       },
       {
         "id": "j2",
-        "name": "Judge 2",
-        "is_active": true
-      },
-      {
-        "id": "j3",
-        "name": "Judge 3",
-        "is_active": true
-      },
-      {
-        "id": "j4",
-        "name": "Judge 4",
-        "is_active": true
-      },
-      {
-        "id": "j5",
-        "name": "Judge 5",
+        "name": "Ms Muskan",
         "is_active": true
       }
     ],
@@ -433,31 +398,16 @@
     "name": "Science Exhibition",
     "description": "Agrash 2026 (12 October 2026) - Science Exhibition & Working Models (30 Teams)",
     "created_at": "2026-10-11T22:08:26.789115",
-    "judge_count": 5,
+    "judge_count": 2,
     "judges": [
       {
         "id": "j1",
-        "name": "Judge 1",
+        "name": "Dr Kirti",
         "is_active": true
       },
       {
         "id": "j2",
-        "name": "Judge 2",
-        "is_active": true
-      },
-      {
-        "id": "j3",
-        "name": "Judge 3",
-        "is_active": true
-      },
-      {
-        "id": "j4",
-        "name": "Judge 4",
-        "is_active": true
-      },
-      {
-        "id": "j5",
-        "name": "Judge 5",
+        "name": "Dr Ravinder",
         "is_active": true
       }
     ],
