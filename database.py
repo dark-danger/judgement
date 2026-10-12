@@ -631,6 +631,7 @@ class DB:
 
         events = load_json(EVENTS_FILE, [])
         updated_events = []
+        any_change = False
 
         for ev in events:
             if target_event_id and ev["id"] != target_event_id:
@@ -647,6 +648,7 @@ class DB:
             completed_list = list(ev.get("completed_tags", []))
             completed_tag_set = {clean_norm_tag(c.get("tag_no")) for c in completed_list if isinstance(c, dict)}
             existing_tag_set = {clean_norm_tag(item.get("tag_no")) for item in current_seq if isinstance(item, dict)}
+            ev_changed = False
 
             # 1. Add any school event that is PRESENT and not in queue or completed
             for s in schools:
@@ -671,6 +673,7 @@ class DB:
                             "approved_at": approved_at or datetime.now().strftime("%I:%M %p")
                         })
                         existing_tag_set.add(t_norm)
+                        ev_changed = True
                 elif status == "ABSENT":
                     # Only remove if explicitly marked ABSENT at registration and not added by coordinator
                     if t_norm in existing_tag_set:
@@ -678,11 +681,15 @@ class DB:
                         if not tag_scores and t_norm not in completed_tag_set:
                             current_seq = [item for item in current_seq if clean_norm_tag(item.get("tag_no")) != t_norm or "Added by Stage" in item.get("notes", "")]
                             existing_tag_set.discard(t_norm)
+                            ev_changed = True
 
-            ev["sequence"] = current_seq
+            if ev_changed:
+                ev["sequence"] = current_seq
+                any_change = True
             updated_events.append(ev)
 
-        save_json(EVENTS_FILE, events)
+        if any_change:
+            save_json(EVENTS_FILE, events)
         return updated_events
 
     def _sync_cloud_scores(self, local_scores=None):

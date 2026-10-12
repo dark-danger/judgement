@@ -261,7 +261,6 @@ def get_all_events():
 
 @app.route("/api/events/<event_id>", methods=["GET"])
 def get_single_event(event_id):
-    trigger_auto_sheet_pull_if_needed(interval_seconds=15)
     event = db.get_event(event_id)
     if not event:
         return jsonify({"success": False, "error": "Event not found"}), 404

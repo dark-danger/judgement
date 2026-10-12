@@ -132,6 +132,69 @@
         "school_name": "RKSD Public School Kaithal",
         "room_no": "C-206",
         "approved_at": "Sat Dec 30 1899 22:17:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "D-28",
+        "notes": "Doon Public School Gohana [Room: F-509]",
+        "school_name": "Doon Public School Gohana",
+        "room_no": "F-509",
+        "approved_at": "9:56 AM"
+      },
+      {
+        "tag_no": "D-50",
+        "notes": "Rishikul Vidyapeeth Sonipat [Room: F-311]",
+        "school_name": "Rishikul Vidyapeeth Sonipat",
+        "room_no": "F-311",
+        "approved_at": "10:11 AM"
+      },
+      {
+        "tag_no": "D-51",
+        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
+        "school_name": "Sant Nischal Singh Public School Yamunanagar",
+        "room_no": "F-313",
+        "approved_at": "9:54 AM"
+      },
+      {
+        "tag_no": "D-56",
+        "notes": "DAV Centenary Public School Samalkha [Room: F-205]",
+        "school_name": "DAV Centenary Public School Samalkha",
+        "room_no": "F-205",
+        "approved_at": "10:05 AM"
+      },
+      {
+        "tag_no": "D-59",
+        "notes": "Maharishi Dayanand Sr Sec School Ballah Karnal [Room: F-209]",
+        "school_name": "Maharishi Dayanand Sr Sec School Ballah Karnal",
+        "room_no": "F-209",
+        "approved_at": "10:07 AM"
+      },
+      {
+        "tag_no": "D-61",
+        "notes": "Sant Nikka Singh Public School Zarifa Farm Karnal [Room: B-202]",
+        "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
+        "room_no": "B-202",
+        "approved_at": "9:53 AM"
+      },
+      {
+        "tag_no": "D-73",
+        "notes": "OM Public School Gohana [Room: C-201]",
+        "school_name": "OM Public School Gohana",
+        "room_no": "C-201",
+        "approved_at": "10:09 AM"
+      },
+      {
+        "tag_no": "D-84",
+        "notes": "Indus Public School Jind [Room: D-202]",
+        "school_name": "Indus Public School Jind",
+        "room_no": "D-202",
+        "approved_at": "9:50 AM"
+      },
+      {
+        "tag_no": "D-53",
+        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
+        "school_name": "Geeta Vidya Mandir Public School Nimbari",
+        "room_no": "F-203",
+        "approved_at": "9:49 AM"
       }
     ],
     "completed_tags": [],
@@ -233,6 +296,62 @@
         "school_name": "Silver Bells Public School Shamli",
         "room_no": "B-304",
         "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "S-23",
+        "notes": "ST Andrews World School Kundli [Room: F-503]",
+        "school_name": "ST Andrews World School Kundli",
+        "room_no": "F-503",
+        "approved_at": "9:52 AM"
+      },
+      {
+        "tag_no": "S-24",
+        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
+        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
+        "room_no": "F-504",
+        "approved_at": "07:38 AM"
+      },
+      {
+        "tag_no": "S-50",
+        "notes": "Rishikul Vidyapeeth Sonipat [Room: F-311]",
+        "school_name": "Rishikul Vidyapeeth Sonipat",
+        "room_no": "F-311",
+        "approved_at": "10:11 AM"
+      },
+      {
+        "tag_no": "S-51",
+        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
+        "school_name": "Sant Nischal Singh Public School Yamunanagar",
+        "room_no": "F-313",
+        "approved_at": "9:54 AM"
+      },
+      {
+        "tag_no": "S-53",
+        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
+        "school_name": "Geeta Vidya Mandir Public School Nimbari",
+        "room_no": "F-203",
+        "approved_at": "9:49 AM"
+      },
+      {
+        "tag_no": "S-56",
+        "notes": "DAV Centenary Public School Samalkha [Room: F-205]",
+        "school_name": "DAV Centenary Public School Samalkha",
+        "room_no": "F-205",
+        "approved_at": "10:05 AM"
+      },
+      {
+        "tag_no": "S-61",
+        "notes": "Sant Nikka Singh Public School Zarifa Farm Karnal [Room: B-202]",
+        "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
+        "room_no": "B-202",
+        "approved_at": "9:53 AM"
+      },
+      {
+        "tag_no": "S-73",
+        "notes": "OM Public School Gohana [Room: C-201]",
+        "school_name": "OM Public School Gohana",
+        "room_no": "C-201",
+        "approved_at": "10:09 AM"
       }
     ],
     "completed_tags": [],
@@ -384,6 +503,83 @@
         "school_name": "Silver Bells Public School Shamli",
         "room_no": "B-304",
         "approved_at": "Sat Dec 30 1899 22:54:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "DC-24",
+        "notes": "Sant Nikka Singh Public School Model Town Karnal [Room: F-504]",
+        "school_name": "Sant Nikka Singh Public School Model Town Karnal",
+        "room_no": "F-504",
+        "approved_at": "7:38 AM"
+      },
+      {
+        "tag_no": "DC-28",
+        "notes": "Doon Public School Gohana [Room: F-509]",
+        "school_name": "Doon Public School Gohana",
+        "room_no": "F-509",
+        "approved_at": "9:56 AM"
+      },
+      {
+        "tag_no": "DC-31",
+        "notes": "Pratap Public School Sector 6 Karnal [Room: D-204]",
+        "school_name": "Pratap Public School Sector 6 Karnal",
+        "room_no": "D-204",
+        "approved_at": "10:03 AM"
+      },
+      {
+        "tag_no": "DC-40",
+        "notes": "Shiv Shakti Sr Sec School Sonipat [Room: TBD]",
+        "school_name": "Shiv Shakti Sr Sec School Sonipat",
+        "room_no": "TBD",
+        "approved_at": "10:06 AM"
+      },
+      {
+        "tag_no": "DC-51",
+        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
+        "school_name": "Sant Nischal Singh Public School Yamunanagar",
+        "room_no": "F-313",
+        "approved_at": "9:54 AM"
+      },
+      {
+        "tag_no": "DC-54",
+        "notes": "Dayanand Public School Gohana [Room: TBD]",
+        "school_name": "Dayanand Public School Gohana",
+        "room_no": "TBD",
+        "approved_at": "9:56 AM"
+      },
+      {
+        "tag_no": "DC-61",
+        "notes": "Sant Nikka Singh Public School Zarifa Farm Karnal [Room: B-202]",
+        "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
+        "room_no": "B-202",
+        "approved_at": "9:53 AM"
+      },
+      {
+        "tag_no": "DC-70",
+        "notes": "Global Public School Gohana [Room: TBD]",
+        "school_name": "Global Public School Gohana",
+        "room_no": "TBD",
+        "approved_at": "9:42 AM"
+      },
+      {
+        "tag_no": "DC-73",
+        "notes": "OM Public School Gohana [Room: C-201]",
+        "school_name": "OM Public School Gohana",
+        "room_no": "C-201",
+        "approved_at": "10:09 AM"
+      },
+      {
+        "tag_no": "DC-81",
+        "notes": "DAV Police Public School Police Lines Panipat [Room: TBD]",
+        "school_name": "DAV Police Public School Police Lines Panipat",
+        "room_no": "TBD",
+        "approved_at": "10:04 AM"
+      },
+      {
+        "tag_no": "DC-53",
+        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
+        "school_name": "Geeta Vidya Mandir Public School Nimbari",
+        "room_no": "F-203",
+        "approved_at": "9:49 AM"
       }
     ],
     "completed_tags": [],
@@ -407,7 +603,7 @@
       },
       {
         "id": "j2",
-        "name": "Dr Ravinder",
+        "name": "Dr Meenu Gupta",
         "is_active": true
       }
     ],
@@ -529,6 +725,55 @@
         "school_name": "Mahavati Sports Sr Sec School Pawti Samalkha",
         "room_no": "TBD",
         "approved_at": "Sat Dec 30 1899 22:50:10 GMT+0521 (India Standard Time)"
+      },
+      {
+        "tag_no": "SE-28",
+        "notes": "Doon Public School Gohana [Room: F-509]",
+        "school_name": "Doon Public School Gohana",
+        "room_no": "F-509",
+        "approved_at": "9:56 AM"
+      },
+      {
+        "tag_no": "SE-29",
+        "notes": "Navyug Public High School [Room: TBD]",
+        "school_name": "Navyug Public High School",
+        "room_no": "TBD",
+        "approved_at": "10:11 AM"
+      },
+      {
+        "tag_no": "SE-31",
+        "notes": "Pratap Public School Sector 6 Karnal [Room: D-204]",
+        "school_name": "Pratap Public School Sector 6 Karnal",
+        "room_no": "D-204",
+        "approved_at": "10:03 AM"
+      },
+      {
+        "tag_no": "SE-51",
+        "notes": "Sant Nischal Singh Public School Yamunanagar [Room: F-313]",
+        "school_name": "Sant Nischal Singh Public School Yamunanagar",
+        "room_no": "F-313",
+        "approved_at": "9:54 AM"
+      },
+      {
+        "tag_no": "SE-53",
+        "notes": "Geeta Vidya Mandir Public School Nimbari [Room: F-203]",
+        "school_name": "Geeta Vidya Mandir Public School Nimbari",
+        "room_no": "F-203",
+        "approved_at": "9:49 AM"
+      },
+      {
+        "tag_no": "SE-54",
+        "notes": "Dayanand Public School Gohana [Room: TBD]",
+        "school_name": "Dayanand Public School Gohana",
+        "room_no": "TBD",
+        "approved_at": "9:56 AM"
+      },
+      {
+        "tag_no": "SE-73",
+        "notes": "OM Public School Gohana [Room: C-201]",
+        "school_name": "OM Public School Gohana",
+        "room_no": "C-201",
+        "approved_at": "10:09 AM"
       }
     ],
     "completed_tags": [],

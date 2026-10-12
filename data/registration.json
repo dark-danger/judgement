@@ -68,8 +68,8 @@
     "school_name": "ST Andrews World School Kundli",
     "desk_no": 1,
     "room_no": "F-503",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:52 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -78,8 +78,8 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-23",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:52 AM"
       }
     ]
   },
@@ -106,15 +106,15 @@
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-24",
-        "status": "ABSENT",
+        "status": "PRESENT",
         "marked_at": "07:38 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-24",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "7:38 AM"
       }
     ]
   },
@@ -201,8 +201,8 @@
     "school_name": "Doon Public School Gohana",
     "desk_no": 1,
     "room_no": "F-509",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:56 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -211,22 +211,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-28",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:56 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-28",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:56 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-28",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:56 AM"
       }
     ]
   },
@@ -236,8 +236,8 @@
     "school_name": "Navyug Public High School",
     "desk_no": 1,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:11 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -246,8 +246,8 @@
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-29",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:11 AM"
       }
     ]
   },
@@ -292,8 +292,8 @@
     "school_name": "Pratap Public School Sector 6 Karnal",
     "desk_no": 2,
     "room_no": "D-204",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:03 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -302,22 +302,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-31",
-        "status": "PENDING",
+        "status": "ABSENT",
         "marked_at": null
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-31",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:03 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-31",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:03 AM"
       }
     ]
   },
@@ -586,8 +586,8 @@
     "school_name": "Shiv Shakti Sr Sec School Sonipat",
     "desk_no": 2,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:06 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -596,8 +596,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-40",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:06 AM"
       }
     ]
   },
@@ -894,8 +894,8 @@
     "school_name": "Rishikul Vidyapeeth Sonipat",
     "desk_no": 3,
     "room_no": "F-311",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:11 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -904,22 +904,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-50",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:11 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-50",
-        "status": "PENDING",
-        "marked_at": null
-      },
-      {
-        "category": "Declamation",
-        "event_id": "evt-declamation",
-        "tag_no": "DC-50",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:11 AM"
       }
     ]
   },
@@ -929,8 +922,8 @@
     "school_name": "Sant Nischal Singh Public School Yamunanagar",
     "desk_no": 4,
     "room_no": "F-313",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:54 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -939,29 +932,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-51",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:54 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-51",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:54 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-51",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:54 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-51",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:54 AM"
       }
     ]
   },
@@ -1013,25 +1006,39 @@
     "school_name": "Geeta Vidya Mandir Public School Nimbari",
     "desk_no": 4,
     "room_no": "F-203",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:49 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
     "events": [
       {
+        "category": "Group Dance",
+        "event_id": "evt-group-dance",
+        "tag_no": "D-53",
+        "status": "PRESENT",
+        "marked_at": "9:49 AM"
+      },
+      {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-53",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:49 AM"
+      },
+      {
+        "category": "Declamation",
+        "event_id": "evt-declamation",
+        "tag_no": "DC-53",
+        "status": "PRESENT",
+        "marked_at": "9:49 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-53",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:49 AM"
       }
     ]
   },
@@ -1041,8 +1048,8 @@
     "school_name": "Dayanand Public School Gohana",
     "desk_no": 4,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:56 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1051,15 +1058,15 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-54",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:56 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-54",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:56 AM"
       }
     ]
   },
@@ -1111,8 +1118,8 @@
     "school_name": "DAV Centenary Public School Samalkha",
     "desk_no": 4,
     "room_no": "F-205",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:05 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1121,15 +1128,15 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-56",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:05 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-56",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:05 AM"
       }
     ]
   },
@@ -1216,8 +1223,8 @@
     "school_name": "Maharishi Dayanand Sr Sec School Ballah Karnal",
     "desk_no": 4,
     "room_no": "F-209",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:07 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1226,8 +1233,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-59",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:07 AM"
       }
     ]
   },
@@ -1272,8 +1279,8 @@
     "school_name": "Sant Nikka Singh Public School Zarifa Farm Karnal",
     "desk_no": 5,
     "room_no": "B-202",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:53 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1282,22 +1289,22 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-61",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:53 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-61",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:53 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-61",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:53 AM"
       }
     ]
   },
@@ -1552,8 +1559,8 @@
     "school_name": "Global Public School Gohana",
     "desk_no": 5,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:42 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1562,8 +1569,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-70",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:42 AM"
       }
     ]
   },
@@ -1636,8 +1643,8 @@
     "school_name": "OM Public School Gohana",
     "desk_no": 6,
     "room_no": "C-201",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:09 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1646,29 +1653,29 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-73",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:09 AM"
       },
       {
         "category": "Group Song",
         "event_id": "evt-group-song",
         "tag_no": "S-73",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:09 AM"
       },
       {
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-73",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:09 AM"
       },
       {
         "category": "Science Exhibition",
         "event_id": "evt-science-exhibition",
         "tag_no": "SE-73",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:09 AM"
       }
     ]
   },
@@ -1867,8 +1874,8 @@
     "school_name": "DAV Police Public School Police Lines Panipat",
     "desk_no": 6,
     "room_no": "TBD",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "10:04 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1877,8 +1884,8 @@
         "category": "Declamation",
         "event_id": "evt-declamation",
         "tag_no": "DC-81",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "10:04 AM"
       }
     ]
   },
@@ -1937,8 +1944,8 @@
     "school_name": "Indus Public School Jind",
     "desk_no": 6,
     "room_no": "D-202",
-    "is_arrived": false,
-    "arrived_at": null,
+    "is_arrived": true,
+    "arrived_at": "9:50 AM",
     "contact_person": "",
     "contact_phone": "",
     "notes": "",
@@ -1947,8 +1954,8 @@
         "category": "Group Dance",
         "event_id": "evt-group-dance",
         "tag_no": "D-84",
-        "status": "PENDING",
-        "marked_at": null
+        "status": "PRESENT",
+        "marked_at": "9:50 AM"
       }
     ]
   },
